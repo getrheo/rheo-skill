@@ -1,11 +1,28 @@
 # rheo-skill
 
-Rheo agent skill — SDK install guidance and flow manifest import tooling.
+Public home for [`@getrheo/rheo-skill`](https://www.npmjs.com/package/%40getrheo%2Frheo-skill) — Rheo agent skill with SDK install guidance and flow manifest import tooling.
 
-**npm:** [`@getrheo/rheo-skill`](https://www.npmjs.com/package/@getrheo/rheo-skill)
+## Package
+
+| npm | Contents |
+| --- | --- |
+| [`@getrheo/rheo-skill`](https://www.npmjs.com/package/%40getrheo%2Frheo-skill) | `rheo/` skill tree + bundled CLI |
+
+**Current release line:** `2.0.2.x` (publish on git tag `v2.0.2`).
+
+## Install
 
 ```bash
-pnpm install && pnpm verify
+npm install @getrheo/rheo-skill
 ```
 
-[Agent import docs](https://docs.getrheo.io/docs/developer-guide/agent-import)
+Point your agent runtime at the `rheo/` directory inside the package (see agent-import docs).
+
+## Development
+
+```bash
+pnpm install
+pnpm verify
+```
+
+[Documentation](https://docs.getrheo.io/docs/developer-guide/agent-import) · [CONTRIBUTING](./CONTRIBUTING.md) · [MIT](./LICENSE)
