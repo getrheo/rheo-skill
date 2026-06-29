@@ -13,6 +13,12 @@
     "verify": "pnpm --filter @getrheo/rheo-skill build && pnpm --filter @getrheo/rheo-skill test && pnpm --filter @getrheo/rheo-skill validate:examples && pnpm --filter @getrheo/rheo-skill validate:skill-format"
   },
   "devDependencies": {
-    "turbo": "^2.9.6"
+    "turbo": "^2.9.6",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.2.1",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "typescript-eslint": "^8.59.0",
+    "typescript": "^5.6.3",
+    "tsup": "^8.5.1"
   }
 }
