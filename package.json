@@ -10,7 +10,7 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "build": "pnpm --filter @getrheo/rheo-skill build",
-    "verify": "pnpm --filter @getrheo/rheo-skill build && pnpm --filter @getrheo/rheo-skill test && pnpm --filter @getrheo/rheo-skill validate:examples && pnpm --filter @getrheo/rheo-skill validate:skill-format"
+    "verify": "node scripts/check-no-platform-contracts.mjs && pnpm --filter @getrheo/rheo-skill build && pnpm --filter @getrheo/rheo-skill test && pnpm --filter @getrheo/rheo-skill validate:examples && pnpm --filter @getrheo/rheo-skill validate:skill-format"
   },
   "devDependencies": {
     "turbo": "^2.9.6",
