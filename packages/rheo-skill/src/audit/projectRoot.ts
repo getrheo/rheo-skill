@@ -35,5 +35,6 @@ export const inferProjectRoot = (fromPath: string): string | undefined => {
  * scans the skill's own examples/references and produces only noise.
  */
 export const looksLikeSkillRoot = (dir: string): boolean =>
+  existsSync(resolve(dir, 'rheo/rheo-flow-import/scripts/lib/rheo-cli.mjs')) ||
   existsSync(resolve(dir, 'rheo-flow-import/scripts/lib/rheo-cli.mjs')) ||
   existsSync(resolve(dir, 'scripts/lib/rheo-cli.mjs'));
