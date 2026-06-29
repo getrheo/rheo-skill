@@ -13,10 +13,7 @@ import { existsSync as existsSync4 } from "node:fs";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 import { isAbsolute as isAbsolute3, resolve as resolve7 } from "node:path";
 
-// ../flow-runtime/src/stateMachine/flowSession.ts
-var findScreen = (manifest, screenId) => manifest.screens.find((s) => s.id === screenId);
-
-// ../../node_modules/zod/v3/external.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/external.js
 var external_exports = {};
 __export(external_exports, {
   BRAND: () => BRAND,
@@ -128,7 +125,7 @@ __export(external_exports, {
   void: () => voidType
 });
 
-// ../../node_modules/zod/v3/helpers/util.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/util.js
 var util;
 (function(util2) {
   util2.assertEqual = (_) => {
@@ -262,7 +259,7 @@ var getParsedType = (data) => {
   }
 };
 
-// ../../node_modules/zod/v3/ZodError.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/ZodError.js
 var ZodIssueCode = util.arrayToEnum([
   "invalid_type",
   "invalid_literal",
@@ -380,7 +377,7 @@ ZodError.create = (issues) => {
   return error;
 };
 
-// ../../node_modules/zod/v3/locales/en.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/locales/en.js
 var errorMap = (issue, _ctx) => {
   let message;
   switch (issue.code) {
@@ -483,7 +480,7 @@ var errorMap = (issue, _ctx) => {
 };
 var en_default = errorMap;
 
-// ../../node_modules/zod/v3/errors.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/errors.js
 var overrideErrorMap = en_default;
 function setErrorMap(map) {
   overrideErrorMap = map;
@@ -492,7 +489,7 @@ function getErrorMap() {
   return overrideErrorMap;
 }
 
-// ../../node_modules/zod/v3/helpers/parseUtil.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
   const { data, path, errorMaps, issueData } = params;
   const fullPath = [...path, ...issueData.path || []];
@@ -602,14 +599,14 @@ var isDirty = (x) => x.status === "dirty";
 var isValid = (x) => x.status === "valid";
 var isAsync = (x) => typeof Promise !== "undefined" && x instanceof Promise;
 
-// ../../node_modules/zod/v3/helpers/errorUtil.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/errorUtil.js
 var errorUtil;
 (function(errorUtil2) {
   errorUtil2.errToObj = (message) => typeof message === "string" ? { message } : message || {};
   errorUtil2.toString = (message) => typeof message === "string" ? message : message?.message;
 })(errorUtil || (errorUtil = {}));
 
-// ../../node_modules/zod/v3/types.js
+// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
   constructor(parent, value, path, key) {
     this._cachedPath = [];
@@ -3844,7 +3841,7 @@ ZodNaN.create = (params) => {
     ...processCreateParams(params)
   });
 };
-var BRAND = /* @__PURE__ */ Symbol("zod_brand");
+var BRAND = Symbol("zod_brand");
 var ZodBranded = class extends ZodType {
   _parse(input) {
     const { ctx } = this._processInputParams(input);
@@ -4046,28 +4043,24 @@ var ostring = () => stringType().optional();
 var onumber = () => numberType().optional();
 var oboolean = () => booleanType().optional();
 var coerce = {
-  string: ((arg) => ZodString.create({ ...arg, coerce: true })),
-  number: ((arg) => ZodNumber.create({ ...arg, coerce: true })),
-  boolean: ((arg) => ZodBoolean.create({
+  string: (arg) => ZodString.create({ ...arg, coerce: true }),
+  number: (arg) => ZodNumber.create({ ...arg, coerce: true }),
+  boolean: (arg) => ZodBoolean.create({
     ...arg,
     coerce: true
-  })),
-  bigint: ((arg) => ZodBigInt.create({ ...arg, coerce: true })),
-  date: ((arg) => ZodDate.create({ ...arg, coerce: true }))
+  }),
+  bigint: (arg) => ZodBigInt.create({ ...arg, coerce: true }),
+  date: (arg) => ZodDate.create({ ...arg, coerce: true })
 };
 var NEVER = INVALID;
 
-// ../contracts/src/layers/layerSchemaRef.ts
+// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/layers.js
 var layerSchemaStore = {};
-
-// ../contracts/src/localized.ts
 var LocaleCode = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
 var LocalizedTextSchema = external_exports.object({
   default: external_exports.string().min(1, "default copy is required"),
   translations: external_exports.record(LocaleCode, external_exports.string()).optional()
 });
-
-// ../contracts/src/hyperlinkHref.ts
 var parseHyperlinkHref = (raw) => {
   const t = raw.trim();
   if (!t) return { ok: false };
@@ -4087,42 +4080,13 @@ var parseHyperlinkHref = (raw) => {
   }
   return { ok: false };
 };
-
-// ../contracts/src/constants/index.ts
 var FIELD_CLASSIFICATIONS = ["safe", "sensitive"];
 var MEDIA_TYPES = ["image", "font", "lottie", "video"];
-var MAX_IMAGE_BYTES = 5 * 1024 * 1024;
-var MAX_LOTTIE_BYTES = 10 * 1024 * 1024;
-var MAX_VIDEO_BYTES = 50 * 1024 * 1024;
-var FONT_FILE_EXTENSIONS = [".ttf", ".otf", ".woff", ".woff2"];
-var MAX_FONT_BYTES = 10 * 1024 * 1024;
-var EVENT_NAMES = [
-  "flow_started",
-  "step_viewed",
-  "step_completed",
-  "step_skipped",
-  "choice_selected",
-  "text_submitted",
-  "flow_completed",
-  "flow_abandoned",
-  "decision_evaluated",
-  "external_link_opened",
-  "surface_presented",
-  "surface_outcome",
-  "app_review_prompt_shown",
-  "app_review_prompt_dismissed",
-  /** Emitted once per provider id when merged SDK attributes first expose that attribution source (used for integration health checks). */
-  "attribution_context_observed",
-  /** Successful in-app purchase from an external surface (e.g. RevenueCat paywall); commerce fields live in `properties`. */
-  "iap_purchase"
-];
-
-// ../contracts/src/media.ts
 var MediaTypeSchema = external_exports.enum(MEDIA_TYPES);
 var MediaReferenceSchema = external_exports.object({
   mediaAssetId: external_exports.string().uuid()
 });
-var MediaAssetSchema = external_exports.object({
+external_exports.object({
   id: external_exports.string().uuid(),
   orgId: external_exports.string().uuid(),
   type: MediaTypeSchema,
@@ -4133,12 +4097,8 @@ var MediaAssetSchema = external_exports.object({
   archivedAt: external_exports.string().datetime().nullable().optional(),
   createdAt: external_exports.string().datetime()
 });
-
-// ../contracts/src/layers/ids.ts
 var LayerIdSchema = external_exports.string().min(1).max(64).regex(/^lyr_[a-z0-9_]+$/i, "layer id must look like lyr_<id>");
 var ScreenIdSchema = external_exports.string().min(1).max(64).regex(/^scr_[a-z0-9_]+$/i, "screen id must look like scr_<id>");
-
-// ../contracts/src/layers/restingMotion.ts
 var RESTING_MOTION_PRESETS = ["translate", "bounce", "scale", "pulse", "rotate"];
 var RestingMotionPresetSchema = external_exports.enum(RESTING_MOTION_PRESETS);
 var RESTING_MOTION_SCALE_DIRECTIONS = ["up", "down"];
@@ -4223,16 +4183,12 @@ var RestingMotionSchema = external_exports.object({
 var RestingMotionEntrySchema = RestingMotionSchema.extend({
   id: external_exports.string().min(1)
 });
-
-// ../contracts/src/layers/base.ts
 var baseLayerShape = {
   id: LayerIdSchema,
   name: external_exports.string().max(80).optional(),
   restingMotion: RestingMotionSchema.optional(),
   restingMotions: external_exports.array(RestingMotionEntrySchema).optional()
 };
-
-// ../contracts/src/layers/themedColor.ts
 var ThemedColorModesSchema = external_exports.object({
   light: external_exports.string().min(1).optional(),
   dark: external_exports.string().min(1).optional()
@@ -4240,8 +4196,6 @@ var ThemedColorModesSchema = external_exports.object({
   message: "at least one of light or dark is required"
 });
 var ThemedColorSchema = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema]);
-
-// ../contracts/src/layerLayout/width.ts
 var WIDTH_PRESETS = ["auto", "full", "1/2", "1/3", "2/3", "1/4", "3/4"];
 var WidthValueSchema = external_exports.union([external_exports.enum(WIDTH_PRESETS), external_exports.number().int().min(0).max(2e3)]);
 var HEIGHT_PRESETS = ["auto", "full", "fill"];
@@ -4249,8 +4203,6 @@ var CommonLayoutHeightSchema = external_exports.union([
   external_exports.enum(HEIGHT_PRESETS),
   external_exports.number().int().min(0).max(2e3)
 ]);
-
-// ../contracts/src/layers/styleCommon.ts
 var NonNegativePxSchema = external_exports.number().int().min(0);
 var PaddingSchema = external_exports.object({
   t: NonNegativePxSchema.optional(),
@@ -4378,8 +4330,6 @@ var ButtonLayoutBreakpointsSchema = external_exports.object({
   xl: ButtonLayoutBreakpointPatchSchema.optional(),
   "2xl": ButtonLayoutBreakpointPatchSchema.optional()
 }).partial().optional();
-
-// ../contracts/src/layers/actions.ts
 var OS_PERMISSION_KEYS = [
   "notifications",
   "camera",
@@ -4405,8 +4355,6 @@ var OS_PERMISSION_KEYS = [
   "phone_android"
 ];
 var OsPermissionKeySchema = external_exports.enum(OS_PERMISSION_KEYS);
-var PERMISSION_CAPTURE_FIELD_KEY_PREFIX = "permission:";
-var permissionCaptureFieldKey = (key) => `${PERMISSION_CAPTURE_FIELD_KEY_PREFIX}${key}`;
 var PERMISSION_OUTCOME_VALUES = ["granted", "denied", "blocked"];
 var PermissionOutcomeSchema = external_exports.enum(PERMISSION_OUTCOME_VALUES);
 var OS_PERMISSION_OUTCOME_CONTINUE = "continue";
@@ -4448,8 +4396,6 @@ var TEXT_INPUT_TYPES = ["plain", "email", "phone", "url", "multiline"];
 var TextInputTypeSchema = external_exports.enum(TEXT_INPUT_TYPES);
 var COUNTER_DISPLAY_KINDS = ["number", "time"];
 var COUNTER_TIME_FORMATS = ["mm_ss", "hh_mm_ss", "dd_hh_mm_ss"];
-
-// ../contracts/src/layers/oauthConstants.ts
 var CheckboxGlyphStyleSchema = external_exports.object({
   /** Square edge length in px. */
   size: external_exports.number().int().min(8).max(128).optional(),
@@ -4477,8 +4423,6 @@ var OAuthPresetButtonChromeBreakpointsSchema = external_exports.object({
 }).partial().optional();
 var EMAIL_PASSWORD_AUTH_MODES = ["sign_in", "sign_up"];
 var EMAIL_PASSWORD_SLOTS = ["email", "password", "confirm"];
-
-// ../contracts/src/layers/kinds/chrome.ts
 var lazyLayer = () => layerSchemaStore.schema;
 var ButtonLayerSchema = external_exports.object({
   ...baseLayerShape,
@@ -4569,8 +4513,6 @@ var CheckboxLayerSchema = external_exports.object({
   style: CommonStyleSchema.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema
 });
-
-// ../contracts/src/layers/kinds/layout.ts
 var lazyLayer2 = () => layerSchemaStore.schema;
 var StackLayerSchema = external_exports.object({
   ...baseLayerShape,
@@ -4685,8 +4627,6 @@ var IconLayerSchema = external_exports.object({
   style: IconStyleSchema.optional(),
   styleBreakpoints: IconStyleBreakpointsSchema
 });
-
-// ../contracts/src/layers/kinds/auth/oauthProvider.ts
 var lazyLayer3 = () => layerSchemaStore.schema;
 var OAuthProviderPresetLayerSchema = external_exports.object({
   ...baseLayerShape,
@@ -4709,7 +4649,7 @@ var migrateOAuthProviderCustomIncoming = (raw) => {
   }
   const pid = typeof o.id === "string" ? o.id : "lyr_oauth_custom";
   const slug = pid.replace(/[^a-z0-9_]/gi, "_").slice(0, 40) || "oauth";
-  const label = o.label ?? { default: "Custom" };
+  const label2 = o.label ?? { default: "Custom" };
   let family = o.family ?? "ionicons";
   let iconName = o.iconName ?? "shield-outline";
   if (family === "sf_symbol") {
@@ -4728,7 +4668,7 @@ var migrateOAuthProviderCustomIncoming = (raw) => {
     buttonVariant: o.buttonVariant ?? "secondary",
     children: [
       { id: iconId, kind: "icon", family, iconName },
-      { id: textId, kind: "text", text: label }
+      { id: textId, kind: "text", text: label2 }
     ]
   };
 };
@@ -4755,8 +4695,6 @@ var OAuthProviderLayerSchema = external_exports.union([
   OAuthProviderPresetLayerSchema,
   OAuthProviderCustomLayerSchema
 ]);
-
-// ../contracts/src/layers/kinds/auth/oauthLogin.ts
 var OAuthLoginPresetProviderSchema = external_exports.object({
   type: external_exports.literal("preset"),
   provider: external_exports.enum(OAUTH_LOGIN_PRESETS)
@@ -4865,13 +4803,9 @@ var OAuthLoginProvidersArraySchema = external_exports.array(OAuthLoginProviderSc
     seen.add(preset);
   }
 });
-
-// ../contracts/src/fields.ts
 var FIELD_KEY_RE = /^[a-z][a-z0-9_]*$/;
 var FieldKeySchema = external_exports.string().min(1).max(64).regex(FIELD_KEY_RE, "field key must be snake_case");
 var FieldClassificationSchema = external_exports.enum(FIELD_CLASSIFICATIONS);
-
-// ../contracts/src/layers/kinds/auth/emailPasswordAuth.ts
 var lazyLayer4 = () => layerSchemaStore.schema;
 var EmailPasswordAuthModeSchema = external_exports.enum(EMAIL_PASSWORD_AUTH_MODES);
 var migrateEmailPasswordAuthIncoming = (raw) => {
@@ -5003,8 +4937,6 @@ var EmailPasswordAuthLayerSchema = external_exports.preprocess(
   migrateEmailPasswordAuthIncoming,
   EmailPasswordAuthLayerSchemaValidated
 );
-
-// ../contracts/src/layers/choiceBranching.ts
 var ChoiceOptionBindingSchema = external_exports.object({
   optionId: external_exports.string().min(1).max(64),
   rootLayerId: LayerIdSchema
@@ -5017,56 +4949,7 @@ var ChoiceBranchingSchema = external_exports.object({
   enabled: external_exports.boolean(),
   conditions: external_exports.array(BranchConditionSchema)
 });
-
-// ../contracts/src/layers/kinds/input.ts
 var lazyLayer5 = () => layerSchemaStore.schema;
-var ChoiceChildrenAndBindingsRefinement = (data, ctx) => {
-  const childIds = /* @__PURE__ */ new Set();
-  for (const c of data.children) {
-    if (childIds.has(c.id)) {
-      ctx.addIssue({
-        code: external_exports.ZodIssueCode.custom,
-        message: `duplicate option child id "${c.id}"`,
-        path: ["children"]
-      });
-    }
-    childIds.add(c.id);
-  }
-  const seenOptionIds = /* @__PURE__ */ new Set();
-  const seenRootIds = /* @__PURE__ */ new Set();
-  for (const b of data.optionBindings) {
-    if (seenOptionIds.has(b.optionId)) {
-      ctx.addIssue({
-        code: external_exports.ZodIssueCode.custom,
-        message: `duplicate optionId "${b.optionId}" in optionBindings`,
-        path: ["optionBindings"]
-      });
-    }
-    seenOptionIds.add(b.optionId);
-    if (seenRootIds.has(b.rootLayerId)) {
-      ctx.addIssue({
-        code: external_exports.ZodIssueCode.custom,
-        message: `duplicate rootLayerId "${b.rootLayerId}" in optionBindings`,
-        path: ["optionBindings"]
-      });
-    }
-    seenRootIds.add(b.rootLayerId);
-    if (!childIds.has(b.rootLayerId)) {
-      ctx.addIssue({
-        code: external_exports.ZodIssueCode.custom,
-        message: `optionBindings rootLayerId "${b.rootLayerId}" does not match any direct child stack`,
-        path: ["optionBindings"]
-      });
-    }
-  }
-  if (data.optionBindings.length !== data.children.length) {
-    ctx.addIssue({
-      code: external_exports.ZodIssueCode.custom,
-      message: "optionBindings length must equal children length",
-      path: ["optionBindings"]
-    });
-  }
-};
 var SingleChoiceLayerSchema = external_exports.object({
   ...baseLayerShape,
   kind: external_exports.literal("single_choice"),
@@ -5099,7 +4982,6 @@ var MultipleChoiceLayerSchema = external_exports.object({
   style: CommonStyleSchema.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema
 });
-var validateChoiceChildrenAndBindings = ChoiceChildrenAndBindingsRefinement;
 var TextInputLayerSchema = external_exports.object({
   ...baseLayerShape,
   kind: external_exports.literal("text_input"),
@@ -5144,8 +5026,6 @@ var ScaleInputLayerSchema = external_exports.object({
   children: external_exports.lazy(() => external_exports.array(lazyLayer5())).optional(),
   style: CommonStyleSchema.optional()
 });
-
-// ../contracts/src/layers/kinds/carousel.ts
 var CarouselIndicatorsStyleSchema = external_exports.object({
   width: external_exports.number().int().min(1).max(64).optional(),
   height: external_exports.number().int().min(1).max(64).optional(),
@@ -5182,8 +5062,6 @@ var CarouselLayerSchema = external_exports.object({
   style: CommonStyleSchema.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema
 });
-
-// ../contracts/src/layers/initLayerSchema.ts
 layerSchemaStore.schema = external_exports.lazy(
   () => external_exports.union([
     StackLayerSchema,
@@ -5213,152 +5091,1056 @@ layerSchemaStore.schema = external_exports.lazy(
   ])
 );
 var LayerSchema = layerSchemaStore.schema;
-
-// ../contracts/src/layers/tree.ts
-var STYLE_BREAKPOINT_KEYS = ["sm", "md", "lg", "xl", "2xl"];
-var commonStyleHasAbsolutePosition = (style, breakpoints) => {
-  if (style?.position === "absolute") return true;
-  if (!breakpoints) return false;
-  for (const k of STYLE_BREAKPOINT_KEYS) {
-    if (breakpoints[k]?.position === "absolute") return true;
-  }
-  return false;
-};
-var layerHasAbsolutePositionAuthored = (layer) => {
-  switch (layer.kind) {
-    case "stack":
-      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints) || layer.selectedStyle?.position === "absolute";
-    case "text":
-    case "counter":
-      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
-    case "image":
-    case "lottie":
-    case "video":
-      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
-    case "icon":
-      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
-    case "button":
-    case "back_button":
-    case "hyperlink":
-      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
-    case "progress":
-    case "loader":
-      return commonStyleHasAbsolutePosition(layer.style, void 0);
-    case "text_input":
-    case "scale_input":
-      return commonStyleHasAbsolutePosition(layer.style, void 0);
-    case "oauth_provider":
-      if (layer.variant === "preset") {
-        return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
-      }
-      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
-    case "oauth_login":
-      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
-    case "email_password_auth":
-      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
-    case "email_password_field":
-      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
-    case "email_password_submit":
-      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
-    case "carousel":
-      return commonStyleHasAbsolutePosition(layer.style, void 0);
-    case "checkbox":
-    case "single_choice":
-    case "multiple_choice":
-      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
-    default:
-      return false;
-  }
-};
-
-// ../contracts/src/layers/layerUnion.ts
 var isInputLayer = (l) => l.kind === "single_choice" || l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input";
 
-// ../flow-runtime/src/brandGradient.ts
-var BRAND_GRADIENT_PREFIX = "$brandGradient:";
-var brandGradientToCss = (g) => {
-  const stops = g.stops.map((s) => `${s.color} ${(s.offset * 100).toFixed(0)}%`).join(", ");
-  if (g.type === "linear") {
-    const angle = g.angle ?? 180;
-    return `linear-gradient(${angle}deg, ${stops})`;
-  }
-  return `radial-gradient(circle, ${stops})`;
-};
-var isBrandGradientToken = (s) => s.startsWith(BRAND_GRADIENT_PREFIX);
-var resolveBrandGradientToken = (branding, token) => {
-  if (!isBrandGradientToken(token)) return void 0;
-  const id = token.slice(BRAND_GRADIENT_PREFIX.length);
-  const preset = branding?.gradientPresets.find((x) => x.id === id);
-  return preset ? brandGradientToCss(preset) : void 0;
-};
-var isStoredLinearGradientCss = (s) => /^\s*linear-gradient\s*\(/i.test(s.trim());
+// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/localized.js
+var LocaleCode2 = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
+var LocalizedTextSchema2 = external_exports.object({
+  default: external_exports.string().min(1, "default copy is required"),
+  translations: external_exports.record(LocaleCode2, external_exports.string()).optional()
+});
 
-// ../flow-runtime/src/layers.ts
-var walkLayers = (root, fn) => {
-  const visit = (l, depth) => {
-    fn(l, depth);
-    if (l.kind === "stack") l.children.forEach((c) => visit(c, depth + 1));
-    else if (l.kind === "carousel") l.slides.forEach((c) => visit(c, depth + 1));
-    else if (l.kind === "button") l.children.forEach((c) => visit(c, depth + 1));
-    else if (l.kind === "back_button") l.children.forEach((c) => visit(c, depth + 1));
-    else if (l.kind === "hyperlink") l.children.forEach((c) => visit(c, depth + 1));
-    else if (l.kind === "single_choice" || l.kind === "multiple_choice") {
-      l.children.forEach((c) => visit(c, depth + 1));
-    } else if (l.kind === "text_input" || l.kind === "scale_input") {
-      l.children?.forEach((c) => visit(c, depth + 1));
-    } else if (l.kind === "oauth_login") {
-      l.children.forEach((c) => visit(c, depth + 1));
-    } else if (l.kind === "oauth_provider" && l.variant === "custom") {
-      l.children.forEach((c) => visit(c, depth + 1));
-    } else if (l.kind === "email_password_auth") {
-      l.children.forEach((c) => visit(c, depth + 1));
-    } else if (l.kind === "email_password_field") {
-      l.children?.forEach((c) => visit(c, depth + 1));
-    } else if (l.kind === "email_password_submit") {
-      l.children.forEach((c) => visit(c, depth + 1));
-    }
-  };
-  visit(root, 0);
+// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/decisions.js
+var layerSchemaStore2 = {};
+var LocaleCode3 = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
+var LocalizedTextSchema3 = external_exports.object({
+  default: external_exports.string().min(1, "default copy is required"),
+  translations: external_exports.record(LocaleCode3, external_exports.string()).optional()
+});
+var parseHyperlinkHref2 = (raw) => {
+  const t = raw.trim();
+  if (!t) return { ok: false };
+  let u;
+  try {
+    u = new URL(t);
+  } catch {
+    return { ok: false };
+  }
+  const scheme = u.protocol.replace(/:$/, "").toLowerCase();
+  if (scheme === "https") {
+    if (!u.hostname) return { ok: false };
+    return { ok: true, scheme: "https", host: u.hostname };
+  }
+  if (scheme === "mailto") {
+    return { ok: true, scheme: "mailto" };
+  }
+  return { ok: false };
 };
-var walkScreen = (screen, fn) => {
-  if (screen.regions.header) walkLayers(screen.regions.header, fn);
-  walkLayers(screen.regions.body, fn);
-  if (screen.regions.footer) walkLayers(screen.regions.footer, fn);
+var FIELD_CLASSIFICATIONS2 = ["safe", "sensitive"];
+var MEDIA_TYPES2 = ["image", "font", "lottie", "video"];
+var MediaTypeSchema2 = external_exports.enum(MEDIA_TYPES2);
+var MediaReferenceSchema2 = external_exports.object({
+  mediaAssetId: external_exports.string().uuid()
+});
+external_exports.object({
+  id: external_exports.string().uuid(),
+  orgId: external_exports.string().uuid(),
+  type: MediaTypeSchema2,
+  url: external_exports.string().url(),
+  name: external_exports.string().nullable().optional(),
+  contentType: external_exports.string(),
+  sizeBytes: external_exports.number().int().nonnegative(),
+  archivedAt: external_exports.string().datetime().nullable().optional(),
+  createdAt: external_exports.string().datetime()
+});
+var LayerIdSchema2 = external_exports.string().min(1).max(64).regex(/^lyr_[a-z0-9_]+$/i, "layer id must look like lyr_<id>");
+var ScreenIdSchema2 = external_exports.string().min(1).max(64).regex(/^scr_[a-z0-9_]+$/i, "screen id must look like scr_<id>");
+var RESTING_MOTION_PRESETS2 = ["translate", "bounce", "scale", "pulse", "rotate"];
+var RestingMotionPresetSchema2 = external_exports.enum(RESTING_MOTION_PRESETS2);
+var RESTING_MOTION_SCALE_DIRECTIONS2 = ["up", "down"];
+var RestingMotionScaleDirectionSchema2 = external_exports.enum(RESTING_MOTION_SCALE_DIRECTIONS2);
+var RESTING_MOTION_ROTATE_DIRECTIONS2 = ["clockwise", "counterclockwise"];
+var RestingMotionRotateDirectionSchema2 = external_exports.enum(RESTING_MOTION_ROTATE_DIRECTIONS2);
+var RestingMotionSchema2 = external_exports.object({
+  preset: RestingMotionPresetSchema2,
+  /**
+   * Timeline segment length (ms): motion is active from start until
+   * start + durationMs. When {@link loop} is true, the preset pattern repeats
+   * every {@link cycleDurationMs} (or preset default) within this window.
+   */
+  durationMs: external_exports.number().int().min(200).max(2e4).optional(),
+  /** When true, repeat the motion pattern within the timeline segment; default is one shot. */
+  loop: external_exports.boolean().optional(),
+  /**
+   * Duration (ms) of one full pattern cycle when looping. Defaults per {@link RESTING_MOTION_DEFAULT_DURATION_MS}.
+   */
+  cycleDurationMs: external_exports.number().int().min(200).max(2e4).optional(),
+  intensity: external_exports.number().min(0).max(2).optional(),
+  /** Bounce preset only: vertical lift in px. When omitted, uses `14 * intensity` (default intensity 1 → 14). */
+  bounceAmplitudePx: external_exports.number().min(1).max(80).optional(),
+  /** Scale preset: grow (+) or shrink (−) toward a peak, then return to 100%. */
+  scaleDirection: RestingMotionScaleDirectionSchema2.optional(),
+  /**
+   * Scale preset: when true (default), each cycle goes rest → peak scale → rest.
+   * When false, ramps rest → peak and holds; with loop, the next cycle restarts from rest.
+   */
+  scaleSpringBack: external_exports.boolean().optional(),
+  /**
+   * Scale preset: magnitude in % — growth above 100% (up to +400% = 5× at peak) or shrink toward
+   * 100%− (up to 90% so peak can be 10% size). See authoring caps in the layer editor.
+   */
+  scalePercent: external_exports.number().min(0).max(400).optional(),
+  /**
+   * Scale preset: ms for one full out-and-back (rest → peak → rest). Timeline bar still sets
+   * {@link durationMs} (when the layer may animate); this controls how fast each cycle runs.
+   */
+  scalePatternDurationMs: external_exports.number().int().min(200).max(2e4).optional(),
+  /** @deprecated Use {@link scalePercent} + {@link scaleDirection}. Kept for legacy manifests. */
+  scaleUpPercent: external_exports.number().min(0).max(400).optional(),
+  /** @deprecated Use {@link scalePercent} + {@link scaleDirection}. Kept for legacy manifests. */
+  scaleDownPercent: external_exports.number().min(0).max(90).optional(),
+  /**
+   * @deprecated Legacy vertical-only float (px). Prefer {@link translatePeakXPercent} / {@link translatePeakYPercent}.
+   */
+  translateRangePx: external_exports.number().min(0).max(40).optional(),
+  /** @deprecated Legacy peak offsets in px. Prefer {@link translatePeakXPercent} / {@link translatePeakYPercent}. */
+  translatePeakXPx: external_exports.number().min(-200).max(200).optional(),
+  /** @deprecated Legacy peak offsets in px. Prefer {@link translatePeakXPercent} / {@link translatePeakYPercent}. */
+  translatePeakYPx: external_exports.number().min(-200).max(200).optional(),
+  /** Translate preset: peak X offset as % of the layer box (−200–200). Scaled by intensity. */
+  translatePeakXPercent: external_exports.number().min(-200).max(200).optional(),
+  /** Translate preset: peak Y offset as % of the layer box (−200–200). Scaled by intensity. */
+  translatePeakYPercent: external_exports.number().min(-200).max(200).optional(),
+  /**
+   * Translate preset: when true (default), each cycle goes rest → peak offset → rest. When false, ramp to
+   * peak and hold; with loop, the next cycle restarts from the origin.
+   */
+  translateSpringBack: external_exports.boolean().optional(),
+  /** Rotate preset: target rotation in degrees (0–360), scaled by intensity. */
+  rotateMaxDeg: external_exports.number().min(0).max(360).optional(),
+  /** Rotate preset: spin direction; omitted or `clockwise` → positive angles (default). */
+  rotateDirection: RestingMotionRotateDirectionSchema2.optional(),
+  /**
+   * Rotate preset: when true (default), each cycle oscillates 0° → peak → 0°.
+   * When false, each cycle ramps 0° → peak and holds; with loop, the next cycle snaps to 0° and ramps again.
+   */
+  rotateSpringBack: external_exports.boolean().optional(),
+  /** Pulse preset: minimum opacity at the dip (0–1). Omitted → `1 - 0.38 * intensity`. */
+  pulseMinOpacity: external_exports.number().min(0).max(1).optional(),
+  /** Ms after the last mount/stagger clip ends before motion applies (authoring + scrub). */
+  delayMsAfterMountEnd: external_exports.number().int().min(0).max(6e4).optional(),
+  /**
+   * Absolute start time (ms from screen mount). When set, overrides
+   * {@link delayMsAfterMountEnd} + mount-clip end so motion can sit between
+   * clips (e.g. after first entry, before exit) when multiple mounts exist.
+   */
+  timelineStartMs: external_exports.number().int().min(0).max(36e5).optional()
+}).strict();
+var RestingMotionEntrySchema2 = RestingMotionSchema2.extend({
+  id: external_exports.string().min(1)
+});
+var baseLayerShape2 = {
+  id: LayerIdSchema2,
+  name: external_exports.string().max(80).optional(),
+  restingMotion: RestingMotionSchema2.optional(),
+  restingMotions: external_exports.array(RestingMotionEntrySchema2).optional()
 };
-var findInputLayer = (screen) => {
-  let found = null;
-  walkScreen(screen, (l) => {
-    if (!found && isInputLayer(l)) found = l;
-  });
-  return found;
-};
-var findLayerById = (screen, id) => {
-  let found = null;
-  walkScreen(screen, (l) => {
-    if (!found && l.id === id) found = l;
-  });
-  return found;
-};
-var collectFieldKeys = (manifest) => {
-  const out = [];
-  for (const screen of manifest.screens) {
-    walkScreen(screen, (l) => {
-      if (isInputLayer(l)) out.push({ fieldKey: l.fieldKey, screenId: screen.id });
-      if (l.kind === "checkbox") out.push({ fieldKey: l.fieldKey, screenId: screen.id });
-      if (l.kind === "email_password_auth") {
-        out.push({ fieldKey: l.fieldKey, screenId: screen.id });
-      }
+var ThemedColorModesSchema2 = external_exports.object({
+  light: external_exports.string().min(1).optional(),
+  dark: external_exports.string().min(1).optional()
+}).strict().refine((o) => o.light !== void 0 || o.dark !== void 0, {
+  message: "at least one of light or dark is required"
+});
+var ThemedColorSchema2 = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema2]);
+var WIDTH_PRESETS2 = ["auto", "full", "1/2", "1/3", "2/3", "1/4", "3/4"];
+var WidthValueSchema2 = external_exports.union([external_exports.enum(WIDTH_PRESETS2), external_exports.number().int().min(0).max(2e3)]);
+var HEIGHT_PRESETS2 = ["auto", "full", "fill"];
+var CommonLayoutHeightSchema2 = external_exports.union([
+  external_exports.enum(HEIGHT_PRESETS2),
+  external_exports.number().int().min(0).max(2e3)
+]);
+var NonNegativePxSchema2 = external_exports.number().int().min(0);
+var PaddingSchema2 = external_exports.object({
+  t: NonNegativePxSchema2.optional(),
+  r: NonNegativePxSchema2.optional(),
+  b: NonNegativePxSchema2.optional(),
+  l: NonNegativePxSchema2.optional()
+}).partial();
+var BorderSchema2 = external_exports.object({
+  width: external_exports.number().int().min(0).max(20).optional(),
+  color: ThemedColorSchema2.optional()
+}).partial();
+var DropShadowSchema2 = external_exports.object({
+  offsetX: external_exports.number().int().min(-100).max(100).optional(),
+  offsetY: external_exports.number().int().min(-100).max(100).optional(),
+  blur: external_exports.number().int().min(0).max(100).optional(),
+  spread: external_exports.number().int().min(-50).max(50).optional(),
+  color: ThemedColorSchema2.optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
+var CommonStyleSchema2 = external_exports.object({
+  padding: PaddingSchema2.optional(),
+  margin: PaddingSchema2.optional(),
+  radius: external_exports.number().int().min(0).max(96).optional(),
+  background: ThemedColorSchema2.optional(),
+  border: BorderSchema2.optional(),
+  shadow: DropShadowSchema2.optional(),
+  opacity: external_exports.number().min(0).max(1).optional(),
+  width: WidthValueSchema2.optional(),
+  /** Omit for normal flow; `'absolute'` removes the layer from flex flow (non-root only). */
+  position: external_exports.literal("absolute").optional(),
+  /** Pixel insets when `position === 'absolute'` (same shape as padding). */
+  inset: PaddingSchema2.optional(),
+  zIndex: external_exports.number().int().min(-999).max(999).optional(),
+  /** Static rotation in degrees (CSS `rotate`); not timeline animation. */
+  rotate: external_exports.number().min(-360).max(360).optional(),
+  /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), or fixed px. No fractions. */
+  height: CommonLayoutHeightSchema2.optional(),
+  /** Stroke thickness in px for layers that render a stroke primitive (e.g. loader ring). */
+  strokeWidth: external_exports.number().int().min(0).max(64).optional()
+}).partial();
+var TextStyleSchema2 = CommonStyleSchema2.extend({
+  /**
+   * Logical font family: manifest `theme.fontFamily` when omitted, {@link TEXT_FONT_FAMILY_SYSTEM_UI}
+   * for the platform stack, or a custom name (matches `Branding.fontFamilies[].name` for uploaded fonts).
+   */
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema2.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional(),
+  lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  /** Multiplier (0–1) applied to the resolved background color alpha only; text stays fully opaque unless `opacity` is set. */
+  backgroundOpacity: external_exports.number().min(0).max(1).optional()
+});
+var ImageStyleSchema2 = CommonStyleSchema2.extend({
+  fit: external_exports.enum(["cover", "contain", "fill"]).optional(),
+  aspectRatio: external_exports.number().positive().max(10).optional()
+});
+var IconStyleSchema2 = CommonStyleSchema2.extend({
+  color: ThemedColorSchema2.optional()
+});
+var ICON_FAMILIES2 = ["ionicons"];
+var ButtonStyleSchema2 = CommonStyleSchema2.extend({
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema2.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional()
+});
+var BUTTON_LAYER_VARIANTS2 = ["primary", "secondary", "ghost", "destructive"];
+var ButtonLayerVariantSchema2 = external_exports.enum(BUTTON_LAYER_VARIANTS2);
+var CommonStyleBreakpointsSchema2 = external_exports.object({
+  sm: CommonStyleSchema2.partial().optional(),
+  md: CommonStyleSchema2.partial().optional(),
+  lg: CommonStyleSchema2.partial().optional(),
+  xl: CommonStyleSchema2.partial().optional(),
+  "2xl": CommonStyleSchema2.partial().optional()
+}).partial().optional();
+var TextStyleBreakpointsSchema2 = external_exports.object({
+  sm: TextStyleSchema2.partial().optional(),
+  md: TextStyleSchema2.partial().optional(),
+  lg: TextStyleSchema2.partial().optional(),
+  xl: TextStyleSchema2.partial().optional(),
+  "2xl": TextStyleSchema2.partial().optional()
+}).partial().optional();
+var ImageStyleBreakpointsSchema2 = external_exports.object({
+  sm: ImageStyleSchema2.partial().optional(),
+  md: ImageStyleSchema2.partial().optional(),
+  lg: ImageStyleSchema2.partial().optional(),
+  xl: ImageStyleSchema2.partial().optional(),
+  "2xl": ImageStyleSchema2.partial().optional()
+}).partial().optional();
+var IconStyleBreakpointsSchema2 = external_exports.object({
+  sm: IconStyleSchema2.partial().optional(),
+  md: IconStyleSchema2.partial().optional(),
+  lg: IconStyleSchema2.partial().optional(),
+  xl: IconStyleSchema2.partial().optional(),
+  "2xl": IconStyleSchema2.partial().optional()
+}).partial().optional();
+var ButtonStyleBreakpointsSchema2 = external_exports.object({
+  sm: ButtonStyleSchema2.partial().optional(),
+  md: ButtonStyleSchema2.partial().optional(),
+  lg: ButtonStyleSchema2.partial().optional(),
+  xl: ButtonStyleSchema2.partial().optional(),
+  "2xl": ButtonStyleSchema2.partial().optional()
+}).partial().optional();
+var StackLayoutBreakpointPatchSchema2 = external_exports.object({
+  gap: NonNegativePxSchema2.optional(),
+  direction: external_exports.enum(["vertical", "horizontal"]).optional()
+}).partial();
+var StackLayoutBreakpointsSchema2 = external_exports.object({
+  sm: StackLayoutBreakpointPatchSchema2.optional(),
+  md: StackLayoutBreakpointPatchSchema2.optional(),
+  lg: StackLayoutBreakpointPatchSchema2.optional(),
+  xl: StackLayoutBreakpointPatchSchema2.optional(),
+  "2xl": StackLayoutBreakpointPatchSchema2.optional()
+}).partial().optional();
+var ButtonLayoutBreakpointPatchSchema2 = external_exports.object({
+  gap: NonNegativePxSchema2.optional(),
+  direction: external_exports.enum(["vertical", "horizontal"]).optional()
+}).partial();
+var ButtonLayoutBreakpointsSchema2 = external_exports.object({
+  sm: ButtonLayoutBreakpointPatchSchema2.optional(),
+  md: ButtonLayoutBreakpointPatchSchema2.optional(),
+  lg: ButtonLayoutBreakpointPatchSchema2.optional(),
+  xl: ButtonLayoutBreakpointPatchSchema2.optional(),
+  "2xl": ButtonLayoutBreakpointPatchSchema2.optional()
+}).partial().optional();
+var OS_PERMISSION_KEYS2 = [
+  "notifications",
+  "camera",
+  "microphone",
+  "photo_library",
+  "contacts",
+  "calendar",
+  "reminders",
+  "location_when_in_use",
+  "location_always",
+  "motion",
+  "bluetooth",
+  "app_tracking_transparency",
+  "speech_recognition",
+  "face_id",
+  "health_kit",
+  "media_library",
+  "local_network",
+  "nearby_interactions",
+  "nfc",
+  "full_screen_intent_android",
+  "sms_android",
+  "phone_android"
+];
+var OsPermissionKeySchema2 = external_exports.enum(OS_PERMISSION_KEYS2);
+var PERMISSION_OUTCOME_VALUES2 = ["granted", "denied", "blocked"];
+external_exports.enum(PERMISSION_OUTCOME_VALUES2);
+var OS_PERMISSION_OUTCOME_CONTINUE2 = "continue";
+var OS_PERMISSION_OUTCOME_END2 = "end";
+var OsPermissionOutcomeBranchTargetSchema2 = external_exports.union([
+  ScreenIdSchema2,
+  external_exports.literal(OS_PERMISSION_OUTCOME_CONTINUE2),
+  external_exports.literal(OS_PERMISSION_OUTCOME_END2)
+]);
+var OsPermissionOutcomesSchema2 = external_exports.object({
+  granted: OsPermissionOutcomeBranchTargetSchema2,
+  denied: OsPermissionOutcomeBranchTargetSchema2,
+  blocked: OsPermissionOutcomeBranchTargetSchema2
+}).strict();
+var APP_REVIEW_OUTCOMES2 = ["not_shown", "dismissed"];
+external_exports.enum(APP_REVIEW_OUTCOMES2);
+var ButtonActionSchema2 = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("none") }),
+  external_exports.object({ kind: external_exports.literal("continue") }),
+  external_exports.object({ kind: external_exports.literal("skip") }),
+  external_exports.object({ kind: external_exports.literal("end_flow") }),
+  external_exports.object({
+    kind: external_exports.literal("go_back_one_screen"),
+    fallbackScreenId: ScreenIdSchema2.optional()
+  }),
+  external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: ScreenIdSchema2 }),
+  external_exports.object({
+    kind: external_exports.literal("request_os_permission"),
+    permissionKey: OsPermissionKeySchema2,
+    outcomes: OsPermissionOutcomesSchema2
+  }),
+  external_exports.object({
+    kind: external_exports.literal("play_media"),
+    targetLayerIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({ kind: external_exports.literal("request_app_review") })
+]);
+var TEXT_INPUT_TYPES2 = ["plain", "email", "phone", "url", "multiline"];
+var TextInputTypeSchema2 = external_exports.enum(TEXT_INPUT_TYPES2);
+var COUNTER_DISPLAY_KINDS2 = ["number", "time"];
+var COUNTER_TIME_FORMATS2 = ["mm_ss", "hh_mm_ss", "dd_hh_mm_ss"];
+var CheckboxGlyphStyleSchema2 = external_exports.object({
+  /** Square edge length in px. */
+  size: external_exports.number().int().min(8).max(128).optional(),
+  radius: external_exports.number().int().min(0).max(96).optional(),
+  background: ThemedColorSchema2.optional(),
+  border: BorderSchema2.optional(),
+  shadow: DropShadowSchema2.optional(),
+  opacity: external_exports.number().min(0).max(1).optional(),
+  /** Fill color for the check mark when checked. */
+  checkColor: ThemedColorSchema2.optional()
+}).partial();
+var OAUTH_LOGIN_PRESETS2 = ["github", "google", "apple"];
+var OAuthPresetButtonChromeSchema2 = CommonStyleSchema2.pick({
+  width: true,
+  padding: true,
+  margin: true,
+  radius: true
+}).partial();
+var OAuthPresetButtonChromeBreakpointsSchema2 = external_exports.object({
+  sm: OAuthPresetButtonChromeSchema2.partial().optional(),
+  md: OAuthPresetButtonChromeSchema2.partial().optional(),
+  lg: OAuthPresetButtonChromeSchema2.partial().optional(),
+  xl: OAuthPresetButtonChromeSchema2.partial().optional(),
+  "2xl": OAuthPresetButtonChromeSchema2.partial().optional()
+}).partial().optional();
+var EMAIL_PASSWORD_AUTH_MODES2 = ["sign_in", "sign_up"];
+var EMAIL_PASSWORD_SLOTS2 = ["email", "password", "confirm"];
+var lazyLayer6 = () => layerSchemaStore2.schema;
+var ButtonLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("button"),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer6())),
+  action: ButtonActionSchema2,
+  variant: ButtonLayerVariantSchema2,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  style: ButtonStyleSchema2.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema2,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema2
+});
+var BackButtonLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("back_button"),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer6())),
+  variant: ButtonLayerVariantSchema2,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  style: ButtonStyleSchema2.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema2,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema2,
+  fallbackScreenId: ScreenIdSchema2.optional()
+});
+var ProgressLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("progress"),
+  trackColor: ThemedColorSchema2.optional(),
+  fillColor: ThemedColorSchema2.optional(),
+  style: CommonStyleSchema2.optional()
+});
+var LoaderOnCompleteSchema2 = external_exports.discriminatedUnion("mode", [
+  external_exports.object({ mode: external_exports.literal("none") }),
+  external_exports.object({ mode: external_exports.literal("next") }),
+  external_exports.object({ mode: external_exports.literal("screen"), screenId: ScreenIdSchema2 })
+]);
+var LoaderLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("loader"),
+  variant: external_exports.enum(["linear", "circular"]).optional(),
+  targetPercent: external_exports.number().int().min(0).max(100).optional(),
+  fillDelayMs: external_exports.number().int().min(0).max(1e4).optional(),
+  durationMs: external_exports.number().int().min(0).max(36e5).optional(),
+  onComplete: LoaderOnCompleteSchema2.optional(),
+  trackColor: ThemedColorSchema2.optional(),
+  trackOpacity: external_exports.number().min(0).max(1).optional(),
+  fillColor: ThemedColorSchema2.optional(),
+  /** Horizontal alignment of the bar or ring within the layer box (default start). */
+  align: external_exports.enum(["start", "center", "end"]).optional(),
+  style: CommonStyleSchema2.optional()
+}).superRefine((data, ctx) => {
+  if (data.variant !== "circular") return;
+  const w = data.style?.width;
+  const h = data.style?.height;
+  if (typeof w === "number" && typeof h === "number" && w !== h) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "circular loader requires style.width === style.height",
+      path: ["style", "height"]
     });
   }
-  return out;
+});
+var CounterLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("counter"),
+  startValue: external_exports.number().finite(),
+  endValue: external_exports.number().finite(),
+  durationMs: external_exports.number().int().min(0).max(36e5).optional(),
+  delayMs: external_exports.number().int().min(0).max(36e5).optional(),
+  decimalPlaces: external_exports.number().int().min(0).max(10).optional(),
+  displayKind: external_exports.enum(COUNTER_DISPLAY_KINDS2).optional(),
+  timeFormat: external_exports.enum(COUNTER_TIME_FORMATS2).optional(),
+  style: TextStyleSchema2.optional(),
+  styleBreakpoints: TextStyleBreakpointsSchema2
+});
+var CheckboxLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("checkbox"),
+  fieldKey: external_exports.string().min(1),
+  blocking: external_exports.boolean().optional(),
+  uncheckedStyle: CheckboxGlyphStyleSchema2.optional(),
+  checkedStyle: CheckboxGlyphStyleSchema2.optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+});
+var lazyLayer22 = () => layerSchemaStore2.schema;
+var StackLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("stack"),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2,
+  stackLayoutBreakpoints: StackLayoutBreakpointsSchema2,
+  selectedStyle: CommonStyleSchema2.optional(),
+  direction: external_exports.enum(["vertical", "horizontal"]),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  justify: external_exports.enum(["start", "center", "end"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  wrap: external_exports.boolean().optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer22()))
+});
+var TextLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("text"),
+  text: LocalizedTextSchema3,
+  style: TextStyleSchema2.optional(),
+  styleBreakpoints: TextStyleBreakpointsSchema2
+});
+var migrateLegacyHyperlinkForParse2 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "hyperlink") return raw;
+  const existing = o.children;
+  if (Array.isArray(existing) && existing.length > 0) return raw;
+  const idSrc = typeof o.id === "string" ? o.id.replace(/[^a-zA-Z0-9_]/g, "_") : "lyr_hyperlink";
+  const textChildId = `${idSrc}_lnktxt`.slice(0, 64);
+  const children = [
+    {
+      id: textChildId,
+      kind: "text",
+      text: o.text ?? { default: "Link" },
+      ...typeof o.style === "object" && o.style !== null ? { style: o.style } : {},
+      ...typeof o.styleBreakpoints === "object" && o.styleBreakpoints !== null ? { styleBreakpoints: o.styleBreakpoints } : {}
+    }
+  ];
+  const next = {
+    ...o,
+    children
+  };
+  delete next.text;
+  delete next.style;
+  delete next.styleBreakpoints;
+  return next;
 };
-
-// ../contracts/src/decisions.ts
+var HyperlinkLayerSchemaInner2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("hyperlink"),
+  href: external_exports.string().min(1).max(2048),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer22()).min(1)),
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  wrap: external_exports.boolean().optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+}).superRefine((data, ctx) => {
+  const p = parseHyperlinkHref2(data.href.trim());
+  if (!p.ok) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "hyperlink href must be a valid https: or mailto: URL",
+      path: ["href"]
+    });
+  }
+});
+var HyperlinkLayerSchema2 = external_exports.preprocess(
+  migrateLegacyHyperlinkForParse2,
+  HyperlinkLayerSchemaInner2
+);
+var ImageLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("image"),
+  media: MediaReferenceSchema2.optional(),
+  alt: external_exports.string().max(280).optional(),
+  style: ImageStyleSchema2.optional(),
+  styleBreakpoints: ImageStyleBreakpointsSchema2
+});
+var LottieLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("lottie"),
+  media: MediaReferenceSchema2.optional(),
+  loop: external_exports.boolean().optional(),
+  autoPlay: external_exports.boolean().optional(),
+  triggerLayerId: external_exports.string().min(1).optional(),
+  onComplete: LoaderOnCompleteSchema2.optional(),
+  style: ImageStyleSchema2.optional(),
+  styleBreakpoints: ImageStyleBreakpointsSchema2
+});
+var VideoLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("video"),
+  media: MediaReferenceSchema2.optional(),
+  loop: external_exports.boolean().optional(),
+  autoPlay: external_exports.boolean().optional(),
+  triggerLayerId: external_exports.string().min(1).optional(),
+  onComplete: LoaderOnCompleteSchema2.optional(),
+  audioEnabled: external_exports.boolean().optional(),
+  style: ImageStyleSchema2.optional(),
+  styleBreakpoints: ImageStyleBreakpointsSchema2
+});
+var IconLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("icon"),
+  family: external_exports.enum(ICON_FAMILIES2),
+  iconName: external_exports.string().min(1).max(128),
+  style: IconStyleSchema2.optional(),
+  styleBreakpoints: IconStyleBreakpointsSchema2
+});
+var lazyLayer32 = () => layerSchemaStore2.schema;
+var OAuthProviderPresetLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("oauth_provider"),
+  variant: external_exports.literal("preset"),
+  provider: external_exports.enum(OAUTH_LOGIN_PRESETS2),
+  label: LocalizedTextSchema3.optional(),
+  style: OAuthPresetButtonChromeSchema2.optional(),
+  styleBreakpoints: OAuthPresetButtonChromeBreakpointsSchema2.optional()
+});
+var migrateOAuthProviderCustomIncoming2 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "oauth_provider" || o.variant !== "custom") return raw;
+  const ch = o.children;
+  if (Array.isArray(ch) && ch.length > 0) {
+    const next2 = { ...o };
+    if (next2.buttonVariant === void 0) next2.buttonVariant = "secondary";
+    return next2;
+  }
+  const pid = typeof o.id === "string" ? o.id : "lyr_oauth_custom";
+  const slug = pid.replace(/[^a-z0-9_]/gi, "_").slice(0, 40) || "oauth";
+  const label = o.label ?? { default: "Custom" };
+  let family = o.family ?? "ionicons";
+  let iconName = o.iconName ?? "shield-outline";
+  if (family === "sf_symbol") {
+    family = "ionicons";
+    iconName = "star-outline";
+  }
+  const cid = slug;
+  const iconId = `lyr_${cid}_ico`.slice(0, 64);
+  const textId = `lyr_${cid}_txt`.slice(0, 64);
+  const next = { ...o };
+  delete next.label;
+  delete next.family;
+  delete next.iconName;
+  return {
+    ...next,
+    buttonVariant: o.buttonVariant ?? "secondary",
+    children: [
+      { id: iconId, kind: "icon", family, iconName },
+      { id: textId, kind: "text", text: label }
+    ]
+  };
+};
+var OAuthProviderCustomLayerSchemaValidated2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("oauth_provider"),
+  variant: external_exports.literal("custom"),
+  rowId: external_exports.string().uuid(),
+  buttonVariant: ButtonLayerVariantSchema2,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer32()).min(1)),
+  style: ButtonStyleSchema2.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema2,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema2
+});
+var OAuthProviderCustomLayerSchema2 = external_exports.preprocess(
+  migrateOAuthProviderCustomIncoming2,
+  OAuthProviderCustomLayerSchemaValidated2
+);
+var OAuthProviderLayerSchema2 = external_exports.union([
+  OAuthProviderPresetLayerSchema2,
+  OAuthProviderCustomLayerSchema2
+]);
+var OAuthLoginPresetProviderSchema2 = external_exports.object({
+  type: external_exports.literal("preset"),
+  provider: external_exports.enum(OAUTH_LOGIN_PRESETS2)
+});
+var OAuthLoginCustomProviderSchema2 = external_exports.object({
+  type: external_exports.literal("custom"),
+  rowId: external_exports.string().uuid(),
+  label: LocalizedTextSchema3,
+  family: external_exports.enum(ICON_FAMILIES2),
+  iconName: external_exports.string().min(1).max(128)
+});
+var OAuthLoginProviderSchema2 = external_exports.discriminatedUnion("type", [
+  OAuthLoginPresetProviderSchema2,
+  OAuthLoginCustomProviderSchema2
+]);
+var oauthLoginChildrenUniquePresets2 = (children, ctx) => {
+  const seen = /* @__PURE__ */ new Set();
+  for (let i = 0; i < children.length; i++) {
+    const c = children[i];
+    if (!c || c.kind !== "oauth_provider" || c.variant !== "preset") continue;
+    const preset = c.provider;
+    if (seen.has(preset)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate OAuth preset "${preset}"`,
+        path: ["children", i, "provider"]
+      });
+      return;
+    }
+    seen.add(preset);
+  }
+};
+var migrateOAuthLoginIncoming2 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "oauth_login") return raw;
+  if (Array.isArray(o.children) && o.children.length > 0) return raw;
+  const provs = o.providers;
+  if (!Array.isArray(provs) || provs.length === 0) return raw;
+  const pid = typeof o.id === "string" ? o.id : "lyr_oauth_legacy";
+  const slug = pid.replace(/^lyr_/i, "").replace(/[^a-z0-9_]/gi, "_").replace(/^_+/, "").slice(0, 48) || "oauth";
+  const children = provs.map((p, idx) => {
+    const prov = p ?? {};
+    const cid = `lyr_${slug}_opr_${idx}`.slice(0, 64);
+    if (prov.type === "preset") {
+      return {
+        id: cid,
+        kind: "oauth_provider",
+        variant: "preset",
+        provider: prov.provider
+      };
+    }
+    return {
+      id: cid,
+      kind: "oauth_provider",
+      variant: "custom",
+      rowId: String(prov.rowId),
+      buttonVariant: "secondary",
+      children: [
+        {
+          id: `${cid}_ico`.slice(0, 64),
+          kind: "icon",
+          family: prov.family ?? "ionicons",
+          iconName: String(prov.iconName ?? "shield")
+        },
+        {
+          id: `${cid}_txt`.slice(0, 64),
+          kind: "text",
+          text: prov.label ?? { default: "Custom" }
+        }
+      ]
+    };
+  });
+  const { providers: _omit, ...rest } = o;
+  return { ...rest, children };
+};
+var OAuthLoginLayerSchemaValidated2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("oauth_login"),
+  children: external_exports.lazy(
+    () => external_exports.array(OAuthProviderLayerSchema2).min(1).superRefine(oauthLoginChildrenUniquePresets2)
+  ),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+});
+var OAuthLoginLayerSchema2 = external_exports.preprocess(
+  migrateOAuthLoginIncoming2,
+  OAuthLoginLayerSchemaValidated2
+);
+external_exports.array(OAuthLoginProviderSchema2).min(1).superRefine((providers, ctx) => {
+  const seen = /* @__PURE__ */ new Set();
+  for (let i = 0; i < providers.length; i++) {
+    const p = providers[i];
+    if (!p || p.type !== "preset") continue;
+    const preset = p.provider;
+    if (seen.has(preset)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate OAuth preset "${preset}"`,
+        path: [i, "provider"]
+      });
+      return;
+    }
+    seen.add(preset);
+  }
+});
+var FIELD_KEY_RE2 = /^[a-z][a-z0-9_]*$/;
+var FieldKeySchema2 = external_exports.string().min(1).max(64).regex(FIELD_KEY_RE2, "field key must be snake_case");
+var FieldClassificationSchema2 = external_exports.enum(FIELD_CLASSIFICATIONS2);
+var lazyLayer42 = () => layerSchemaStore2.schema;
+var EmailPasswordAuthModeSchema2 = external_exports.enum(EMAIL_PASSWORD_AUTH_MODES2);
+var migrateEmailPasswordAuthIncoming2 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "email_password_auth") return raw;
+  if (Array.isArray(o.children) && o.children.length > 0) return raw;
+  const idBase = typeof o.id === "string" ? o.id : "lyr_email_password_auth";
+  const slugRaw = idBase.replace(/^lyr_/i, "").replace(/[^a-z0-9_]/gi, "_");
+  const slug = slugRaw.length > 0 ? slugRaw.slice(0, 40) : "ep_auth";
+  const mode = o.mode === "sign_up" ? "sign_up" : "sign_in";
+  const pickLt = (v, fallback) => v && typeof v === "object" && v !== null && "default" in v ? v : { default: fallback };
+  const mkField = (suf, slot, labelSource, fallbackPlaceholder) => ({
+    id: `lyr_${slug}_fld_${suf}`.slice(0, 64),
+    kind: "email_password_field",
+    slot,
+    ...labelSource ? { placeholder: pickLt(labelSource, fallbackPlaceholder) } : { placeholder: { default: fallbackPlaceholder } },
+    children: []
+  });
+  const children = [];
+  children.push(mkField("email", "email", o.emailLabel, "Email"));
+  children.push(mkField("pw", "password", o.passwordLabel, "Password"));
+  if (mode === "sign_up") {
+    children.push(mkField("cf", "confirm", o.confirmPasswordLabel, "Confirm password"));
+  }
+  const submitLbl = o.submitLabel ?? { default: mode === "sign_in" ? "Sign in" : "Create account" };
+  children.push({
+    id: `lyr_${slug}_submit`.slice(0, 64),
+    kind: "email_password_submit",
+    buttonVariant: "primary",
+    direction: "horizontal",
+    align: "center",
+    distribution: "center",
+    gap: 8,
+    children: [
+      {
+        id: `lyr_${slug}_submit_txt`.slice(0, 64),
+        kind: "text",
+        text: submitLbl
+      }
+    ]
+  });
+  const {
+    emailLabel: _e,
+    passwordLabel: _p,
+    confirmPasswordLabel: _c,
+    submitLabel: _s,
+    ...rest
+  } = o;
+  return { ...rest, mode, children };
+};
+var refineEmailPasswordAuthChildren2 = (data, ctx) => {
+  const fields = data.children.filter((c) => c.kind === "email_password_field");
+  const submits = data.children.filter((c) => c.kind === "email_password_submit");
+  const slotSeen = /* @__PURE__ */ new Set();
+  for (const f of fields) {
+    if (slotSeen.has(f.slot)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate email_password_field slot "${f.slot}"`,
+        path: ["children"]
+      });
+    }
+    slotSeen.add(f.slot);
+  }
+  const slotHas = new Set(fields.map((f) => f.slot));
+  const requiredSlots = data.mode === "sign_up" ? ["email", "password", "confirm"] : ["email", "password"];
+  for (const s of requiredSlots) {
+    if (!slotHas.has(s)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: data.mode === "sign_up" ? `sign_up requires an email_password_field with slot "${s}"` : `sign_in requires an email_password_field with slot "${s}"`,
+        path: ["children"]
+      });
+    }
+  }
+  if (data.mode === "sign_in" && slotHas.has("confirm")) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: 'sign_in must not include email_password_field with slot "confirm"',
+      path: ["children"]
+    });
+  }
+  if (submits.length !== 1) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: `email_password_auth must have exactly one email_password_submit (found ${submits.length})`,
+      path: ["children"]
+    });
+  }
+};
+var EmailPasswordFieldLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("email_password_field"),
+  slot: external_exports.enum(EMAIL_PASSWORD_SLOTS2),
+  placeholder: LocalizedTextSchema3.optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer42())).optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+});
+var EmailPasswordSubmitLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("email_password_submit"),
+  buttonVariant: ButtonLayerVariantSchema2,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer42()).min(1)),
+  style: ButtonStyleSchema2.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema2,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema2
+});
+var EmailPasswordAuthLayerSchemaValidated2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("email_password_auth"),
+  mode: EmailPasswordAuthModeSchema2,
+  fieldKey: FieldKeySchema2,
+  minPasswordLength: external_exports.number().int().min(4).max(128).optional(),
+  children: external_exports.lazy(
+    () => external_exports.array(external_exports.union([EmailPasswordFieldLayerSchema2, EmailPasswordSubmitLayerSchema2])).min(1)
+  ),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+}).superRefine(refineEmailPasswordAuthChildren2);
+var EmailPasswordAuthLayerSchema2 = external_exports.preprocess(
+  migrateEmailPasswordAuthIncoming2,
+  EmailPasswordAuthLayerSchemaValidated2
+);
+var ChoiceOptionBindingSchema2 = external_exports.object({
+  optionId: external_exports.string().min(1).max(64),
+  rootLayerId: LayerIdSchema2
+});
+var BranchConditionSchema2 = external_exports.object({
+  choiceId: external_exports.string().min(1),
+  goTo: ScreenIdSchema2
+});
+var ChoiceBranchingSchema2 = external_exports.object({
+  enabled: external_exports.boolean(),
+  conditions: external_exports.array(BranchConditionSchema2)
+});
+var lazyLayer52 = () => layerSchemaStore2.schema;
+var SingleChoiceLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("single_choice"),
+  fieldKey: FieldKeySchema2,
+  children: external_exports.lazy(
+    () => external_exports.array(StackLayerSchema2).min(2)
+  ),
+  optionBindings: external_exports.array(ChoiceOptionBindingSchema2).min(2),
+  branching: ChoiceBranchingSchema2,
+  direction: external_exports.enum(["vertical", "horizontal", "grid"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  columns: external_exports.number().int().min(1).max(12).optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+});
+var MultipleChoiceLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("multiple_choice"),
+  fieldKey: FieldKeySchema2,
+  children: external_exports.lazy(
+    () => external_exports.array(StackLayerSchema2).min(2)
+  ),
+  optionBindings: external_exports.array(ChoiceOptionBindingSchema2).min(2),
+  minSelections: external_exports.number().int().nonnegative().optional(),
+  maxSelections: external_exports.number().int().positive().optional(),
+  branching: ChoiceBranchingSchema2,
+  direction: external_exports.enum(["vertical", "horizontal", "grid"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  columns: external_exports.number().int().min(1).max(12).optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+});
+var TextInputLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("text_input"),
+  fieldKey: FieldKeySchema2,
+  placeholder: LocalizedTextSchema3.optional(),
+  inputType: TextInputTypeSchema2.optional(),
+  required: external_exports.boolean().optional(),
+  minLength: external_exports.number().int().min(0).max(2e3).optional(),
+  maxLength: external_exports.number().int().positive().max(2e3).optional(),
+  classification: FieldClassificationSchema2,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer52())).optional(),
+  style: CommonStyleSchema2.optional()
+});
+var ScaleInputLabelStyleSchema2 = external_exports.object({
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema2.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional(),
+  lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
+var ScaleInputLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("scale_input"),
+  fieldKey: FieldKeySchema2,
+  min: external_exports.number(),
+  max: external_exports.number(),
+  step: external_exports.number().positive().optional(),
+  defaultValue: external_exports.number().optional(),
+  minLabel: LocalizedTextSchema3.optional(),
+  maxLabel: LocalizedTextSchema3.optional(),
+  labelStyle: ScaleInputLabelStyleSchema2.optional(),
+  valueStyle: ScaleInputLabelStyleSchema2.optional(),
+  showLabels: external_exports.boolean().optional(),
+  showValue: external_exports.boolean().optional(),
+  trackHeight: external_exports.number().int().min(2).max(32).optional(),
+  trackColor: ThemedColorSchema2.optional(),
+  fillColor: ThemedColorSchema2.optional(),
+  thumbSize: external_exports.number().int().min(8).max(48).optional(),
+  thumbColor: ThemedColorSchema2.optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer52())).optional(),
+  style: CommonStyleSchema2.optional()
+});
+var CarouselIndicatorsStyleSchema2 = external_exports.object({
+  width: external_exports.number().int().min(1).max(64).optional(),
+  height: external_exports.number().int().min(1).max(64).optional(),
+  defaultColor: ThemedColorSchema2.optional(),
+  defaultOpacity: external_exports.number().min(0).max(1).optional(),
+  activeColor: ThemedColorSchema2.optional(),
+  activeOpacity: external_exports.number().min(0).max(1).optional(),
+  activeWidth: external_exports.number().int().min(1).max(64).optional(),
+  activeHeight: external_exports.number().int().min(1).max(64).optional(),
+  border: BorderSchema2.optional(),
+  activeBorder: BorderSchema2.optional()
+}).partial();
+var CarouselPageControlSchema2 = external_exports.object({
+  position: external_exports.enum(["top", "bottom"]),
+  spacing: external_exports.number().int().min(0).optional(),
+  padding: PaddingSchema2.optional(),
+  margin: PaddingSchema2.optional(),
+  indicators: CarouselIndicatorsStyleSchema2.optional(),
+  border: BorderSchema2.optional(),
+  shadow: DropShadowSchema2.optional()
+});
+var CarouselLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("carousel"),
+  slides: external_exports.lazy(() => external_exports.array(StackLayerSchema2).min(1)),
+  pageAlignment: external_exports.enum(["top", "center", "bottom"]).optional(),
+  pageSpacing: external_exports.number().int().min(0).optional(),
+  pagePeek: external_exports.number().int().min(0).max(400).optional(),
+  openOn: external_exports.number().int().min(0).optional(),
+  loop: external_exports.boolean().optional(),
+  autoAdvance: external_exports.boolean().optional(),
+  autoAdvanceMs: external_exports.number().int().min(500).max(6e4).optional(),
+  pageControl: CarouselPageControlSchema2.optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+});
+layerSchemaStore2.schema = external_exports.lazy(
+  () => external_exports.union([
+    StackLayerSchema2,
+    TextLayerSchema2,
+    HyperlinkLayerSchema2,
+    ImageLayerSchema2,
+    LottieLayerSchema2,
+    VideoLayerSchema2,
+    IconLayerSchema2,
+    ButtonLayerSchema2,
+    BackButtonLayerSchema2,
+    ProgressLayerSchema2,
+    LoaderLayerSchema2,
+    CounterLayerSchema2,
+    CheckboxLayerSchema2,
+    SingleChoiceLayerSchema2,
+    MultipleChoiceLayerSchema2,
+    TextInputLayerSchema2,
+    ScaleInputLayerSchema2,
+    OAuthLoginLayerSchema2,
+    OAuthProviderPresetLayerSchema2,
+    OAuthProviderCustomLayerSchema2,
+    EmailPasswordAuthLayerSchema2,
+    EmailPasswordFieldLayerSchema2,
+    EmailPasswordSubmitLayerSchema2,
+    CarouselLayerSchema2
+  ])
+);
 var DecisionNodeIdSchema = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i, "decision node id must look like dec_<id>");
 var ExternalSurfaceJumpIdSchema = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
 var EXTERNAL_SURFACE_NO_NEXT = "__onb_surface_no_next__";
 var ExternalSurfaceTerminalTargetSchema = external_exports.literal(EXTERNAL_SURFACE_NO_NEXT);
-var FlowJumpTargetSchema = ScreenIdSchema.or(DecisionNodeIdSchema).or(ExternalSurfaceJumpIdSchema).or(ExternalSurfaceTerminalTargetSchema).nullable();
+var FlowJumpTargetSchema = ScreenIdSchema2.or(DecisionNodeIdSchema).or(ExternalSurfaceJumpIdSchema).or(ExternalSurfaceTerminalTargetSchema).nullable();
 var DecisionBuiltinNameSchema = external_exports.enum(["locale", "platform"]);
 var DecisionVariableRefSchema = external_exports.discriminatedUnion("kind", [
   external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema }),
@@ -5435,40 +6217,6 @@ var DecisionNodeSchema = external_exports.object({
   cases: external_exports.array(DecisionCaseSchema).min(1).max(16),
   elseNext: FlowJumpTargetSchema
 });
-var migrateLegacyDecisionNodeInPlace = (node) => {
-  if (!node || typeof node !== "object") return;
-  if (Array.isArray(node.cases)) return;
-  if (!("expression" in node)) return;
-  const id = typeof node.id === "string" ? node.id : "dec_unknown";
-  const expression = node.expression;
-  const onTrue = "onTrue" in node ? node.onTrue ?? null : null;
-  const onFalse = "onFalse" in node ? node.onFalse ?? null : null;
-  delete node.expression;
-  delete node.onTrue;
-  delete node.onFalse;
-  node.cases = [
-    {
-      id: `${id}_case_0`,
-      name: "Group 1",
-      expression,
-      next: onTrue
-    }
-  ];
-  node.elseNext = onFalse;
-};
-var collectDecisionSdkKeys = (expr) => {
-  const out = [];
-  const walk = (e) => {
-    if (e.kind === "empty") return;
-    if (e.kind === "predicate") {
-      if (e.variable.kind === "sdk") out.push(e.variable.key);
-      return;
-    }
-    for (const c of e.children) walk(c);
-  };
-  walk(expr);
-  return out;
-};
 var collectDecisionFieldKeys = (expr) => {
   const out = [];
   const walk = (e) => {
@@ -5490,7 +6238,1173 @@ var collectDecisionFieldKeysFromNode = (node) => {
   return [...seen];
 };
 
-// ../contracts/src/animations.ts
+// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/index.js
+var LocaleCode4 = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
+var LocalizedTextSchema4 = external_exports.object({
+  default: external_exports.string().min(1, "default copy is required"),
+  translations: external_exports.record(LocaleCode4, external_exports.string()).optional()
+});
+var parseHyperlinkHref3 = (raw) => {
+  const t = raw.trim();
+  if (!t) return { ok: false };
+  let u;
+  try {
+    u = new URL(t);
+  } catch {
+    return { ok: false };
+  }
+  const scheme = u.protocol.replace(/:$/, "").toLowerCase();
+  if (scheme === "https") {
+    if (!u.hostname) return { ok: false };
+    return { ok: true, scheme: "https", host: u.hostname };
+  }
+  if (scheme === "mailto") {
+    return { ok: true, scheme: "mailto" };
+  }
+  return { ok: false };
+};
+var FIELD_CLASSIFICATIONS3 = ["safe", "sensitive"];
+var MEDIA_TYPES3 = ["image", "font", "lottie", "video"];
+var MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+var MAX_LOTTIE_BYTES = 10 * 1024 * 1024;
+var MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+var MAX_FONT_BYTES = 10 * 1024 * 1024;
+var EVENT_NAMES = [
+  "flow_started",
+  "step_viewed",
+  "step_completed",
+  "step_skipped",
+  "choice_selected",
+  "text_submitted",
+  "flow_completed",
+  "flow_abandoned",
+  "decision_evaluated",
+  "external_link_opened",
+  "surface_presented",
+  "surface_outcome",
+  "app_review_prompt_shown",
+  "app_review_prompt_dismissed",
+  /** Emitted once per provider id when merged SDK attributes first expose that attribution source (used for integration health checks). */
+  "attribution_context_observed",
+  /** Successful in-app purchase from an external surface (e.g. RevenueCat paywall); commerce fields live in `properties`. */
+  "iap_purchase"
+];
+var MediaTypeSchema3 = external_exports.enum(MEDIA_TYPES3);
+var MediaReferenceSchema3 = external_exports.object({
+  mediaAssetId: external_exports.string().uuid()
+});
+var MediaAssetSchema = external_exports.object({
+  id: external_exports.string().uuid(),
+  orgId: external_exports.string().uuid(),
+  type: MediaTypeSchema3,
+  url: external_exports.string().url(),
+  name: external_exports.string().nullable().optional(),
+  contentType: external_exports.string(),
+  sizeBytes: external_exports.number().int().nonnegative(),
+  archivedAt: external_exports.string().datetime().nullable().optional(),
+  createdAt: external_exports.string().datetime()
+});
+var FIELD_KEY_RE3 = /^[a-z][a-z0-9_]*$/;
+var FieldKeySchema3 = external_exports.string().min(1).max(64).regex(FIELD_KEY_RE3, "field key must be snake_case");
+var FieldClassificationSchema3 = external_exports.enum(FIELD_CLASSIFICATIONS3);
+var layerSchemaStore3 = {};
+var LayerIdSchema3 = external_exports.string().min(1).max(64).regex(/^lyr_[a-z0-9_]+$/i, "layer id must look like lyr_<id>");
+var ScreenIdSchema3 = external_exports.string().min(1).max(64).regex(/^scr_[a-z0-9_]+$/i, "screen id must look like scr_<id>");
+var RESTING_MOTION_PRESETS3 = ["translate", "bounce", "scale", "pulse", "rotate"];
+var RestingMotionPresetSchema3 = external_exports.enum(RESTING_MOTION_PRESETS3);
+var RESTING_MOTION_SCALE_DIRECTIONS3 = ["up", "down"];
+var RestingMotionScaleDirectionSchema3 = external_exports.enum(RESTING_MOTION_SCALE_DIRECTIONS3);
+var RESTING_MOTION_ROTATE_DIRECTIONS3 = ["clockwise", "counterclockwise"];
+var RestingMotionRotateDirectionSchema3 = external_exports.enum(RESTING_MOTION_ROTATE_DIRECTIONS3);
+var RestingMotionSchema3 = external_exports.object({
+  preset: RestingMotionPresetSchema3,
+  /**
+   * Timeline segment length (ms): motion is active from start until
+   * start + durationMs. When {@link loop} is true, the preset pattern repeats
+   * every {@link cycleDurationMs} (or preset default) within this window.
+   */
+  durationMs: external_exports.number().int().min(200).max(2e4).optional(),
+  /** When true, repeat the motion pattern within the timeline segment; default is one shot. */
+  loop: external_exports.boolean().optional(),
+  /**
+   * Duration (ms) of one full pattern cycle when looping. Defaults per {@link RESTING_MOTION_DEFAULT_DURATION_MS}.
+   */
+  cycleDurationMs: external_exports.number().int().min(200).max(2e4).optional(),
+  intensity: external_exports.number().min(0).max(2).optional(),
+  /** Bounce preset only: vertical lift in px. When omitted, uses `14 * intensity` (default intensity 1 → 14). */
+  bounceAmplitudePx: external_exports.number().min(1).max(80).optional(),
+  /** Scale preset: grow (+) or shrink (−) toward a peak, then return to 100%. */
+  scaleDirection: RestingMotionScaleDirectionSchema3.optional(),
+  /**
+   * Scale preset: when true (default), each cycle goes rest → peak scale → rest.
+   * When false, ramps rest → peak and holds; with loop, the next cycle restarts from rest.
+   */
+  scaleSpringBack: external_exports.boolean().optional(),
+  /**
+   * Scale preset: magnitude in % — growth above 100% (up to +400% = 5× at peak) or shrink toward
+   * 100%− (up to 90% so peak can be 10% size). See authoring caps in the layer editor.
+   */
+  scalePercent: external_exports.number().min(0).max(400).optional(),
+  /**
+   * Scale preset: ms for one full out-and-back (rest → peak → rest). Timeline bar still sets
+   * {@link durationMs} (when the layer may animate); this controls how fast each cycle runs.
+   */
+  scalePatternDurationMs: external_exports.number().int().min(200).max(2e4).optional(),
+  /** @deprecated Use {@link scalePercent} + {@link scaleDirection}. Kept for legacy manifests. */
+  scaleUpPercent: external_exports.number().min(0).max(400).optional(),
+  /** @deprecated Use {@link scalePercent} + {@link scaleDirection}. Kept for legacy manifests. */
+  scaleDownPercent: external_exports.number().min(0).max(90).optional(),
+  /**
+   * @deprecated Legacy vertical-only float (px). Prefer {@link translatePeakXPercent} / {@link translatePeakYPercent}.
+   */
+  translateRangePx: external_exports.number().min(0).max(40).optional(),
+  /** @deprecated Legacy peak offsets in px. Prefer {@link translatePeakXPercent} / {@link translatePeakYPercent}. */
+  translatePeakXPx: external_exports.number().min(-200).max(200).optional(),
+  /** @deprecated Legacy peak offsets in px. Prefer {@link translatePeakXPercent} / {@link translatePeakYPercent}. */
+  translatePeakYPx: external_exports.number().min(-200).max(200).optional(),
+  /** Translate preset: peak X offset as % of the layer box (−200–200). Scaled by intensity. */
+  translatePeakXPercent: external_exports.number().min(-200).max(200).optional(),
+  /** Translate preset: peak Y offset as % of the layer box (−200–200). Scaled by intensity. */
+  translatePeakYPercent: external_exports.number().min(-200).max(200).optional(),
+  /**
+   * Translate preset: when true (default), each cycle goes rest → peak offset → rest. When false, ramp to
+   * peak and hold; with loop, the next cycle restarts from the origin.
+   */
+  translateSpringBack: external_exports.boolean().optional(),
+  /** Rotate preset: target rotation in degrees (0–360), scaled by intensity. */
+  rotateMaxDeg: external_exports.number().min(0).max(360).optional(),
+  /** Rotate preset: spin direction; omitted or `clockwise` → positive angles (default). */
+  rotateDirection: RestingMotionRotateDirectionSchema3.optional(),
+  /**
+   * Rotate preset: when true (default), each cycle oscillates 0° → peak → 0°.
+   * When false, each cycle ramps 0° → peak and holds; with loop, the next cycle snaps to 0° and ramps again.
+   */
+  rotateSpringBack: external_exports.boolean().optional(),
+  /** Pulse preset: minimum opacity at the dip (0–1). Omitted → `1 - 0.38 * intensity`. */
+  pulseMinOpacity: external_exports.number().min(0).max(1).optional(),
+  /** Ms after the last mount/stagger clip ends before motion applies (authoring + scrub). */
+  delayMsAfterMountEnd: external_exports.number().int().min(0).max(6e4).optional(),
+  /**
+   * Absolute start time (ms from screen mount). When set, overrides
+   * {@link delayMsAfterMountEnd} + mount-clip end so motion can sit between
+   * clips (e.g. after first entry, before exit) when multiple mounts exist.
+   */
+  timelineStartMs: external_exports.number().int().min(0).max(36e5).optional()
+}).strict();
+var RestingMotionEntrySchema3 = RestingMotionSchema3.extend({
+  id: external_exports.string().min(1)
+});
+var baseLayerShape3 = {
+  id: LayerIdSchema3,
+  name: external_exports.string().max(80).optional(),
+  restingMotion: RestingMotionSchema3.optional(),
+  restingMotions: external_exports.array(RestingMotionEntrySchema3).optional()
+};
+var ThemedColorModesSchema3 = external_exports.object({
+  light: external_exports.string().min(1).optional(),
+  dark: external_exports.string().min(1).optional()
+}).strict().refine((o) => o.light !== void 0 || o.dark !== void 0, {
+  message: "at least one of light or dark is required"
+});
+var ThemedColorSchema3 = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema3]);
+var WIDTH_PRESETS3 = ["auto", "full", "1/2", "1/3", "2/3", "1/4", "3/4"];
+var WidthValueSchema3 = external_exports.union([external_exports.enum(WIDTH_PRESETS3), external_exports.number().int().min(0).max(2e3)]);
+var HEIGHT_PRESETS3 = ["auto", "full", "fill"];
+var CommonLayoutHeightSchema3 = external_exports.union([
+  external_exports.enum(HEIGHT_PRESETS3),
+  external_exports.number().int().min(0).max(2e3)
+]);
+var NonNegativePxSchema3 = external_exports.number().int().min(0);
+var PaddingSchema3 = external_exports.object({
+  t: NonNegativePxSchema3.optional(),
+  r: NonNegativePxSchema3.optional(),
+  b: NonNegativePxSchema3.optional(),
+  l: NonNegativePxSchema3.optional()
+}).partial();
+var BorderSchema3 = external_exports.object({
+  width: external_exports.number().int().min(0).max(20).optional(),
+  color: ThemedColorSchema3.optional()
+}).partial();
+var DropShadowSchema3 = external_exports.object({
+  offsetX: external_exports.number().int().min(-100).max(100).optional(),
+  offsetY: external_exports.number().int().min(-100).max(100).optional(),
+  blur: external_exports.number().int().min(0).max(100).optional(),
+  spread: external_exports.number().int().min(-50).max(50).optional(),
+  color: ThemedColorSchema3.optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
+var CommonStyleSchema3 = external_exports.object({
+  padding: PaddingSchema3.optional(),
+  margin: PaddingSchema3.optional(),
+  radius: external_exports.number().int().min(0).max(96).optional(),
+  background: ThemedColorSchema3.optional(),
+  border: BorderSchema3.optional(),
+  shadow: DropShadowSchema3.optional(),
+  opacity: external_exports.number().min(0).max(1).optional(),
+  width: WidthValueSchema3.optional(),
+  /** Omit for normal flow; `'absolute'` removes the layer from flex flow (non-root only). */
+  position: external_exports.literal("absolute").optional(),
+  /** Pixel insets when `position === 'absolute'` (same shape as padding). */
+  inset: PaddingSchema3.optional(),
+  zIndex: external_exports.number().int().min(-999).max(999).optional(),
+  /** Static rotation in degrees (CSS `rotate`); not timeline animation. */
+  rotate: external_exports.number().min(-360).max(360).optional(),
+  /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), or fixed px. No fractions. */
+  height: CommonLayoutHeightSchema3.optional(),
+  /** Stroke thickness in px for layers that render a stroke primitive (e.g. loader ring). */
+  strokeWidth: external_exports.number().int().min(0).max(64).optional()
+}).partial();
+var TextStyleSchema3 = CommonStyleSchema3.extend({
+  /**
+   * Logical font family: manifest `theme.fontFamily` when omitted, {@link TEXT_FONT_FAMILY_SYSTEM_UI}
+   * for the platform stack, or a custom name (matches `Branding.fontFamilies[].name` for uploaded fonts).
+   */
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema3.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional(),
+  lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  /** Multiplier (0–1) applied to the resolved background color alpha only; text stays fully opaque unless `opacity` is set. */
+  backgroundOpacity: external_exports.number().min(0).max(1).optional()
+});
+var ImageStyleSchema3 = CommonStyleSchema3.extend({
+  fit: external_exports.enum(["cover", "contain", "fill"]).optional(),
+  aspectRatio: external_exports.number().positive().max(10).optional()
+});
+var IconStyleSchema3 = CommonStyleSchema3.extend({
+  color: ThemedColorSchema3.optional()
+});
+var ICON_FAMILIES3 = ["ionicons"];
+var ButtonStyleSchema3 = CommonStyleSchema3.extend({
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema3.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional()
+});
+var BUTTON_LAYER_VARIANTS3 = ["primary", "secondary", "ghost", "destructive"];
+var ButtonLayerVariantSchema3 = external_exports.enum(BUTTON_LAYER_VARIANTS3);
+var CommonStyleBreakpointsSchema3 = external_exports.object({
+  sm: CommonStyleSchema3.partial().optional(),
+  md: CommonStyleSchema3.partial().optional(),
+  lg: CommonStyleSchema3.partial().optional(),
+  xl: CommonStyleSchema3.partial().optional(),
+  "2xl": CommonStyleSchema3.partial().optional()
+}).partial().optional();
+var TextStyleBreakpointsSchema3 = external_exports.object({
+  sm: TextStyleSchema3.partial().optional(),
+  md: TextStyleSchema3.partial().optional(),
+  lg: TextStyleSchema3.partial().optional(),
+  xl: TextStyleSchema3.partial().optional(),
+  "2xl": TextStyleSchema3.partial().optional()
+}).partial().optional();
+var ImageStyleBreakpointsSchema3 = external_exports.object({
+  sm: ImageStyleSchema3.partial().optional(),
+  md: ImageStyleSchema3.partial().optional(),
+  lg: ImageStyleSchema3.partial().optional(),
+  xl: ImageStyleSchema3.partial().optional(),
+  "2xl": ImageStyleSchema3.partial().optional()
+}).partial().optional();
+var IconStyleBreakpointsSchema3 = external_exports.object({
+  sm: IconStyleSchema3.partial().optional(),
+  md: IconStyleSchema3.partial().optional(),
+  lg: IconStyleSchema3.partial().optional(),
+  xl: IconStyleSchema3.partial().optional(),
+  "2xl": IconStyleSchema3.partial().optional()
+}).partial().optional();
+var ButtonStyleBreakpointsSchema3 = external_exports.object({
+  sm: ButtonStyleSchema3.partial().optional(),
+  md: ButtonStyleSchema3.partial().optional(),
+  lg: ButtonStyleSchema3.partial().optional(),
+  xl: ButtonStyleSchema3.partial().optional(),
+  "2xl": ButtonStyleSchema3.partial().optional()
+}).partial().optional();
+var StackLayoutBreakpointPatchSchema3 = external_exports.object({
+  gap: NonNegativePxSchema3.optional(),
+  direction: external_exports.enum(["vertical", "horizontal"]).optional()
+}).partial();
+var StackLayoutBreakpointsSchema3 = external_exports.object({
+  sm: StackLayoutBreakpointPatchSchema3.optional(),
+  md: StackLayoutBreakpointPatchSchema3.optional(),
+  lg: StackLayoutBreakpointPatchSchema3.optional(),
+  xl: StackLayoutBreakpointPatchSchema3.optional(),
+  "2xl": StackLayoutBreakpointPatchSchema3.optional()
+}).partial().optional();
+var ButtonLayoutBreakpointPatchSchema3 = external_exports.object({
+  gap: NonNegativePxSchema3.optional(),
+  direction: external_exports.enum(["vertical", "horizontal"]).optional()
+}).partial();
+var ButtonLayoutBreakpointsSchema3 = external_exports.object({
+  sm: ButtonLayoutBreakpointPatchSchema3.optional(),
+  md: ButtonLayoutBreakpointPatchSchema3.optional(),
+  lg: ButtonLayoutBreakpointPatchSchema3.optional(),
+  xl: ButtonLayoutBreakpointPatchSchema3.optional(),
+  "2xl": ButtonLayoutBreakpointPatchSchema3.optional()
+}).partial().optional();
+var OS_PERMISSION_KEYS3 = [
+  "notifications",
+  "camera",
+  "microphone",
+  "photo_library",
+  "contacts",
+  "calendar",
+  "reminders",
+  "location_when_in_use",
+  "location_always",
+  "motion",
+  "bluetooth",
+  "app_tracking_transparency",
+  "speech_recognition",
+  "face_id",
+  "health_kit",
+  "media_library",
+  "local_network",
+  "nearby_interactions",
+  "nfc",
+  "full_screen_intent_android",
+  "sms_android",
+  "phone_android"
+];
+var OsPermissionKeySchema3 = external_exports.enum(OS_PERMISSION_KEYS3);
+var PERMISSION_CAPTURE_FIELD_KEY_PREFIX = "permission:";
+var permissionCaptureFieldKey = (key) => `${PERMISSION_CAPTURE_FIELD_KEY_PREFIX}${key}`;
+var PERMISSION_OUTCOME_VALUES3 = ["granted", "denied", "blocked"];
+var PermissionOutcomeSchema2 = external_exports.enum(PERMISSION_OUTCOME_VALUES3);
+var OS_PERMISSION_OUTCOME_CONTINUE3 = "continue";
+var OS_PERMISSION_OUTCOME_END3 = "end";
+var OsPermissionOutcomeBranchTargetSchema3 = external_exports.union([
+  ScreenIdSchema3,
+  external_exports.literal(OS_PERMISSION_OUTCOME_CONTINUE3),
+  external_exports.literal(OS_PERMISSION_OUTCOME_END3)
+]);
+var OsPermissionOutcomesSchema3 = external_exports.object({
+  granted: OsPermissionOutcomeBranchTargetSchema3,
+  denied: OsPermissionOutcomeBranchTargetSchema3,
+  blocked: OsPermissionOutcomeBranchTargetSchema3
+}).strict();
+var APP_REVIEW_OUTCOMES3 = ["not_shown", "dismissed"];
+var AppReviewOutcomeSchema2 = external_exports.enum(APP_REVIEW_OUTCOMES3);
+var ButtonActionSchema3 = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("none") }),
+  external_exports.object({ kind: external_exports.literal("continue") }),
+  external_exports.object({ kind: external_exports.literal("skip") }),
+  external_exports.object({ kind: external_exports.literal("end_flow") }),
+  external_exports.object({
+    kind: external_exports.literal("go_back_one_screen"),
+    fallbackScreenId: ScreenIdSchema3.optional()
+  }),
+  external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: ScreenIdSchema3 }),
+  external_exports.object({
+    kind: external_exports.literal("request_os_permission"),
+    permissionKey: OsPermissionKeySchema3,
+    outcomes: OsPermissionOutcomesSchema3
+  }),
+  external_exports.object({
+    kind: external_exports.literal("play_media"),
+    targetLayerIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({ kind: external_exports.literal("request_app_review") })
+]);
+var TEXT_INPUT_TYPES3 = ["plain", "email", "phone", "url", "multiline"];
+var TextInputTypeSchema3 = external_exports.enum(TEXT_INPUT_TYPES3);
+var COUNTER_DISPLAY_KINDS3 = ["number", "time"];
+var COUNTER_TIME_FORMATS3 = ["mm_ss", "hh_mm_ss", "dd_hh_mm_ss"];
+var CheckboxGlyphStyleSchema3 = external_exports.object({
+  /** Square edge length in px. */
+  size: external_exports.number().int().min(8).max(128).optional(),
+  radius: external_exports.number().int().min(0).max(96).optional(),
+  background: ThemedColorSchema3.optional(),
+  border: BorderSchema3.optional(),
+  shadow: DropShadowSchema3.optional(),
+  opacity: external_exports.number().min(0).max(1).optional(),
+  /** Fill color for the check mark when checked. */
+  checkColor: ThemedColorSchema3.optional()
+}).partial();
+var OAUTH_LOGIN_PRESETS3 = ["github", "google", "apple"];
+var OAuthPresetButtonChromeSchema3 = CommonStyleSchema3.pick({
+  width: true,
+  padding: true,
+  margin: true,
+  radius: true
+}).partial();
+var OAuthPresetButtonChromeBreakpointsSchema3 = external_exports.object({
+  sm: OAuthPresetButtonChromeSchema3.partial().optional(),
+  md: OAuthPresetButtonChromeSchema3.partial().optional(),
+  lg: OAuthPresetButtonChromeSchema3.partial().optional(),
+  xl: OAuthPresetButtonChromeSchema3.partial().optional(),
+  "2xl": OAuthPresetButtonChromeSchema3.partial().optional()
+}).partial().optional();
+var EMAIL_PASSWORD_AUTH_MODES3 = ["sign_in", "sign_up"];
+var EMAIL_PASSWORD_SLOTS3 = ["email", "password", "confirm"];
+var lazyLayer7 = () => layerSchemaStore3.schema;
+var ButtonLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("button"),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer7())),
+  action: ButtonActionSchema3,
+  variant: ButtonLayerVariantSchema3,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  style: ButtonStyleSchema3.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema3,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema3
+});
+var BackButtonLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("back_button"),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer7())),
+  variant: ButtonLayerVariantSchema3,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  style: ButtonStyleSchema3.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema3,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema3,
+  fallbackScreenId: ScreenIdSchema3.optional()
+});
+var ProgressLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("progress"),
+  trackColor: ThemedColorSchema3.optional(),
+  fillColor: ThemedColorSchema3.optional(),
+  style: CommonStyleSchema3.optional()
+});
+var LoaderOnCompleteSchema3 = external_exports.discriminatedUnion("mode", [
+  external_exports.object({ mode: external_exports.literal("none") }),
+  external_exports.object({ mode: external_exports.literal("next") }),
+  external_exports.object({ mode: external_exports.literal("screen"), screenId: ScreenIdSchema3 })
+]);
+var LoaderLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("loader"),
+  variant: external_exports.enum(["linear", "circular"]).optional(),
+  targetPercent: external_exports.number().int().min(0).max(100).optional(),
+  fillDelayMs: external_exports.number().int().min(0).max(1e4).optional(),
+  durationMs: external_exports.number().int().min(0).max(36e5).optional(),
+  onComplete: LoaderOnCompleteSchema3.optional(),
+  trackColor: ThemedColorSchema3.optional(),
+  trackOpacity: external_exports.number().min(0).max(1).optional(),
+  fillColor: ThemedColorSchema3.optional(),
+  /** Horizontal alignment of the bar or ring within the layer box (default start). */
+  align: external_exports.enum(["start", "center", "end"]).optional(),
+  style: CommonStyleSchema3.optional()
+}).superRefine((data, ctx) => {
+  if (data.variant !== "circular") return;
+  const w = data.style?.width;
+  const h = data.style?.height;
+  if (typeof w === "number" && typeof h === "number" && w !== h) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "circular loader requires style.width === style.height",
+      path: ["style", "height"]
+    });
+  }
+});
+var CounterLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("counter"),
+  startValue: external_exports.number().finite(),
+  endValue: external_exports.number().finite(),
+  durationMs: external_exports.number().int().min(0).max(36e5).optional(),
+  delayMs: external_exports.number().int().min(0).max(36e5).optional(),
+  decimalPlaces: external_exports.number().int().min(0).max(10).optional(),
+  displayKind: external_exports.enum(COUNTER_DISPLAY_KINDS3).optional(),
+  timeFormat: external_exports.enum(COUNTER_TIME_FORMATS3).optional(),
+  style: TextStyleSchema3.optional(),
+  styleBreakpoints: TextStyleBreakpointsSchema3
+});
+var CheckboxLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("checkbox"),
+  fieldKey: external_exports.string().min(1),
+  blocking: external_exports.boolean().optional(),
+  uncheckedStyle: CheckboxGlyphStyleSchema3.optional(),
+  checkedStyle: CheckboxGlyphStyleSchema3.optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+});
+var lazyLayer23 = () => layerSchemaStore3.schema;
+var StackLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("stack"),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3,
+  stackLayoutBreakpoints: StackLayoutBreakpointsSchema3,
+  selectedStyle: CommonStyleSchema3.optional(),
+  direction: external_exports.enum(["vertical", "horizontal"]),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  justify: external_exports.enum(["start", "center", "end"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  wrap: external_exports.boolean().optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer23()))
+});
+var TextLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("text"),
+  text: LocalizedTextSchema4,
+  style: TextStyleSchema3.optional(),
+  styleBreakpoints: TextStyleBreakpointsSchema3
+});
+var migrateLegacyHyperlinkForParse3 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "hyperlink") return raw;
+  const existing = o.children;
+  if (Array.isArray(existing) && existing.length > 0) return raw;
+  const idSrc = typeof o.id === "string" ? o.id.replace(/[^a-zA-Z0-9_]/g, "_") : "lyr_hyperlink";
+  const textChildId = `${idSrc}_lnktxt`.slice(0, 64);
+  const children = [
+    {
+      id: textChildId,
+      kind: "text",
+      text: o.text ?? { default: "Link" },
+      ...typeof o.style === "object" && o.style !== null ? { style: o.style } : {},
+      ...typeof o.styleBreakpoints === "object" && o.styleBreakpoints !== null ? { styleBreakpoints: o.styleBreakpoints } : {}
+    }
+  ];
+  const next = {
+    ...o,
+    children
+  };
+  delete next.text;
+  delete next.style;
+  delete next.styleBreakpoints;
+  return next;
+};
+var HyperlinkLayerSchemaInner3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("hyperlink"),
+  href: external_exports.string().min(1).max(2048),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer23()).min(1)),
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  wrap: external_exports.boolean().optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+}).superRefine((data, ctx) => {
+  const p = parseHyperlinkHref3(data.href.trim());
+  if (!p.ok) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "hyperlink href must be a valid https: or mailto: URL",
+      path: ["href"]
+    });
+  }
+});
+var HyperlinkLayerSchema3 = external_exports.preprocess(
+  migrateLegacyHyperlinkForParse3,
+  HyperlinkLayerSchemaInner3
+);
+var ImageLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("image"),
+  media: MediaReferenceSchema3.optional(),
+  alt: external_exports.string().max(280).optional(),
+  style: ImageStyleSchema3.optional(),
+  styleBreakpoints: ImageStyleBreakpointsSchema3
+});
+var LottieLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("lottie"),
+  media: MediaReferenceSchema3.optional(),
+  loop: external_exports.boolean().optional(),
+  autoPlay: external_exports.boolean().optional(),
+  triggerLayerId: external_exports.string().min(1).optional(),
+  onComplete: LoaderOnCompleteSchema3.optional(),
+  style: ImageStyleSchema3.optional(),
+  styleBreakpoints: ImageStyleBreakpointsSchema3
+});
+var VideoLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("video"),
+  media: MediaReferenceSchema3.optional(),
+  loop: external_exports.boolean().optional(),
+  autoPlay: external_exports.boolean().optional(),
+  triggerLayerId: external_exports.string().min(1).optional(),
+  onComplete: LoaderOnCompleteSchema3.optional(),
+  audioEnabled: external_exports.boolean().optional(),
+  style: ImageStyleSchema3.optional(),
+  styleBreakpoints: ImageStyleBreakpointsSchema3
+});
+var IconLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("icon"),
+  family: external_exports.enum(ICON_FAMILIES3),
+  iconName: external_exports.string().min(1).max(128),
+  style: IconStyleSchema3.optional(),
+  styleBreakpoints: IconStyleBreakpointsSchema3
+});
+var lazyLayer33 = () => layerSchemaStore3.schema;
+var OAuthProviderPresetLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("oauth_provider"),
+  variant: external_exports.literal("preset"),
+  provider: external_exports.enum(OAUTH_LOGIN_PRESETS3),
+  label: LocalizedTextSchema4.optional(),
+  style: OAuthPresetButtonChromeSchema3.optional(),
+  styleBreakpoints: OAuthPresetButtonChromeBreakpointsSchema3.optional()
+});
+var migrateOAuthProviderCustomIncoming3 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "oauth_provider" || o.variant !== "custom") return raw;
+  const ch = o.children;
+  if (Array.isArray(ch) && ch.length > 0) {
+    const next2 = { ...o };
+    if (next2.buttonVariant === void 0) next2.buttonVariant = "secondary";
+    return next2;
+  }
+  const pid = typeof o.id === "string" ? o.id : "lyr_oauth_custom";
+  const slug = pid.replace(/[^a-z0-9_]/gi, "_").slice(0, 40) || "oauth";
+  const label2 = o.label ?? { default: "Custom" };
+  let family = o.family ?? "ionicons";
+  let iconName = o.iconName ?? "shield-outline";
+  if (family === "sf_symbol") {
+    family = "ionicons";
+    iconName = "star-outline";
+  }
+  const cid = slug;
+  const iconId = `lyr_${cid}_ico`.slice(0, 64);
+  const textId = `lyr_${cid}_txt`.slice(0, 64);
+  const next = { ...o };
+  delete next.label;
+  delete next.family;
+  delete next.iconName;
+  return {
+    ...next,
+    buttonVariant: o.buttonVariant ?? "secondary",
+    children: [
+      { id: iconId, kind: "icon", family, iconName },
+      { id: textId, kind: "text", text: label2 }
+    ]
+  };
+};
+var OAuthProviderCustomLayerSchemaValidated3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("oauth_provider"),
+  variant: external_exports.literal("custom"),
+  rowId: external_exports.string().uuid(),
+  buttonVariant: ButtonLayerVariantSchema3,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer33()).min(1)),
+  style: ButtonStyleSchema3.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema3,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema3
+});
+var OAuthProviderCustomLayerSchema3 = external_exports.preprocess(
+  migrateOAuthProviderCustomIncoming3,
+  OAuthProviderCustomLayerSchemaValidated3
+);
+var OAuthProviderLayerSchema3 = external_exports.union([
+  OAuthProviderPresetLayerSchema3,
+  OAuthProviderCustomLayerSchema3
+]);
+var OAuthLoginPresetProviderSchema3 = external_exports.object({
+  type: external_exports.literal("preset"),
+  provider: external_exports.enum(OAUTH_LOGIN_PRESETS3)
+});
+var OAuthLoginCustomProviderSchema3 = external_exports.object({
+  type: external_exports.literal("custom"),
+  rowId: external_exports.string().uuid(),
+  label: LocalizedTextSchema4,
+  family: external_exports.enum(ICON_FAMILIES3),
+  iconName: external_exports.string().min(1).max(128)
+});
+var OAuthLoginProviderSchema3 = external_exports.discriminatedUnion("type", [
+  OAuthLoginPresetProviderSchema3,
+  OAuthLoginCustomProviderSchema3
+]);
+var oauthLoginChildrenUniquePresets3 = (children, ctx) => {
+  const seen = /* @__PURE__ */ new Set();
+  for (let i = 0; i < children.length; i++) {
+    const c = children[i];
+    if (!c || c.kind !== "oauth_provider" || c.variant !== "preset") continue;
+    const preset = c.provider;
+    if (seen.has(preset)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate OAuth preset "${preset}"`,
+        path: ["children", i, "provider"]
+      });
+      return;
+    }
+    seen.add(preset);
+  }
+};
+var migrateOAuthLoginIncoming3 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "oauth_login") return raw;
+  if (Array.isArray(o.children) && o.children.length > 0) return raw;
+  const provs = o.providers;
+  if (!Array.isArray(provs) || provs.length === 0) return raw;
+  const pid = typeof o.id === "string" ? o.id : "lyr_oauth_legacy";
+  const slug = pid.replace(/^lyr_/i, "").replace(/[^a-z0-9_]/gi, "_").replace(/^_+/, "").slice(0, 48) || "oauth";
+  const children = provs.map((p, idx) => {
+    const prov = p ?? {};
+    const cid = `lyr_${slug}_opr_${idx}`.slice(0, 64);
+    if (prov.type === "preset") {
+      return {
+        id: cid,
+        kind: "oauth_provider",
+        variant: "preset",
+        provider: prov.provider
+      };
+    }
+    return {
+      id: cid,
+      kind: "oauth_provider",
+      variant: "custom",
+      rowId: String(prov.rowId),
+      buttonVariant: "secondary",
+      children: [
+        {
+          id: `${cid}_ico`.slice(0, 64),
+          kind: "icon",
+          family: prov.family ?? "ionicons",
+          iconName: String(prov.iconName ?? "shield")
+        },
+        {
+          id: `${cid}_txt`.slice(0, 64),
+          kind: "text",
+          text: prov.label ?? { default: "Custom" }
+        }
+      ]
+    };
+  });
+  const { providers: _omit, ...rest } = o;
+  return { ...rest, children };
+};
+var OAuthLoginLayerSchemaValidated3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("oauth_login"),
+  children: external_exports.lazy(
+    () => external_exports.array(OAuthProviderLayerSchema3).min(1).superRefine(oauthLoginChildrenUniquePresets3)
+  ),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+});
+var OAuthLoginLayerSchema3 = external_exports.preprocess(
+  migrateOAuthLoginIncoming3,
+  OAuthLoginLayerSchemaValidated3
+);
+var OAuthLoginProvidersArraySchema2 = external_exports.array(OAuthLoginProviderSchema3).min(1).superRefine((providers, ctx) => {
+  const seen = /* @__PURE__ */ new Set();
+  for (let i = 0; i < providers.length; i++) {
+    const p = providers[i];
+    if (!p || p.type !== "preset") continue;
+    const preset = p.provider;
+    if (seen.has(preset)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate OAuth preset "${preset}"`,
+        path: [i, "provider"]
+      });
+      return;
+    }
+    seen.add(preset);
+  }
+});
+var lazyLayer43 = () => layerSchemaStore3.schema;
+var EmailPasswordAuthModeSchema3 = external_exports.enum(EMAIL_PASSWORD_AUTH_MODES3);
+var migrateEmailPasswordAuthIncoming3 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "email_password_auth") return raw;
+  if (Array.isArray(o.children) && o.children.length > 0) return raw;
+  const idBase = typeof o.id === "string" ? o.id : "lyr_email_password_auth";
+  const slugRaw = idBase.replace(/^lyr_/i, "").replace(/[^a-z0-9_]/gi, "_");
+  const slug = slugRaw.length > 0 ? slugRaw.slice(0, 40) : "ep_auth";
+  const mode = o.mode === "sign_up" ? "sign_up" : "sign_in";
+  const pickLt = (v, fallback) => v && typeof v === "object" && v !== null && "default" in v ? v : { default: fallback };
+  const mkField = (suf, slot, labelSource, fallbackPlaceholder) => ({
+    id: `lyr_${slug}_fld_${suf}`.slice(0, 64),
+    kind: "email_password_field",
+    slot,
+    ...labelSource ? { placeholder: pickLt(labelSource, fallbackPlaceholder) } : { placeholder: { default: fallbackPlaceholder } },
+    children: []
+  });
+  const children = [];
+  children.push(mkField("email", "email", o.emailLabel, "Email"));
+  children.push(mkField("pw", "password", o.passwordLabel, "Password"));
+  if (mode === "sign_up") {
+    children.push(mkField("cf", "confirm", o.confirmPasswordLabel, "Confirm password"));
+  }
+  const submitLbl = o.submitLabel ?? { default: mode === "sign_in" ? "Sign in" : "Create account" };
+  children.push({
+    id: `lyr_${slug}_submit`.slice(0, 64),
+    kind: "email_password_submit",
+    buttonVariant: "primary",
+    direction: "horizontal",
+    align: "center",
+    distribution: "center",
+    gap: 8,
+    children: [
+      {
+        id: `lyr_${slug}_submit_txt`.slice(0, 64),
+        kind: "text",
+        text: submitLbl
+      }
+    ]
+  });
+  const {
+    emailLabel: _e,
+    passwordLabel: _p,
+    confirmPasswordLabel: _c,
+    submitLabel: _s,
+    ...rest
+  } = o;
+  return { ...rest, mode, children };
+};
+var refineEmailPasswordAuthChildren3 = (data, ctx) => {
+  const fields = data.children.filter((c) => c.kind === "email_password_field");
+  const submits = data.children.filter((c) => c.kind === "email_password_submit");
+  const slotSeen = /* @__PURE__ */ new Set();
+  for (const f of fields) {
+    if (slotSeen.has(f.slot)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate email_password_field slot "${f.slot}"`,
+        path: ["children"]
+      });
+    }
+    slotSeen.add(f.slot);
+  }
+  const slotHas = new Set(fields.map((f) => f.slot));
+  const requiredSlots = data.mode === "sign_up" ? ["email", "password", "confirm"] : ["email", "password"];
+  for (const s of requiredSlots) {
+    if (!slotHas.has(s)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: data.mode === "sign_up" ? `sign_up requires an email_password_field with slot "${s}"` : `sign_in requires an email_password_field with slot "${s}"`,
+        path: ["children"]
+      });
+    }
+  }
+  if (data.mode === "sign_in" && slotHas.has("confirm")) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: 'sign_in must not include email_password_field with slot "confirm"',
+      path: ["children"]
+    });
+  }
+  if (submits.length !== 1) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: `email_password_auth must have exactly one email_password_submit (found ${submits.length})`,
+      path: ["children"]
+    });
+  }
+};
+var EmailPasswordFieldLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("email_password_field"),
+  slot: external_exports.enum(EMAIL_PASSWORD_SLOTS3),
+  placeholder: LocalizedTextSchema4.optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer43())).optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+});
+var EmailPasswordSubmitLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("email_password_submit"),
+  buttonVariant: ButtonLayerVariantSchema3,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer43()).min(1)),
+  style: ButtonStyleSchema3.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema3,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema3
+});
+var EmailPasswordAuthLayerSchemaValidated3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("email_password_auth"),
+  mode: EmailPasswordAuthModeSchema3,
+  fieldKey: FieldKeySchema3,
+  minPasswordLength: external_exports.number().int().min(4).max(128).optional(),
+  children: external_exports.lazy(
+    () => external_exports.array(external_exports.union([EmailPasswordFieldLayerSchema3, EmailPasswordSubmitLayerSchema3])).min(1)
+  ),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+}).superRefine(refineEmailPasswordAuthChildren3);
+var EmailPasswordAuthLayerSchema3 = external_exports.preprocess(
+  migrateEmailPasswordAuthIncoming3,
+  EmailPasswordAuthLayerSchemaValidated3
+);
+var ChoiceOptionBindingSchema3 = external_exports.object({
+  optionId: external_exports.string().min(1).max(64),
+  rootLayerId: LayerIdSchema3
+});
+var BranchConditionSchema3 = external_exports.object({
+  choiceId: external_exports.string().min(1),
+  goTo: ScreenIdSchema3
+});
+var ChoiceBranchingSchema3 = external_exports.object({
+  enabled: external_exports.boolean(),
+  conditions: external_exports.array(BranchConditionSchema3)
+});
+var lazyLayer53 = () => layerSchemaStore3.schema;
+var ChoiceChildrenAndBindingsRefinement = (data, ctx) => {
+  const childIds = /* @__PURE__ */ new Set();
+  for (const c of data.children) {
+    if (childIds.has(c.id)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate option child id "${c.id}"`,
+        path: ["children"]
+      });
+    }
+    childIds.add(c.id);
+  }
+  const seenOptionIds = /* @__PURE__ */ new Set();
+  const seenRootIds = /* @__PURE__ */ new Set();
+  for (const b of data.optionBindings) {
+    if (seenOptionIds.has(b.optionId)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate optionId "${b.optionId}" in optionBindings`,
+        path: ["optionBindings"]
+      });
+    }
+    seenOptionIds.add(b.optionId);
+    if (seenRootIds.has(b.rootLayerId)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate rootLayerId "${b.rootLayerId}" in optionBindings`,
+        path: ["optionBindings"]
+      });
+    }
+    seenRootIds.add(b.rootLayerId);
+    if (!childIds.has(b.rootLayerId)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `optionBindings rootLayerId "${b.rootLayerId}" does not match any direct child stack`,
+        path: ["optionBindings"]
+      });
+    }
+  }
+  if (data.optionBindings.length !== data.children.length) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "optionBindings length must equal children length",
+      path: ["optionBindings"]
+    });
+  }
+};
+var SingleChoiceLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("single_choice"),
+  fieldKey: FieldKeySchema3,
+  children: external_exports.lazy(
+    () => external_exports.array(StackLayerSchema3).min(2)
+  ),
+  optionBindings: external_exports.array(ChoiceOptionBindingSchema3).min(2),
+  branching: ChoiceBranchingSchema3,
+  direction: external_exports.enum(["vertical", "horizontal", "grid"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  columns: external_exports.number().int().min(1).max(12).optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+});
+var MultipleChoiceLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("multiple_choice"),
+  fieldKey: FieldKeySchema3,
+  children: external_exports.lazy(
+    () => external_exports.array(StackLayerSchema3).min(2)
+  ),
+  optionBindings: external_exports.array(ChoiceOptionBindingSchema3).min(2),
+  minSelections: external_exports.number().int().nonnegative().optional(),
+  maxSelections: external_exports.number().int().positive().optional(),
+  branching: ChoiceBranchingSchema3,
+  direction: external_exports.enum(["vertical", "horizontal", "grid"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  columns: external_exports.number().int().min(1).max(12).optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+});
+var validateChoiceChildrenAndBindings = ChoiceChildrenAndBindingsRefinement;
+var TextInputLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("text_input"),
+  fieldKey: FieldKeySchema3,
+  placeholder: LocalizedTextSchema4.optional(),
+  inputType: TextInputTypeSchema3.optional(),
+  required: external_exports.boolean().optional(),
+  minLength: external_exports.number().int().min(0).max(2e3).optional(),
+  maxLength: external_exports.number().int().positive().max(2e3).optional(),
+  classification: FieldClassificationSchema3,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer53())).optional(),
+  style: CommonStyleSchema3.optional()
+});
+var ScaleInputLabelStyleSchema3 = external_exports.object({
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema3.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional(),
+  lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
+var ScaleInputLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("scale_input"),
+  fieldKey: FieldKeySchema3,
+  min: external_exports.number(),
+  max: external_exports.number(),
+  step: external_exports.number().positive().optional(),
+  defaultValue: external_exports.number().optional(),
+  minLabel: LocalizedTextSchema4.optional(),
+  maxLabel: LocalizedTextSchema4.optional(),
+  labelStyle: ScaleInputLabelStyleSchema3.optional(),
+  valueStyle: ScaleInputLabelStyleSchema3.optional(),
+  showLabels: external_exports.boolean().optional(),
+  showValue: external_exports.boolean().optional(),
+  trackHeight: external_exports.number().int().min(2).max(32).optional(),
+  trackColor: ThemedColorSchema3.optional(),
+  fillColor: ThemedColorSchema3.optional(),
+  thumbSize: external_exports.number().int().min(8).max(48).optional(),
+  thumbColor: ThemedColorSchema3.optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer53())).optional(),
+  style: CommonStyleSchema3.optional()
+});
+var CarouselIndicatorsStyleSchema3 = external_exports.object({
+  width: external_exports.number().int().min(1).max(64).optional(),
+  height: external_exports.number().int().min(1).max(64).optional(),
+  defaultColor: ThemedColorSchema3.optional(),
+  defaultOpacity: external_exports.number().min(0).max(1).optional(),
+  activeColor: ThemedColorSchema3.optional(),
+  activeOpacity: external_exports.number().min(0).max(1).optional(),
+  activeWidth: external_exports.number().int().min(1).max(64).optional(),
+  activeHeight: external_exports.number().int().min(1).max(64).optional(),
+  border: BorderSchema3.optional(),
+  activeBorder: BorderSchema3.optional()
+}).partial();
+var CarouselPageControlSchema3 = external_exports.object({
+  position: external_exports.enum(["top", "bottom"]),
+  spacing: external_exports.number().int().min(0).optional(),
+  padding: PaddingSchema3.optional(),
+  margin: PaddingSchema3.optional(),
+  indicators: CarouselIndicatorsStyleSchema3.optional(),
+  border: BorderSchema3.optional(),
+  shadow: DropShadowSchema3.optional()
+});
+var CarouselLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("carousel"),
+  slides: external_exports.lazy(() => external_exports.array(StackLayerSchema3).min(1)),
+  pageAlignment: external_exports.enum(["top", "center", "bottom"]).optional(),
+  pageSpacing: external_exports.number().int().min(0).optional(),
+  pagePeek: external_exports.number().int().min(0).max(400).optional(),
+  openOn: external_exports.number().int().min(0).optional(),
+  loop: external_exports.boolean().optional(),
+  autoAdvance: external_exports.boolean().optional(),
+  autoAdvanceMs: external_exports.number().int().min(500).max(6e4).optional(),
+  pageControl: CarouselPageControlSchema3.optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+});
+layerSchemaStore3.schema = external_exports.lazy(
+  () => external_exports.union([
+    StackLayerSchema3,
+    TextLayerSchema3,
+    HyperlinkLayerSchema3,
+    ImageLayerSchema3,
+    LottieLayerSchema3,
+    VideoLayerSchema3,
+    IconLayerSchema3,
+    ButtonLayerSchema3,
+    BackButtonLayerSchema3,
+    ProgressLayerSchema3,
+    LoaderLayerSchema3,
+    CounterLayerSchema3,
+    CheckboxLayerSchema3,
+    SingleChoiceLayerSchema3,
+    MultipleChoiceLayerSchema3,
+    TextInputLayerSchema3,
+    ScaleInputLayerSchema3,
+    OAuthLoginLayerSchema3,
+    OAuthProviderPresetLayerSchema3,
+    OAuthProviderCustomLayerSchema3,
+    EmailPasswordAuthLayerSchema3,
+    EmailPasswordFieldLayerSchema3,
+    EmailPasswordSubmitLayerSchema3,
+    CarouselLayerSchema3
+  ])
+);
+var LayerSchema2 = layerSchemaStore3.schema;
+var STYLE_BREAKPOINT_KEYS = ["sm", "md", "lg", "xl", "2xl"];
+var commonStyleHasAbsolutePosition = (style, breakpoints) => {
+  if (style?.position === "absolute") return true;
+  if (!breakpoints) return false;
+  for (const k of STYLE_BREAKPOINT_KEYS) {
+    if (breakpoints[k]?.position === "absolute") return true;
+  }
+  return false;
+};
+var layerHasAbsolutePositionAuthored = (layer) => {
+  switch (layer.kind) {
+    case "stack":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints) || layer.selectedStyle?.position === "absolute";
+    case "text":
+    case "counter":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+    case "image":
+    case "lottie":
+    case "video":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+    case "icon":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+    case "button":
+    case "back_button":
+    case "hyperlink":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+    case "progress":
+    case "loader":
+      return commonStyleHasAbsolutePosition(layer.style, void 0);
+    case "text_input":
+    case "scale_input":
+      return commonStyleHasAbsolutePosition(layer.style, void 0);
+    case "oauth_provider":
+      if (layer.variant === "preset") {
+        return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+      }
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+    case "oauth_login":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+    case "email_password_auth":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+    case "email_password_field":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+    case "email_password_submit":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+    case "carousel":
+      return commonStyleHasAbsolutePosition(layer.style, void 0);
+    case "checkbox":
+    case "single_choice":
+    case "multiple_choice":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+    default:
+      return false;
+  }
+};
+var isInputLayer2 = (l) => l.kind === "single_choice" || l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input";
 var ANIMATABLE_PROPERTIES = [
   "opacity",
   "translateX",
@@ -5545,7 +7459,7 @@ var ANIMATION_TRIGGERS = ["mount", "stagger", "unmount"];
 var AnimationTriggerSchema = external_exports.enum(ANIMATION_TRIGGERS);
 var AnimationClipSchema = external_exports.object({
   id: external_exports.string().min(1).max(64),
-  targetLayerId: LayerIdSchema,
+  targetLayerId: LayerIdSchema3,
   trigger: AnimationTriggerSchema,
   /** Position in the screen's stagger order. Required when trigger is `stagger`. */
   staggerIndex: external_exports.number().int().min(0).max(64).optional(),
@@ -5584,25 +7498,23 @@ var ScreenStaggerSchema = external_exports.object({
   /** Per-index delay multiplier in ms. */
   stepMs: external_exports.number().int().min(0).max(2e3)
 }).strict();
-
-// ../contracts/src/screenBackground.ts
 var SCREEN_BACKGROUND_PLAYBACK_PREFIX = "__screen_bg__:";
 var screenBackgroundPlaybackId = (screenId) => `${SCREEN_BACKGROUND_PLAYBACK_PREFIX}${screenId}`;
 var isScreenBackgroundPlaybackId = (id) => id.startsWith(SCREEN_BACKGROUND_PLAYBACK_PREFIX);
 var ScreenBackgroundFitSchema = external_exports.enum(["cover", "contain", "fill"]);
 var ScreenBackgroundScrimSchema = external_exports.object({
-  color: ThemedColorSchema.optional(),
+  color: ThemedColorSchema3.optional(),
   opacity: external_exports.number().min(0).max(1).optional()
 }).partial();
 var screenBackgroundMediaShape = {
-  media: MediaReferenceSchema.optional(),
+  media: MediaReferenceSchema3.optional(),
   fit: ScreenBackgroundFitSchema.optional(),
   opacity: external_exports.number().min(0).max(1).optional(),
   scrim: ScreenBackgroundScrimSchema.optional()
 };
 var ScreenBackgroundColorFillSchema = external_exports.object({
   kind: external_exports.literal("color"),
-  color: ThemedColorSchema.optional(),
+  color: ThemedColorSchema3.optional(),
   opacity: external_exports.number().min(0).max(1).optional()
 });
 var ScreenBackgroundImageFillSchema = external_exports.object({
@@ -5615,7 +7527,7 @@ var ScreenBackgroundVideoFillSchema = external_exports.object({
   loop: external_exports.boolean().optional(),
   autoPlay: external_exports.boolean().optional(),
   triggerLayerId: external_exports.string().min(1).optional(),
-  onComplete: LoaderOnCompleteSchema.optional(),
+  onComplete: LoaderOnCompleteSchema3.optional(),
   audioEnabled: external_exports.boolean().optional()
 });
 var ScreenBackgroundFillSchema = external_exports.discriminatedUnion("kind", [
@@ -5624,19 +7536,19 @@ var ScreenBackgroundFillSchema = external_exports.discriminatedUnion("kind", [
   ScreenBackgroundVideoFillSchema
 ]);
 var ScreenBackgroundFillPatchSchema = external_exports.object({
-  color: ThemedColorSchema.optional(),
+  color: ThemedColorSchema3.optional(),
   fit: ScreenBackgroundFitSchema.optional(),
   opacity: external_exports.number().min(0).max(1).optional(),
   scrim: ScreenBackgroundScrimSchema.optional(),
   loop: external_exports.boolean().optional(),
   autoPlay: external_exports.boolean().optional(),
   triggerLayerId: external_exports.string().min(1).optional(),
-  onComplete: LoaderOnCompleteSchema.optional(),
+  onComplete: LoaderOnCompleteSchema3.optional(),
   audioEnabled: external_exports.boolean().optional()
 }).partial();
 var ScreenContainerBreakpointPatchSchema = external_exports.object({
-  padding: PaddingSchema.optional(),
-  margin: PaddingSchema.optional(),
+  padding: PaddingSchema3.optional(),
+  margin: PaddingSchema3.optional(),
   insetSafeArea: external_exports.boolean().optional(),
   backgroundFillPatch: ScreenBackgroundFillPatchSchema.optional()
 }).partial();
@@ -5647,25 +7559,158 @@ var ScreenContainerStyleBreakpointsSchema = external_exports.object({
   xl: ScreenContainerBreakpointPatchSchema.optional(),
   "2xl": ScreenContainerBreakpointPatchSchema.optional()
 }).partial().optional();
-
-// ../contracts/src/screens.ts
+var DecisionNodeIdSchema2 = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i, "decision node id must look like dec_<id>");
+var ExternalSurfaceJumpIdSchema2 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
+var EXTERNAL_SURFACE_NO_NEXT2 = "__onb_surface_no_next__";
+var ExternalSurfaceTerminalTargetSchema2 = external_exports.literal(EXTERNAL_SURFACE_NO_NEXT2);
+var FlowJumpTargetSchema2 = ScreenIdSchema3.or(DecisionNodeIdSchema2).or(ExternalSurfaceJumpIdSchema2).or(ExternalSurfaceTerminalTargetSchema2).nullable();
+var DecisionBuiltinNameSchema2 = external_exports.enum(["locale", "platform"]);
+var DecisionVariableRefSchema2 = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema2 }),
+  external_exports.object({ kind: external_exports.literal("sdk"), key: external_exports.string().min(1).max(128) }),
+  external_exports.object({ kind: external_exports.literal("field"), fieldKey: external_exports.string().min(1).max(128) })
+]);
+var DecisionStringPredicateSchema2 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("contains"), value: external_exports.string() })
+]);
+var DecisionNumberPredicateSchema2 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lte"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gte"), value: external_exports.number() })
+]);
+var DecisionChoicePredicateSchema2 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), optionId: external_exports.string().min(1) }),
+  external_exports.object({ op: external_exports.literal("one_of"), optionIds: external_exports.array(external_exports.string().min(1)).min(1) })
+]);
+var DecisionMultiPredicateSchema2 = external_exports.discriminatedUnion("op", [
+  external_exports.object({
+    op: external_exports.literal("intersects"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("contains_all"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("subset_of"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  })
+]);
+var DecisionBooleanPredicateSchema2 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.boolean() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.boolean() })
+]);
+var DecisionPredicatePayloadSchema2 = external_exports.discriminatedUnion("type", [
+  external_exports.object({ type: external_exports.literal("string"), pred: DecisionStringPredicateSchema2 }),
+  external_exports.object({ type: external_exports.literal("number"), pred: DecisionNumberPredicateSchema2 }),
+  external_exports.object({ type: external_exports.literal("boolean"), pred: DecisionBooleanPredicateSchema2 }),
+  external_exports.object({ type: external_exports.literal("choice"), pred: DecisionChoicePredicateSchema2 }),
+  external_exports.object({ type: external_exports.literal("multi"), pred: DecisionMultiPredicateSchema2 })
+]);
+var DecisionExprSchema2 = external_exports.lazy(
+  () => external_exports.discriminatedUnion("kind", [
+    external_exports.object({ kind: external_exports.literal("empty") }),
+    external_exports.object({
+      kind: external_exports.literal("group"),
+      op: external_exports.enum(["and", "or"]),
+      children: external_exports.array(DecisionExprSchema2).min(1)
+    }),
+    external_exports.object({
+      kind: external_exports.literal("predicate"),
+      variable: DecisionVariableRefSchema2,
+      predicate: DecisionPredicatePayloadSchema2
+    })
+  ])
+);
+var DecisionCaseSchema2 = external_exports.object({
+  id: external_exports.string().min(1).max(80),
+  /** Display label in the editor (e.g. “Engaged users”). */
+  name: external_exports.string().min(1).max(80).optional(),
+  expression: DecisionExprSchema2,
+  next: FlowJumpTargetSchema2
+});
+var DecisionNodeSchema2 = external_exports.object({
+  id: DecisionNodeIdSchema2,
+  name: external_exports.string().min(1).max(80).optional(),
+  cases: external_exports.array(DecisionCaseSchema2).min(1).max(16),
+  elseNext: FlowJumpTargetSchema2
+});
+var migrateLegacyDecisionNodeInPlace = (node) => {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node.cases)) return;
+  if (!("expression" in node)) return;
+  const id = typeof node.id === "string" ? node.id : "dec_unknown";
+  const expression = node.expression;
+  const onTrue = "onTrue" in node ? node.onTrue ?? null : null;
+  const onFalse = "onFalse" in node ? node.onFalse ?? null : null;
+  delete node.expression;
+  delete node.onTrue;
+  delete node.onFalse;
+  node.cases = [
+    {
+      id: `${id}_case_0`,
+      name: "Group 1",
+      expression,
+      next: onTrue
+    }
+  ];
+  node.elseNext = onFalse;
+};
+var collectDecisionSdkKeys = (expr) => {
+  const out = [];
+  const walk = (e) => {
+    if (e.kind === "empty") return;
+    if (e.kind === "predicate") {
+      if (e.variable.kind === "sdk") out.push(e.variable.key);
+      return;
+    }
+    for (const c of e.children) walk(c);
+  };
+  walk(expr);
+  return out;
+};
+var collectDecisionFieldKeys2 = (expr) => {
+  const out = [];
+  const walk = (e) => {
+    if (e.kind === "empty") return;
+    if (e.kind === "predicate") {
+      if (e.variable.kind === "field") out.push(e.variable.fieldKey);
+      return;
+    }
+    for (const c of e.children) walk(c);
+  };
+  walk(expr);
+  return out;
+};
+var collectDecisionFieldKeysFromNode2 = (node) => {
+  const seen = /* @__PURE__ */ new Set();
+  for (const c of node.cases) {
+    for (const k of collectDecisionFieldKeys2(c.expression)) seen.add(k);
+  }
+  return [...seen];
+};
 var ScreenNextSchema = external_exports.object({
-  default: FlowJumpTargetSchema
+  default: FlowJumpTargetSchema2
 });
 var ScreenRegionsSchema = external_exports.object({
-  header: StackLayerSchema.optional(),
-  body: StackLayerSchema,
-  footer: StackLayerSchema.optional()
+  header: StackLayerSchema3.optional(),
+  body: StackLayerSchema3,
+  footer: StackLayerSchema3.optional()
 });
 var ScreenContainerStyleSchema = external_exports.object({
-  padding: PaddingSchema.optional(),
-  margin: PaddingSchema.optional(),
+  padding: PaddingSchema3.optional(),
+  margin: PaddingSchema3.optional(),
   /** When true, runtimes add device safe-area insets to shell padding (in addition to manual padding). */
   insetSafeArea: external_exports.boolean().optional(),
   backgroundFill: ScreenBackgroundFillSchema.optional()
 }).partial();
 var ScreenSchema = external_exports.object({
-  id: ScreenIdSchema,
+  id: ScreenIdSchema3,
   name: external_exports.string().min(1).max(80),
   regions: ScreenRegionsSchema,
   next: ScreenNextSchema,
@@ -5750,8 +7795,6 @@ var walkScreenLayers = (screen, fn) => {
   visit(screen.regions.body);
   if (screen.regions.footer) visit(screen.regions.footer);
 };
-
-// ../contracts/src/externalSurfaces.ts
 var ExternalSurfaceNodeIdSchema = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
 var NORMALIZED_SURFACE_OUTCOMES = [
   "purchase_completed",
@@ -5777,11 +7820,11 @@ var ExternalSurfaceConfigSchema = external_exports.discriminatedUnion("provider"
   RevenueCatSurfaceConfigSchema
 ]);
 var ExternalSurfaceOutcomesMapSchema = external_exports.object({
-  purchase_completed: FlowJumpTargetSchema.optional(),
-  purchase_cancelled: FlowJumpTargetSchema.optional(),
-  dismissed: FlowJumpTargetSchema.optional(),
-  failed: FlowJumpTargetSchema.optional(),
-  restore_completed: FlowJumpTargetSchema.optional()
+  purchase_completed: FlowJumpTargetSchema2.optional(),
+  purchase_cancelled: FlowJumpTargetSchema2.optional(),
+  dismissed: FlowJumpTargetSchema2.optional(),
+  failed: FlowJumpTargetSchema2.optional(),
+  restore_completed: FlowJumpTargetSchema2.optional()
 }).strict();
 var ExternalSurfaceNodeSchema = external_exports.object({
   id: ExternalSurfaceNodeIdSchema,
@@ -5790,10 +7833,8 @@ var ExternalSurfaceNodeSchema = external_exports.object({
   /** Per-outcome jump targets. Outcomes not listed here fall through to `fallback`. */
   outcomes: ExternalSurfaceOutcomesMapSchema,
   /** Required: used for any outcome not in `outcomes` (e.g. provider quirks, unmapped events). */
-  fallback: FlowJumpTargetSchema
+  fallback: FlowJumpTargetSchema2
 });
-
-// ../contracts/src/sdkAttributes.ts
 var RESERVED_RC_SDK_KEYS = [
   /** Last RC event observed by the SDK (e.g. `purchase_completed`, `purchase_cancelled`). */
   "onb_rc_last_event",
@@ -5806,11 +7847,7 @@ var RESERVED_RC_SDK_KEYS = [
 ];
 var RESERVED_SDK_KEYS_SET = new Set(RESERVED_RC_SDK_KEYS);
 var isReservedSdkKey = (key) => RESERVED_SDK_KEYS_SET.has(key);
-
-// ../contracts/src/manifest/version.ts
 var MANIFEST_SCHEMA_VERSION = 7;
-
-// ../contracts/src/manifest/theme.ts
 var ThemeSchema = external_exports.object({
   primary: external_exports.string().optional(),
   primaryForeground: external_exports.string().optional(),
@@ -5837,8 +7874,6 @@ var BuilderMetaSchema = external_exports.object({
     }).optional()
   }).optional()
 }).passthrough().optional();
-
-// ../contracts/src/manifest/migrate.ts
 var migrateLayerInPlace = (layer) => {
   if (!layer || typeof layer !== "object") return;
   const l = layer;
@@ -5946,26 +7981,22 @@ var migrateLegacyManifest = (raw) => {
   const clone = JSON.parse(JSON.stringify(raw));
   return migrateManifestInPlace(clone);
 };
-
-// ../contracts/src/manifest/flowManifestObjectBaseSchema.ts
 var FlowManifestObjectBaseSchema = external_exports.object({
   flowId: external_exports.string().uuid(),
   /** Manifest schema version — see {@link MANIFEST_SCHEMA_VERSION}. */
   schemaVersion: external_exports.literal(MANIFEST_SCHEMA_VERSION).optional(),
   version: external_exports.number().int().positive(),
-  defaultLocale: LocaleCode,
-  locales: external_exports.array(LocaleCode),
+  defaultLocale: LocaleCode4,
+  locales: external_exports.array(LocaleCode4),
   /** When null, the draft has no wired entry target (builder connects the canvas entry node). */
   entryScreenId: external_exports.union([external_exports.string().min(1), external_exports.null()]),
   screens: external_exports.array(ScreenSchema),
-  decisionNodes: external_exports.union([external_exports.array(DecisionNodeSchema), external_exports.undefined()]).transform((x) => x ?? []),
+  decisionNodes: external_exports.union([external_exports.array(DecisionNodeSchema2), external_exports.undefined()]).transform((x) => x ?? []),
   externalSurfaceNodes: external_exports.union([external_exports.array(ExternalSurfaceNodeSchema), external_exports.undefined()]).transform((x) => x ?? []),
   sdkAttributeKeys: external_exports.union([external_exports.array(external_exports.string().min(1).max(128)), external_exports.undefined()]).transform((x) => x ?? []),
   theme: ThemeSchema.optional(),
   builderMeta: BuilderMetaSchema
 });
-
-// ../contracts/src/manifest/refineManifestGraph.ts
 var buildManifestJumpTargets = (manifest) => {
   const screenIds = new Set(manifest.screens.map((s) => s.id));
   const decisionIds = new Set(manifest.decisionNodes.map((d) => d.id));
@@ -5974,7 +8005,7 @@ var buildManifestJumpTargets = (manifest) => {
     ...screenIds,
     ...decisionIds,
     ...surfaceIds,
-    EXTERNAL_SURFACE_NO_NEXT
+    EXTERNAL_SURFACE_NO_NEXT2
   ]);
 };
 var refineManifestGraph = (manifest, ctx, jumpTargets) => {
@@ -6093,8 +8124,6 @@ var refineManifestGraph = (manifest, ctx, jumpTargets) => {
   });
   return { screenIds, decisionIds, surfaceIds };
 };
-
-// ../contracts/src/manifest/refineManifestScreens.ts
 var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys) => {
   const layerIds = /* @__PURE__ */ new Set();
   manifest.screens.forEach((screen, screenIdx) => {
@@ -6112,7 +8141,7 @@ var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys
         });
       }
       layerIds.add(l.id);
-      if (isInputLayer(l)) {
+      if (isInputLayer2(l)) {
         inputCount += 1;
         if (allFieldKeys.has(l.fieldKey)) {
           ctx.addIssue({
@@ -6227,25 +8256,25 @@ var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys
         });
       }
       if (l.kind === "button" && l.action.kind === "request_os_permission") {
-        for (const [label, sid] of [
+        for (const [label2, sid] of [
           ["granted", l.action.outcomes.granted],
           ["denied", l.action.outcomes.denied],
           ["blocked", l.action.outcomes.blocked]
         ]) {
-          if (sid === OS_PERMISSION_OUTCOME_END) {
-          } else if (sid === OS_PERMISSION_OUTCOME_CONTINUE) {
+          if (sid === OS_PERMISSION_OUTCOME_END3) ;
+          else if (sid === OS_PERMISSION_OUTCOME_CONTINUE3) {
             const def = screen.next.default;
             if (def != null && !jumpTargets.has(def)) {
               ctx.addIssue({
                 code: external_exports.ZodIssueCode.custom,
-                message: `screen "${screen.id}" request_os_permission outcomes.${label} uses default next (continue) but screen.next.default "${def}" is not a valid target`,
+                message: `screen "${screen.id}" request_os_permission outcomes.${label2} uses default next (continue) but screen.next.default "${def}" is not a valid target`,
                 path: ["screens", screenIdx]
               });
             }
           } else if (!jumpTargets.has(sid)) {
             ctx.addIssue({
               code: external_exports.ZodIssueCode.custom,
-              message: `screen "${screen.id}" request_os_permission outcomes.${label} "${sid}" not found`,
+              message: `screen "${screen.id}" request_os_permission outcomes.${label2} "${sid}" not found`,
               path: ["screens", screenIdx]
             });
           }
@@ -6327,15 +8356,13 @@ var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys
     }
   });
 };
-
-// ../contracts/src/manifest/refineFlowManifest.ts
 var refineFlowManifest = (manifest, ctx) => {
   const jumpTargets = buildManifestJumpTargets(manifest);
   const { screenIds } = refineManifestGraph(manifest, ctx, jumpTargets);
   const allFieldKeys = /* @__PURE__ */ new Map();
   refineManifestScreens(manifest, ctx, jumpTargets, screenIds, allFieldKeys);
   manifest.decisionNodes.forEach((dn, di) => {
-    for (const fk of collectDecisionFieldKeysFromNode(dn)) {
+    for (const fk of collectDecisionFieldKeysFromNode2(dn)) {
       if (!allFieldKeys.has(fk)) {
         ctx.addIssue({
           code: external_exports.ZodIssueCode.custom,
@@ -6353,12 +8380,8 @@ var refineFlowManifest = (manifest, ctx) => {
     });
   }
 };
-
-// ../contracts/src/manifest/flowManifestSchema.ts
 var FlowManifestObjectSchema = FlowManifestObjectBaseSchema.superRefine(refineFlowManifest);
 var FlowManifestSchema = FlowManifestObjectSchema;
-
-// ../contracts/src/identity.ts
 var SdkIdentitySchema = external_exports.object({
   appUserId: external_exports.string().min(1),
   customUserId: external_exports.string().min(1).optional(),
@@ -6370,8 +8393,6 @@ var SdkContextSchema = external_exports.object({
   locale: external_exports.string().optional(),
   customProperties: external_exports.record(external_exports.string(), external_exports.union([external_exports.string(), external_exports.number(), external_exports.boolean()])).optional()
 });
-
-// ../contracts/src/appIntegrations.ts
 var RevenueCatIntegrationSchema = external_exports.object({
   enabled: external_exports.boolean(),
   defaultOfferingId: external_exports.string(),
@@ -6404,8 +8425,6 @@ var AttributionProviderSignalResponseSchema = external_exports.object({
   /** ISO-8601 from ClickHouse `max(timestamp)`, or null when there are no matches. */
   lastSeenAt: external_exports.string().nullable()
 });
-
-// ../contracts/src/branding.ts
 var HEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 var BrandColorSchema = external_exports.object({
   id: external_exports.string().uuid(),
@@ -6456,8 +8475,6 @@ var BrandingSchema = external_exports.object({
   gradientPresets: external_exports.array(BrandGradientSchema),
   fontFamilies: external_exports.array(FontFamilySchema)
 });
-
-// ../contracts/src/sdk.ts
 var SdkResolveRequestSchema = external_exports.object({
   identity: SdkIdentitySchema,
   context: SdkContextSchema.optional()
@@ -6530,8 +8547,6 @@ var FlowTerminalSnapshotSchema = external_exports.object({
   answersDetail: external_exports.record(external_exports.string(), external_exports.unknown()).optional(),
   manifest: FlowManifestSchema.optional()
 });
-
-// ../contracts/src/events.ts
 var EventNameSchema = external_exports.enum(EVENT_NAMES);
 var SdkEventSchema = external_exports.object({
   eventId: external_exports.string().uuid(),
@@ -6555,8 +8570,6 @@ var SdkEventSchema = external_exports.object({
 var SdkEventBatchSchema = external_exports.object({
   events: external_exports.array(SdkEventSchema).min(1).max(500)
 });
-
-// ../contracts/src/iapPurchase.ts
 var IapPurchasePeriodTypeSchema = external_exports.enum(["normal", "intro", "trial"]);
 var IapPurchaseEventPropertiesSchema = external_exports.object({
   /** External surface provider that produced the purchase. */
@@ -6588,8 +8601,6 @@ var IapPurchaseStoredPropertiesSchema = IapPurchaseEventPropertiesSchema.innerTy
   /** True when client provided price + currency but FX conversion was unavailable. */
   fx_unavailable: external_exports.boolean().optional()
 });
-
-// ../contracts/src/canvasEditorGates.ts
 var CanvasEditorGatesResolvedSchema = external_exports.object({
   lottie: external_exports.boolean(),
   oauthLogin: external_exports.boolean(),
@@ -6626,7 +8637,7 @@ var parseCanvasEditorGates = (raw) => {
   if (!parsed.success) return { ...ALL_TRUE };
   return { ...ALL_TRUE, ...parsed.data };
 };
-var layerViolationMessage = (screenId, layerId, label) => `Screen "${screenId}": ${label} (layer "${layerId}") is disabled for this app in canvas editor settings.`;
+var layerViolationMessage = (screenId, layerId, label2) => `Screen "${screenId}": ${label2} (layer "${layerId}") is disabled for this app in canvas editor settings.`;
 var buttonOsPermissionMessage = (screenId, layerId) => `Screen "${screenId}": request OS permission button actions are disabled for this app (layer "${layerId}").`;
 var collectCanvasGateViolations = (manifest, gates) => {
   const issues = [];
@@ -6669,7 +8680,1386 @@ var collectCanvasGateViolations = (manifest, gates) => {
   return issues;
 };
 
-// ../flow-runtime/src/validation.ts
+// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/fields.js
+var FIELD_CLASSIFICATIONS4 = ["safe", "sensitive"];
+var FIELD_KEY_RE4 = /^[a-z][a-z0-9_]*$/;
+var FieldKeySchema4 = external_exports.string().min(1).max(64).regex(FIELD_KEY_RE4, "field key must be snake_case");
+var FieldClassificationSchema4 = external_exports.enum(FIELD_CLASSIFICATIONS4);
+
+// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/screens.js
+var layerSchemaStore4 = {};
+var LocaleCode5 = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
+var LocalizedTextSchema5 = external_exports.object({
+  default: external_exports.string().min(1, "default copy is required"),
+  translations: external_exports.record(LocaleCode5, external_exports.string()).optional()
+});
+var parseHyperlinkHref4 = (raw) => {
+  const t = raw.trim();
+  if (!t) return { ok: false };
+  let u;
+  try {
+    u = new URL(t);
+  } catch {
+    return { ok: false };
+  }
+  const scheme = u.protocol.replace(/:$/, "").toLowerCase();
+  if (scheme === "https") {
+    if (!u.hostname) return { ok: false };
+    return { ok: true, scheme: "https", host: u.hostname };
+  }
+  if (scheme === "mailto") {
+    return { ok: true, scheme: "mailto" };
+  }
+  return { ok: false };
+};
+var FIELD_CLASSIFICATIONS5 = ["safe", "sensitive"];
+var MEDIA_TYPES4 = ["image", "font", "lottie", "video"];
+var MediaTypeSchema4 = external_exports.enum(MEDIA_TYPES4);
+var MediaReferenceSchema4 = external_exports.object({
+  mediaAssetId: external_exports.string().uuid()
+});
+external_exports.object({
+  id: external_exports.string().uuid(),
+  orgId: external_exports.string().uuid(),
+  type: MediaTypeSchema4,
+  url: external_exports.string().url(),
+  name: external_exports.string().nullable().optional(),
+  contentType: external_exports.string(),
+  sizeBytes: external_exports.number().int().nonnegative(),
+  archivedAt: external_exports.string().datetime().nullable().optional(),
+  createdAt: external_exports.string().datetime()
+});
+var LayerIdSchema4 = external_exports.string().min(1).max(64).regex(/^lyr_[a-z0-9_]+$/i, "layer id must look like lyr_<id>");
+var ScreenIdSchema4 = external_exports.string().min(1).max(64).regex(/^scr_[a-z0-9_]+$/i, "screen id must look like scr_<id>");
+var RESTING_MOTION_PRESETS4 = ["translate", "bounce", "scale", "pulse", "rotate"];
+var RestingMotionPresetSchema4 = external_exports.enum(RESTING_MOTION_PRESETS4);
+var RESTING_MOTION_SCALE_DIRECTIONS4 = ["up", "down"];
+var RestingMotionScaleDirectionSchema4 = external_exports.enum(RESTING_MOTION_SCALE_DIRECTIONS4);
+var RESTING_MOTION_ROTATE_DIRECTIONS4 = ["clockwise", "counterclockwise"];
+var RestingMotionRotateDirectionSchema4 = external_exports.enum(RESTING_MOTION_ROTATE_DIRECTIONS4);
+var RestingMotionSchema4 = external_exports.object({
+  preset: RestingMotionPresetSchema4,
+  /**
+   * Timeline segment length (ms): motion is active from start until
+   * start + durationMs. When {@link loop} is true, the preset pattern repeats
+   * every {@link cycleDurationMs} (or preset default) within this window.
+   */
+  durationMs: external_exports.number().int().min(200).max(2e4).optional(),
+  /** When true, repeat the motion pattern within the timeline segment; default is one shot. */
+  loop: external_exports.boolean().optional(),
+  /**
+   * Duration (ms) of one full pattern cycle when looping. Defaults per {@link RESTING_MOTION_DEFAULT_DURATION_MS}.
+   */
+  cycleDurationMs: external_exports.number().int().min(200).max(2e4).optional(),
+  intensity: external_exports.number().min(0).max(2).optional(),
+  /** Bounce preset only: vertical lift in px. When omitted, uses `14 * intensity` (default intensity 1 → 14). */
+  bounceAmplitudePx: external_exports.number().min(1).max(80).optional(),
+  /** Scale preset: grow (+) or shrink (−) toward a peak, then return to 100%. */
+  scaleDirection: RestingMotionScaleDirectionSchema4.optional(),
+  /**
+   * Scale preset: when true (default), each cycle goes rest → peak scale → rest.
+   * When false, ramps rest → peak and holds; with loop, the next cycle restarts from rest.
+   */
+  scaleSpringBack: external_exports.boolean().optional(),
+  /**
+   * Scale preset: magnitude in % — growth above 100% (up to +400% = 5× at peak) or shrink toward
+   * 100%− (up to 90% so peak can be 10% size). See authoring caps in the layer editor.
+   */
+  scalePercent: external_exports.number().min(0).max(400).optional(),
+  /**
+   * Scale preset: ms for one full out-and-back (rest → peak → rest). Timeline bar still sets
+   * {@link durationMs} (when the layer may animate); this controls how fast each cycle runs.
+   */
+  scalePatternDurationMs: external_exports.number().int().min(200).max(2e4).optional(),
+  /** @deprecated Use {@link scalePercent} + {@link scaleDirection}. Kept for legacy manifests. */
+  scaleUpPercent: external_exports.number().min(0).max(400).optional(),
+  /** @deprecated Use {@link scalePercent} + {@link scaleDirection}. Kept for legacy manifests. */
+  scaleDownPercent: external_exports.number().min(0).max(90).optional(),
+  /**
+   * @deprecated Legacy vertical-only float (px). Prefer {@link translatePeakXPercent} / {@link translatePeakYPercent}.
+   */
+  translateRangePx: external_exports.number().min(0).max(40).optional(),
+  /** @deprecated Legacy peak offsets in px. Prefer {@link translatePeakXPercent} / {@link translatePeakYPercent}. */
+  translatePeakXPx: external_exports.number().min(-200).max(200).optional(),
+  /** @deprecated Legacy peak offsets in px. Prefer {@link translatePeakXPercent} / {@link translatePeakYPercent}. */
+  translatePeakYPx: external_exports.number().min(-200).max(200).optional(),
+  /** Translate preset: peak X offset as % of the layer box (−200–200). Scaled by intensity. */
+  translatePeakXPercent: external_exports.number().min(-200).max(200).optional(),
+  /** Translate preset: peak Y offset as % of the layer box (−200–200). Scaled by intensity. */
+  translatePeakYPercent: external_exports.number().min(-200).max(200).optional(),
+  /**
+   * Translate preset: when true (default), each cycle goes rest → peak offset → rest. When false, ramp to
+   * peak and hold; with loop, the next cycle restarts from the origin.
+   */
+  translateSpringBack: external_exports.boolean().optional(),
+  /** Rotate preset: target rotation in degrees (0–360), scaled by intensity. */
+  rotateMaxDeg: external_exports.number().min(0).max(360).optional(),
+  /** Rotate preset: spin direction; omitted or `clockwise` → positive angles (default). */
+  rotateDirection: RestingMotionRotateDirectionSchema4.optional(),
+  /**
+   * Rotate preset: when true (default), each cycle oscillates 0° → peak → 0°.
+   * When false, each cycle ramps 0° → peak and holds; with loop, the next cycle snaps to 0° and ramps again.
+   */
+  rotateSpringBack: external_exports.boolean().optional(),
+  /** Pulse preset: minimum opacity at the dip (0–1). Omitted → `1 - 0.38 * intensity`. */
+  pulseMinOpacity: external_exports.number().min(0).max(1).optional(),
+  /** Ms after the last mount/stagger clip ends before motion applies (authoring + scrub). */
+  delayMsAfterMountEnd: external_exports.number().int().min(0).max(6e4).optional(),
+  /**
+   * Absolute start time (ms from screen mount). When set, overrides
+   * {@link delayMsAfterMountEnd} + mount-clip end so motion can sit between
+   * clips (e.g. after first entry, before exit) when multiple mounts exist.
+   */
+  timelineStartMs: external_exports.number().int().min(0).max(36e5).optional()
+}).strict();
+var RestingMotionEntrySchema4 = RestingMotionSchema4.extend({
+  id: external_exports.string().min(1)
+});
+var baseLayerShape4 = {
+  id: LayerIdSchema4,
+  name: external_exports.string().max(80).optional(),
+  restingMotion: RestingMotionSchema4.optional(),
+  restingMotions: external_exports.array(RestingMotionEntrySchema4).optional()
+};
+var ThemedColorModesSchema4 = external_exports.object({
+  light: external_exports.string().min(1).optional(),
+  dark: external_exports.string().min(1).optional()
+}).strict().refine((o) => o.light !== void 0 || o.dark !== void 0, {
+  message: "at least one of light or dark is required"
+});
+var ThemedColorSchema4 = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema4]);
+var WIDTH_PRESETS4 = ["auto", "full", "1/2", "1/3", "2/3", "1/4", "3/4"];
+var WidthValueSchema4 = external_exports.union([external_exports.enum(WIDTH_PRESETS4), external_exports.number().int().min(0).max(2e3)]);
+var HEIGHT_PRESETS4 = ["auto", "full", "fill"];
+var CommonLayoutHeightSchema4 = external_exports.union([
+  external_exports.enum(HEIGHT_PRESETS4),
+  external_exports.number().int().min(0).max(2e3)
+]);
+var NonNegativePxSchema4 = external_exports.number().int().min(0);
+var PaddingSchema4 = external_exports.object({
+  t: NonNegativePxSchema4.optional(),
+  r: NonNegativePxSchema4.optional(),
+  b: NonNegativePxSchema4.optional(),
+  l: NonNegativePxSchema4.optional()
+}).partial();
+var BorderSchema4 = external_exports.object({
+  width: external_exports.number().int().min(0).max(20).optional(),
+  color: ThemedColorSchema4.optional()
+}).partial();
+var DropShadowSchema4 = external_exports.object({
+  offsetX: external_exports.number().int().min(-100).max(100).optional(),
+  offsetY: external_exports.number().int().min(-100).max(100).optional(),
+  blur: external_exports.number().int().min(0).max(100).optional(),
+  spread: external_exports.number().int().min(-50).max(50).optional(),
+  color: ThemedColorSchema4.optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
+var CommonStyleSchema4 = external_exports.object({
+  padding: PaddingSchema4.optional(),
+  margin: PaddingSchema4.optional(),
+  radius: external_exports.number().int().min(0).max(96).optional(),
+  background: ThemedColorSchema4.optional(),
+  border: BorderSchema4.optional(),
+  shadow: DropShadowSchema4.optional(),
+  opacity: external_exports.number().min(0).max(1).optional(),
+  width: WidthValueSchema4.optional(),
+  /** Omit for normal flow; `'absolute'` removes the layer from flex flow (non-root only). */
+  position: external_exports.literal("absolute").optional(),
+  /** Pixel insets when `position === 'absolute'` (same shape as padding). */
+  inset: PaddingSchema4.optional(),
+  zIndex: external_exports.number().int().min(-999).max(999).optional(),
+  /** Static rotation in degrees (CSS `rotate`); not timeline animation. */
+  rotate: external_exports.number().min(-360).max(360).optional(),
+  /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), or fixed px. No fractions. */
+  height: CommonLayoutHeightSchema4.optional(),
+  /** Stroke thickness in px for layers that render a stroke primitive (e.g. loader ring). */
+  strokeWidth: external_exports.number().int().min(0).max(64).optional()
+}).partial();
+var TextStyleSchema4 = CommonStyleSchema4.extend({
+  /**
+   * Logical font family: manifest `theme.fontFamily` when omitted, {@link TEXT_FONT_FAMILY_SYSTEM_UI}
+   * for the platform stack, or a custom name (matches `Branding.fontFamilies[].name` for uploaded fonts).
+   */
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema4.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional(),
+  lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  /** Multiplier (0–1) applied to the resolved background color alpha only; text stays fully opaque unless `opacity` is set. */
+  backgroundOpacity: external_exports.number().min(0).max(1).optional()
+});
+var ImageStyleSchema4 = CommonStyleSchema4.extend({
+  fit: external_exports.enum(["cover", "contain", "fill"]).optional(),
+  aspectRatio: external_exports.number().positive().max(10).optional()
+});
+var IconStyleSchema4 = CommonStyleSchema4.extend({
+  color: ThemedColorSchema4.optional()
+});
+var ICON_FAMILIES4 = ["ionicons"];
+var ButtonStyleSchema4 = CommonStyleSchema4.extend({
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema4.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional()
+});
+var BUTTON_LAYER_VARIANTS4 = ["primary", "secondary", "ghost", "destructive"];
+var ButtonLayerVariantSchema4 = external_exports.enum(BUTTON_LAYER_VARIANTS4);
+var CommonStyleBreakpointsSchema4 = external_exports.object({
+  sm: CommonStyleSchema4.partial().optional(),
+  md: CommonStyleSchema4.partial().optional(),
+  lg: CommonStyleSchema4.partial().optional(),
+  xl: CommonStyleSchema4.partial().optional(),
+  "2xl": CommonStyleSchema4.partial().optional()
+}).partial().optional();
+var TextStyleBreakpointsSchema4 = external_exports.object({
+  sm: TextStyleSchema4.partial().optional(),
+  md: TextStyleSchema4.partial().optional(),
+  lg: TextStyleSchema4.partial().optional(),
+  xl: TextStyleSchema4.partial().optional(),
+  "2xl": TextStyleSchema4.partial().optional()
+}).partial().optional();
+var ImageStyleBreakpointsSchema4 = external_exports.object({
+  sm: ImageStyleSchema4.partial().optional(),
+  md: ImageStyleSchema4.partial().optional(),
+  lg: ImageStyleSchema4.partial().optional(),
+  xl: ImageStyleSchema4.partial().optional(),
+  "2xl": ImageStyleSchema4.partial().optional()
+}).partial().optional();
+var IconStyleBreakpointsSchema4 = external_exports.object({
+  sm: IconStyleSchema4.partial().optional(),
+  md: IconStyleSchema4.partial().optional(),
+  lg: IconStyleSchema4.partial().optional(),
+  xl: IconStyleSchema4.partial().optional(),
+  "2xl": IconStyleSchema4.partial().optional()
+}).partial().optional();
+var ButtonStyleBreakpointsSchema4 = external_exports.object({
+  sm: ButtonStyleSchema4.partial().optional(),
+  md: ButtonStyleSchema4.partial().optional(),
+  lg: ButtonStyleSchema4.partial().optional(),
+  xl: ButtonStyleSchema4.partial().optional(),
+  "2xl": ButtonStyleSchema4.partial().optional()
+}).partial().optional();
+var StackLayoutBreakpointPatchSchema4 = external_exports.object({
+  gap: NonNegativePxSchema4.optional(),
+  direction: external_exports.enum(["vertical", "horizontal"]).optional()
+}).partial();
+var StackLayoutBreakpointsSchema4 = external_exports.object({
+  sm: StackLayoutBreakpointPatchSchema4.optional(),
+  md: StackLayoutBreakpointPatchSchema4.optional(),
+  lg: StackLayoutBreakpointPatchSchema4.optional(),
+  xl: StackLayoutBreakpointPatchSchema4.optional(),
+  "2xl": StackLayoutBreakpointPatchSchema4.optional()
+}).partial().optional();
+var ButtonLayoutBreakpointPatchSchema4 = external_exports.object({
+  gap: NonNegativePxSchema4.optional(),
+  direction: external_exports.enum(["vertical", "horizontal"]).optional()
+}).partial();
+var ButtonLayoutBreakpointsSchema4 = external_exports.object({
+  sm: ButtonLayoutBreakpointPatchSchema4.optional(),
+  md: ButtonLayoutBreakpointPatchSchema4.optional(),
+  lg: ButtonLayoutBreakpointPatchSchema4.optional(),
+  xl: ButtonLayoutBreakpointPatchSchema4.optional(),
+  "2xl": ButtonLayoutBreakpointPatchSchema4.optional()
+}).partial().optional();
+var OS_PERMISSION_KEYS4 = [
+  "notifications",
+  "camera",
+  "microphone",
+  "photo_library",
+  "contacts",
+  "calendar",
+  "reminders",
+  "location_when_in_use",
+  "location_always",
+  "motion",
+  "bluetooth",
+  "app_tracking_transparency",
+  "speech_recognition",
+  "face_id",
+  "health_kit",
+  "media_library",
+  "local_network",
+  "nearby_interactions",
+  "nfc",
+  "full_screen_intent_android",
+  "sms_android",
+  "phone_android"
+];
+var OsPermissionKeySchema4 = external_exports.enum(OS_PERMISSION_KEYS4);
+var PERMISSION_OUTCOME_VALUES4 = ["granted", "denied", "blocked"];
+external_exports.enum(PERMISSION_OUTCOME_VALUES4);
+var OS_PERMISSION_OUTCOME_CONTINUE4 = "continue";
+var OS_PERMISSION_OUTCOME_END4 = "end";
+var OsPermissionOutcomeBranchTargetSchema4 = external_exports.union([
+  ScreenIdSchema4,
+  external_exports.literal(OS_PERMISSION_OUTCOME_CONTINUE4),
+  external_exports.literal(OS_PERMISSION_OUTCOME_END4)
+]);
+var OsPermissionOutcomesSchema4 = external_exports.object({
+  granted: OsPermissionOutcomeBranchTargetSchema4,
+  denied: OsPermissionOutcomeBranchTargetSchema4,
+  blocked: OsPermissionOutcomeBranchTargetSchema4
+}).strict();
+var APP_REVIEW_OUTCOMES4 = ["not_shown", "dismissed"];
+external_exports.enum(APP_REVIEW_OUTCOMES4);
+var ButtonActionSchema4 = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("none") }),
+  external_exports.object({ kind: external_exports.literal("continue") }),
+  external_exports.object({ kind: external_exports.literal("skip") }),
+  external_exports.object({ kind: external_exports.literal("end_flow") }),
+  external_exports.object({
+    kind: external_exports.literal("go_back_one_screen"),
+    fallbackScreenId: ScreenIdSchema4.optional()
+  }),
+  external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: ScreenIdSchema4 }),
+  external_exports.object({
+    kind: external_exports.literal("request_os_permission"),
+    permissionKey: OsPermissionKeySchema4,
+    outcomes: OsPermissionOutcomesSchema4
+  }),
+  external_exports.object({
+    kind: external_exports.literal("play_media"),
+    targetLayerIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({ kind: external_exports.literal("request_app_review") })
+]);
+var TEXT_INPUT_TYPES4 = ["plain", "email", "phone", "url", "multiline"];
+var TextInputTypeSchema4 = external_exports.enum(TEXT_INPUT_TYPES4);
+var COUNTER_DISPLAY_KINDS4 = ["number", "time"];
+var COUNTER_TIME_FORMATS4 = ["mm_ss", "hh_mm_ss", "dd_hh_mm_ss"];
+var CheckboxGlyphStyleSchema4 = external_exports.object({
+  /** Square edge length in px. */
+  size: external_exports.number().int().min(8).max(128).optional(),
+  radius: external_exports.number().int().min(0).max(96).optional(),
+  background: ThemedColorSchema4.optional(),
+  border: BorderSchema4.optional(),
+  shadow: DropShadowSchema4.optional(),
+  opacity: external_exports.number().min(0).max(1).optional(),
+  /** Fill color for the check mark when checked. */
+  checkColor: ThemedColorSchema4.optional()
+}).partial();
+var OAUTH_LOGIN_PRESETS4 = ["github", "google", "apple"];
+var OAuthPresetButtonChromeSchema4 = CommonStyleSchema4.pick({
+  width: true,
+  padding: true,
+  margin: true,
+  radius: true
+}).partial();
+var OAuthPresetButtonChromeBreakpointsSchema4 = external_exports.object({
+  sm: OAuthPresetButtonChromeSchema4.partial().optional(),
+  md: OAuthPresetButtonChromeSchema4.partial().optional(),
+  lg: OAuthPresetButtonChromeSchema4.partial().optional(),
+  xl: OAuthPresetButtonChromeSchema4.partial().optional(),
+  "2xl": OAuthPresetButtonChromeSchema4.partial().optional()
+}).partial().optional();
+var EMAIL_PASSWORD_AUTH_MODES4 = ["sign_in", "sign_up"];
+var EMAIL_PASSWORD_SLOTS4 = ["email", "password", "confirm"];
+var lazyLayer8 = () => layerSchemaStore4.schema;
+var ButtonLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("button"),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer8())),
+  action: ButtonActionSchema4,
+  variant: ButtonLayerVariantSchema4,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  style: ButtonStyleSchema4.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema4,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema4
+});
+var BackButtonLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("back_button"),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer8())),
+  variant: ButtonLayerVariantSchema4,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  style: ButtonStyleSchema4.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema4,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema4,
+  fallbackScreenId: ScreenIdSchema4.optional()
+});
+var ProgressLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("progress"),
+  trackColor: ThemedColorSchema4.optional(),
+  fillColor: ThemedColorSchema4.optional(),
+  style: CommonStyleSchema4.optional()
+});
+var LoaderOnCompleteSchema4 = external_exports.discriminatedUnion("mode", [
+  external_exports.object({ mode: external_exports.literal("none") }),
+  external_exports.object({ mode: external_exports.literal("next") }),
+  external_exports.object({ mode: external_exports.literal("screen"), screenId: ScreenIdSchema4 })
+]);
+var LoaderLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("loader"),
+  variant: external_exports.enum(["linear", "circular"]).optional(),
+  targetPercent: external_exports.number().int().min(0).max(100).optional(),
+  fillDelayMs: external_exports.number().int().min(0).max(1e4).optional(),
+  durationMs: external_exports.number().int().min(0).max(36e5).optional(),
+  onComplete: LoaderOnCompleteSchema4.optional(),
+  trackColor: ThemedColorSchema4.optional(),
+  trackOpacity: external_exports.number().min(0).max(1).optional(),
+  fillColor: ThemedColorSchema4.optional(),
+  /** Horizontal alignment of the bar or ring within the layer box (default start). */
+  align: external_exports.enum(["start", "center", "end"]).optional(),
+  style: CommonStyleSchema4.optional()
+}).superRefine((data, ctx) => {
+  if (data.variant !== "circular") return;
+  const w = data.style?.width;
+  const h = data.style?.height;
+  if (typeof w === "number" && typeof h === "number" && w !== h) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "circular loader requires style.width === style.height",
+      path: ["style", "height"]
+    });
+  }
+});
+var CounterLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("counter"),
+  startValue: external_exports.number().finite(),
+  endValue: external_exports.number().finite(),
+  durationMs: external_exports.number().int().min(0).max(36e5).optional(),
+  delayMs: external_exports.number().int().min(0).max(36e5).optional(),
+  decimalPlaces: external_exports.number().int().min(0).max(10).optional(),
+  displayKind: external_exports.enum(COUNTER_DISPLAY_KINDS4).optional(),
+  timeFormat: external_exports.enum(COUNTER_TIME_FORMATS4).optional(),
+  style: TextStyleSchema4.optional(),
+  styleBreakpoints: TextStyleBreakpointsSchema4
+});
+var CheckboxLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("checkbox"),
+  fieldKey: external_exports.string().min(1),
+  blocking: external_exports.boolean().optional(),
+  uncheckedStyle: CheckboxGlyphStyleSchema4.optional(),
+  checkedStyle: CheckboxGlyphStyleSchema4.optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+});
+var lazyLayer24 = () => layerSchemaStore4.schema;
+var StackLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("stack"),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4,
+  stackLayoutBreakpoints: StackLayoutBreakpointsSchema4,
+  selectedStyle: CommonStyleSchema4.optional(),
+  direction: external_exports.enum(["vertical", "horizontal"]),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  justify: external_exports.enum(["start", "center", "end"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  wrap: external_exports.boolean().optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer24()))
+});
+var TextLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("text"),
+  text: LocalizedTextSchema5,
+  style: TextStyleSchema4.optional(),
+  styleBreakpoints: TextStyleBreakpointsSchema4
+});
+var migrateLegacyHyperlinkForParse4 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "hyperlink") return raw;
+  const existing = o.children;
+  if (Array.isArray(existing) && existing.length > 0) return raw;
+  const idSrc = typeof o.id === "string" ? o.id.replace(/[^a-zA-Z0-9_]/g, "_") : "lyr_hyperlink";
+  const textChildId = `${idSrc}_lnktxt`.slice(0, 64);
+  const children = [
+    {
+      id: textChildId,
+      kind: "text",
+      text: o.text ?? { default: "Link" },
+      ...typeof o.style === "object" && o.style !== null ? { style: o.style } : {},
+      ...typeof o.styleBreakpoints === "object" && o.styleBreakpoints !== null ? { styleBreakpoints: o.styleBreakpoints } : {}
+    }
+  ];
+  const next = {
+    ...o,
+    children
+  };
+  delete next.text;
+  delete next.style;
+  delete next.styleBreakpoints;
+  return next;
+};
+var HyperlinkLayerSchemaInner4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("hyperlink"),
+  href: external_exports.string().min(1).max(2048),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer24()).min(1)),
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  wrap: external_exports.boolean().optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+}).superRefine((data, ctx) => {
+  const p = parseHyperlinkHref4(data.href.trim());
+  if (!p.ok) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "hyperlink href must be a valid https: or mailto: URL",
+      path: ["href"]
+    });
+  }
+});
+var HyperlinkLayerSchema4 = external_exports.preprocess(
+  migrateLegacyHyperlinkForParse4,
+  HyperlinkLayerSchemaInner4
+);
+var ImageLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("image"),
+  media: MediaReferenceSchema4.optional(),
+  alt: external_exports.string().max(280).optional(),
+  style: ImageStyleSchema4.optional(),
+  styleBreakpoints: ImageStyleBreakpointsSchema4
+});
+var LottieLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("lottie"),
+  media: MediaReferenceSchema4.optional(),
+  loop: external_exports.boolean().optional(),
+  autoPlay: external_exports.boolean().optional(),
+  triggerLayerId: external_exports.string().min(1).optional(),
+  onComplete: LoaderOnCompleteSchema4.optional(),
+  style: ImageStyleSchema4.optional(),
+  styleBreakpoints: ImageStyleBreakpointsSchema4
+});
+var VideoLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("video"),
+  media: MediaReferenceSchema4.optional(),
+  loop: external_exports.boolean().optional(),
+  autoPlay: external_exports.boolean().optional(),
+  triggerLayerId: external_exports.string().min(1).optional(),
+  onComplete: LoaderOnCompleteSchema4.optional(),
+  audioEnabled: external_exports.boolean().optional(),
+  style: ImageStyleSchema4.optional(),
+  styleBreakpoints: ImageStyleBreakpointsSchema4
+});
+var IconLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("icon"),
+  family: external_exports.enum(ICON_FAMILIES4),
+  iconName: external_exports.string().min(1).max(128),
+  style: IconStyleSchema4.optional(),
+  styleBreakpoints: IconStyleBreakpointsSchema4
+});
+var lazyLayer34 = () => layerSchemaStore4.schema;
+var OAuthProviderPresetLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("oauth_provider"),
+  variant: external_exports.literal("preset"),
+  provider: external_exports.enum(OAUTH_LOGIN_PRESETS4),
+  label: LocalizedTextSchema5.optional(),
+  style: OAuthPresetButtonChromeSchema4.optional(),
+  styleBreakpoints: OAuthPresetButtonChromeBreakpointsSchema4.optional()
+});
+var migrateOAuthProviderCustomIncoming4 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "oauth_provider" || o.variant !== "custom") return raw;
+  const ch = o.children;
+  if (Array.isArray(ch) && ch.length > 0) {
+    const next2 = { ...o };
+    if (next2.buttonVariant === void 0) next2.buttonVariant = "secondary";
+    return next2;
+  }
+  const pid = typeof o.id === "string" ? o.id : "lyr_oauth_custom";
+  const slug = pid.replace(/[^a-z0-9_]/gi, "_").slice(0, 40) || "oauth";
+  const label = o.label ?? { default: "Custom" };
+  let family = o.family ?? "ionicons";
+  let iconName = o.iconName ?? "shield-outline";
+  if (family === "sf_symbol") {
+    family = "ionicons";
+    iconName = "star-outline";
+  }
+  const cid = slug;
+  const iconId = `lyr_${cid}_ico`.slice(0, 64);
+  const textId = `lyr_${cid}_txt`.slice(0, 64);
+  const next = { ...o };
+  delete next.label;
+  delete next.family;
+  delete next.iconName;
+  return {
+    ...next,
+    buttonVariant: o.buttonVariant ?? "secondary",
+    children: [
+      { id: iconId, kind: "icon", family, iconName },
+      { id: textId, kind: "text", text: label }
+    ]
+  };
+};
+var OAuthProviderCustomLayerSchemaValidated4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("oauth_provider"),
+  variant: external_exports.literal("custom"),
+  rowId: external_exports.string().uuid(),
+  buttonVariant: ButtonLayerVariantSchema4,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer34()).min(1)),
+  style: ButtonStyleSchema4.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema4,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema4
+});
+var OAuthProviderCustomLayerSchema4 = external_exports.preprocess(
+  migrateOAuthProviderCustomIncoming4,
+  OAuthProviderCustomLayerSchemaValidated4
+);
+var OAuthProviderLayerSchema4 = external_exports.union([
+  OAuthProviderPresetLayerSchema4,
+  OAuthProviderCustomLayerSchema4
+]);
+var OAuthLoginPresetProviderSchema4 = external_exports.object({
+  type: external_exports.literal("preset"),
+  provider: external_exports.enum(OAUTH_LOGIN_PRESETS4)
+});
+var OAuthLoginCustomProviderSchema4 = external_exports.object({
+  type: external_exports.literal("custom"),
+  rowId: external_exports.string().uuid(),
+  label: LocalizedTextSchema5,
+  family: external_exports.enum(ICON_FAMILIES4),
+  iconName: external_exports.string().min(1).max(128)
+});
+var OAuthLoginProviderSchema4 = external_exports.discriminatedUnion("type", [
+  OAuthLoginPresetProviderSchema4,
+  OAuthLoginCustomProviderSchema4
+]);
+var oauthLoginChildrenUniquePresets4 = (children, ctx) => {
+  const seen = /* @__PURE__ */ new Set();
+  for (let i = 0; i < children.length; i++) {
+    const c = children[i];
+    if (!c || c.kind !== "oauth_provider" || c.variant !== "preset") continue;
+    const preset = c.provider;
+    if (seen.has(preset)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate OAuth preset "${preset}"`,
+        path: ["children", i, "provider"]
+      });
+      return;
+    }
+    seen.add(preset);
+  }
+};
+var migrateOAuthLoginIncoming4 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "oauth_login") return raw;
+  if (Array.isArray(o.children) && o.children.length > 0) return raw;
+  const provs = o.providers;
+  if (!Array.isArray(provs) || provs.length === 0) return raw;
+  const pid = typeof o.id === "string" ? o.id : "lyr_oauth_legacy";
+  const slug = pid.replace(/^lyr_/i, "").replace(/[^a-z0-9_]/gi, "_").replace(/^_+/, "").slice(0, 48) || "oauth";
+  const children = provs.map((p, idx) => {
+    const prov = p ?? {};
+    const cid = `lyr_${slug}_opr_${idx}`.slice(0, 64);
+    if (prov.type === "preset") {
+      return {
+        id: cid,
+        kind: "oauth_provider",
+        variant: "preset",
+        provider: prov.provider
+      };
+    }
+    return {
+      id: cid,
+      kind: "oauth_provider",
+      variant: "custom",
+      rowId: String(prov.rowId),
+      buttonVariant: "secondary",
+      children: [
+        {
+          id: `${cid}_ico`.slice(0, 64),
+          kind: "icon",
+          family: prov.family ?? "ionicons",
+          iconName: String(prov.iconName ?? "shield")
+        },
+        {
+          id: `${cid}_txt`.slice(0, 64),
+          kind: "text",
+          text: prov.label ?? { default: "Custom" }
+        }
+      ]
+    };
+  });
+  const { providers: _omit, ...rest } = o;
+  return { ...rest, children };
+};
+var OAuthLoginLayerSchemaValidated4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("oauth_login"),
+  children: external_exports.lazy(
+    () => external_exports.array(OAuthProviderLayerSchema4).min(1).superRefine(oauthLoginChildrenUniquePresets4)
+  ),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+});
+var OAuthLoginLayerSchema4 = external_exports.preprocess(
+  migrateOAuthLoginIncoming4,
+  OAuthLoginLayerSchemaValidated4
+);
+external_exports.array(OAuthLoginProviderSchema4).min(1).superRefine((providers, ctx) => {
+  const seen = /* @__PURE__ */ new Set();
+  for (let i = 0; i < providers.length; i++) {
+    const p = providers[i];
+    if (!p || p.type !== "preset") continue;
+    const preset = p.provider;
+    if (seen.has(preset)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate OAuth preset "${preset}"`,
+        path: [i, "provider"]
+      });
+      return;
+    }
+    seen.add(preset);
+  }
+});
+var FIELD_KEY_RE5 = /^[a-z][a-z0-9_]*$/;
+var FieldKeySchema5 = external_exports.string().min(1).max(64).regex(FIELD_KEY_RE5, "field key must be snake_case");
+var FieldClassificationSchema5 = external_exports.enum(FIELD_CLASSIFICATIONS5);
+var lazyLayer44 = () => layerSchemaStore4.schema;
+var EmailPasswordAuthModeSchema4 = external_exports.enum(EMAIL_PASSWORD_AUTH_MODES4);
+var migrateEmailPasswordAuthIncoming4 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "email_password_auth") return raw;
+  if (Array.isArray(o.children) && o.children.length > 0) return raw;
+  const idBase = typeof o.id === "string" ? o.id : "lyr_email_password_auth";
+  const slugRaw = idBase.replace(/^lyr_/i, "").replace(/[^a-z0-9_]/gi, "_");
+  const slug = slugRaw.length > 0 ? slugRaw.slice(0, 40) : "ep_auth";
+  const mode = o.mode === "sign_up" ? "sign_up" : "sign_in";
+  const pickLt = (v, fallback) => v && typeof v === "object" && v !== null && "default" in v ? v : { default: fallback };
+  const mkField = (suf, slot, labelSource, fallbackPlaceholder) => ({
+    id: `lyr_${slug}_fld_${suf}`.slice(0, 64),
+    kind: "email_password_field",
+    slot,
+    ...labelSource ? { placeholder: pickLt(labelSource, fallbackPlaceholder) } : { placeholder: { default: fallbackPlaceholder } },
+    children: []
+  });
+  const children = [];
+  children.push(mkField("email", "email", o.emailLabel, "Email"));
+  children.push(mkField("pw", "password", o.passwordLabel, "Password"));
+  if (mode === "sign_up") {
+    children.push(mkField("cf", "confirm", o.confirmPasswordLabel, "Confirm password"));
+  }
+  const submitLbl = o.submitLabel ?? { default: mode === "sign_in" ? "Sign in" : "Create account" };
+  children.push({
+    id: `lyr_${slug}_submit`.slice(0, 64),
+    kind: "email_password_submit",
+    buttonVariant: "primary",
+    direction: "horizontal",
+    align: "center",
+    distribution: "center",
+    gap: 8,
+    children: [
+      {
+        id: `lyr_${slug}_submit_txt`.slice(0, 64),
+        kind: "text",
+        text: submitLbl
+      }
+    ]
+  });
+  const {
+    emailLabel: _e,
+    passwordLabel: _p,
+    confirmPasswordLabel: _c,
+    submitLabel: _s,
+    ...rest
+  } = o;
+  return { ...rest, mode, children };
+};
+var refineEmailPasswordAuthChildren4 = (data, ctx) => {
+  const fields = data.children.filter((c) => c.kind === "email_password_field");
+  const submits = data.children.filter((c) => c.kind === "email_password_submit");
+  const slotSeen = /* @__PURE__ */ new Set();
+  for (const f of fields) {
+    if (slotSeen.has(f.slot)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate email_password_field slot "${f.slot}"`,
+        path: ["children"]
+      });
+    }
+    slotSeen.add(f.slot);
+  }
+  const slotHas = new Set(fields.map((f) => f.slot));
+  const requiredSlots = data.mode === "sign_up" ? ["email", "password", "confirm"] : ["email", "password"];
+  for (const s of requiredSlots) {
+    if (!slotHas.has(s)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: data.mode === "sign_up" ? `sign_up requires an email_password_field with slot "${s}"` : `sign_in requires an email_password_field with slot "${s}"`,
+        path: ["children"]
+      });
+    }
+  }
+  if (data.mode === "sign_in" && slotHas.has("confirm")) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: 'sign_in must not include email_password_field with slot "confirm"',
+      path: ["children"]
+    });
+  }
+  if (submits.length !== 1) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: `email_password_auth must have exactly one email_password_submit (found ${submits.length})`,
+      path: ["children"]
+    });
+  }
+};
+var EmailPasswordFieldLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("email_password_field"),
+  slot: external_exports.enum(EMAIL_PASSWORD_SLOTS4),
+  placeholder: LocalizedTextSchema5.optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer44())).optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+});
+var EmailPasswordSubmitLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("email_password_submit"),
+  buttonVariant: ButtonLayerVariantSchema4,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer44()).min(1)),
+  style: ButtonStyleSchema4.optional(),
+  styleBreakpoints: ButtonStyleBreakpointsSchema4,
+  buttonLayoutBreakpoints: ButtonLayoutBreakpointsSchema4
+});
+var EmailPasswordAuthLayerSchemaValidated4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("email_password_auth"),
+  mode: EmailPasswordAuthModeSchema4,
+  fieldKey: FieldKeySchema5,
+  minPasswordLength: external_exports.number().int().min(4).max(128).optional(),
+  children: external_exports.lazy(
+    () => external_exports.array(external_exports.union([EmailPasswordFieldLayerSchema4, EmailPasswordSubmitLayerSchema4])).min(1)
+  ),
+  gap: external_exports.number().int().min(0).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+}).superRefine(refineEmailPasswordAuthChildren4);
+var EmailPasswordAuthLayerSchema4 = external_exports.preprocess(
+  migrateEmailPasswordAuthIncoming4,
+  EmailPasswordAuthLayerSchemaValidated4
+);
+var ChoiceOptionBindingSchema4 = external_exports.object({
+  optionId: external_exports.string().min(1).max(64),
+  rootLayerId: LayerIdSchema4
+});
+var BranchConditionSchema4 = external_exports.object({
+  choiceId: external_exports.string().min(1),
+  goTo: ScreenIdSchema4
+});
+var ChoiceBranchingSchema4 = external_exports.object({
+  enabled: external_exports.boolean(),
+  conditions: external_exports.array(BranchConditionSchema4)
+});
+var lazyLayer54 = () => layerSchemaStore4.schema;
+var SingleChoiceLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("single_choice"),
+  fieldKey: FieldKeySchema5,
+  children: external_exports.lazy(
+    () => external_exports.array(StackLayerSchema4).min(2)
+  ),
+  optionBindings: external_exports.array(ChoiceOptionBindingSchema4).min(2),
+  branching: ChoiceBranchingSchema4,
+  direction: external_exports.enum(["vertical", "horizontal", "grid"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  columns: external_exports.number().int().min(1).max(12).optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+});
+var MultipleChoiceLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("multiple_choice"),
+  fieldKey: FieldKeySchema5,
+  children: external_exports.lazy(
+    () => external_exports.array(StackLayerSchema4).min(2)
+  ),
+  optionBindings: external_exports.array(ChoiceOptionBindingSchema4).min(2),
+  minSelections: external_exports.number().int().nonnegative().optional(),
+  maxSelections: external_exports.number().int().positive().optional(),
+  branching: ChoiceBranchingSchema4,
+  direction: external_exports.enum(["vertical", "horizontal", "grid"]).optional(),
+  gap: external_exports.number().int().min(0).optional(),
+  columns: external_exports.number().int().min(1).max(12).optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+});
+var TextInputLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("text_input"),
+  fieldKey: FieldKeySchema5,
+  placeholder: LocalizedTextSchema5.optional(),
+  inputType: TextInputTypeSchema4.optional(),
+  required: external_exports.boolean().optional(),
+  minLength: external_exports.number().int().min(0).max(2e3).optional(),
+  maxLength: external_exports.number().int().positive().max(2e3).optional(),
+  classification: FieldClassificationSchema5,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer54())).optional(),
+  style: CommonStyleSchema4.optional()
+});
+var ScaleInputLabelStyleSchema4 = external_exports.object({
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema4.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional(),
+  lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
+var ScaleInputLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("scale_input"),
+  fieldKey: FieldKeySchema5,
+  min: external_exports.number(),
+  max: external_exports.number(),
+  step: external_exports.number().positive().optional(),
+  defaultValue: external_exports.number().optional(),
+  minLabel: LocalizedTextSchema5.optional(),
+  maxLabel: LocalizedTextSchema5.optional(),
+  labelStyle: ScaleInputLabelStyleSchema4.optional(),
+  valueStyle: ScaleInputLabelStyleSchema4.optional(),
+  showLabels: external_exports.boolean().optional(),
+  showValue: external_exports.boolean().optional(),
+  trackHeight: external_exports.number().int().min(2).max(32).optional(),
+  trackColor: ThemedColorSchema4.optional(),
+  fillColor: ThemedColorSchema4.optional(),
+  thumbSize: external_exports.number().int().min(8).max(48).optional(),
+  thumbColor: ThemedColorSchema4.optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer54())).optional(),
+  style: CommonStyleSchema4.optional()
+});
+var CarouselIndicatorsStyleSchema4 = external_exports.object({
+  width: external_exports.number().int().min(1).max(64).optional(),
+  height: external_exports.number().int().min(1).max(64).optional(),
+  defaultColor: ThemedColorSchema4.optional(),
+  defaultOpacity: external_exports.number().min(0).max(1).optional(),
+  activeColor: ThemedColorSchema4.optional(),
+  activeOpacity: external_exports.number().min(0).max(1).optional(),
+  activeWidth: external_exports.number().int().min(1).max(64).optional(),
+  activeHeight: external_exports.number().int().min(1).max(64).optional(),
+  border: BorderSchema4.optional(),
+  activeBorder: BorderSchema4.optional()
+}).partial();
+var CarouselPageControlSchema4 = external_exports.object({
+  position: external_exports.enum(["top", "bottom"]),
+  spacing: external_exports.number().int().min(0).optional(),
+  padding: PaddingSchema4.optional(),
+  margin: PaddingSchema4.optional(),
+  indicators: CarouselIndicatorsStyleSchema4.optional(),
+  border: BorderSchema4.optional(),
+  shadow: DropShadowSchema4.optional()
+});
+var CarouselLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("carousel"),
+  slides: external_exports.lazy(() => external_exports.array(StackLayerSchema4).min(1)),
+  pageAlignment: external_exports.enum(["top", "center", "bottom"]).optional(),
+  pageSpacing: external_exports.number().int().min(0).optional(),
+  pagePeek: external_exports.number().int().min(0).max(400).optional(),
+  openOn: external_exports.number().int().min(0).optional(),
+  loop: external_exports.boolean().optional(),
+  autoAdvance: external_exports.boolean().optional(),
+  autoAdvanceMs: external_exports.number().int().min(500).max(6e4).optional(),
+  pageControl: CarouselPageControlSchema4.optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+});
+layerSchemaStore4.schema = external_exports.lazy(
+  () => external_exports.union([
+    StackLayerSchema4,
+    TextLayerSchema4,
+    HyperlinkLayerSchema4,
+    ImageLayerSchema4,
+    LottieLayerSchema4,
+    VideoLayerSchema4,
+    IconLayerSchema4,
+    ButtonLayerSchema4,
+    BackButtonLayerSchema4,
+    ProgressLayerSchema4,
+    LoaderLayerSchema4,
+    CounterLayerSchema4,
+    CheckboxLayerSchema4,
+    SingleChoiceLayerSchema4,
+    MultipleChoiceLayerSchema4,
+    TextInputLayerSchema4,
+    ScaleInputLayerSchema4,
+    OAuthLoginLayerSchema4,
+    OAuthProviderPresetLayerSchema4,
+    OAuthProviderCustomLayerSchema4,
+    EmailPasswordAuthLayerSchema4,
+    EmailPasswordFieldLayerSchema4,
+    EmailPasswordSubmitLayerSchema4,
+    CarouselLayerSchema4
+  ])
+);
+var ScreenBackgroundFitSchema2 = external_exports.enum(["cover", "contain", "fill"]);
+var ScreenBackgroundScrimSchema2 = external_exports.object({
+  color: ThemedColorSchema4.optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
+var screenBackgroundMediaShape2 = {
+  media: MediaReferenceSchema4.optional(),
+  fit: ScreenBackgroundFitSchema2.optional(),
+  opacity: external_exports.number().min(0).max(1).optional(),
+  scrim: ScreenBackgroundScrimSchema2.optional()
+};
+var ScreenBackgroundColorFillSchema2 = external_exports.object({
+  kind: external_exports.literal("color"),
+  color: ThemedColorSchema4.optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+});
+var ScreenBackgroundImageFillSchema2 = external_exports.object({
+  kind: external_exports.literal("image"),
+  ...screenBackgroundMediaShape2
+});
+var ScreenBackgroundVideoFillSchema2 = external_exports.object({
+  kind: external_exports.literal("video"),
+  ...screenBackgroundMediaShape2,
+  loop: external_exports.boolean().optional(),
+  autoPlay: external_exports.boolean().optional(),
+  triggerLayerId: external_exports.string().min(1).optional(),
+  onComplete: LoaderOnCompleteSchema4.optional(),
+  audioEnabled: external_exports.boolean().optional()
+});
+var ScreenBackgroundFillSchema2 = external_exports.discriminatedUnion("kind", [
+  ScreenBackgroundColorFillSchema2,
+  ScreenBackgroundImageFillSchema2,
+  ScreenBackgroundVideoFillSchema2
+]);
+var ScreenBackgroundFillPatchSchema2 = external_exports.object({
+  color: ThemedColorSchema4.optional(),
+  fit: ScreenBackgroundFitSchema2.optional(),
+  opacity: external_exports.number().min(0).max(1).optional(),
+  scrim: ScreenBackgroundScrimSchema2.optional(),
+  loop: external_exports.boolean().optional(),
+  autoPlay: external_exports.boolean().optional(),
+  triggerLayerId: external_exports.string().min(1).optional(),
+  onComplete: LoaderOnCompleteSchema4.optional(),
+  audioEnabled: external_exports.boolean().optional()
+}).partial();
+var ScreenContainerBreakpointPatchSchema2 = external_exports.object({
+  padding: PaddingSchema4.optional(),
+  margin: PaddingSchema4.optional(),
+  insetSafeArea: external_exports.boolean().optional(),
+  backgroundFillPatch: ScreenBackgroundFillPatchSchema2.optional()
+}).partial();
+var ScreenContainerStyleBreakpointsSchema2 = external_exports.object({
+  sm: ScreenContainerBreakpointPatchSchema2.optional(),
+  md: ScreenContainerBreakpointPatchSchema2.optional(),
+  lg: ScreenContainerBreakpointPatchSchema2.optional(),
+  xl: ScreenContainerBreakpointPatchSchema2.optional(),
+  "2xl": ScreenContainerBreakpointPatchSchema2.optional()
+}).partial().optional();
+var DecisionNodeIdSchema3 = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i, "decision node id must look like dec_<id>");
+var ExternalSurfaceJumpIdSchema3 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
+var EXTERNAL_SURFACE_NO_NEXT3 = "__onb_surface_no_next__";
+var ExternalSurfaceTerminalTargetSchema3 = external_exports.literal(EXTERNAL_SURFACE_NO_NEXT3);
+var FlowJumpTargetSchema3 = ScreenIdSchema4.or(DecisionNodeIdSchema3).or(ExternalSurfaceJumpIdSchema3).or(ExternalSurfaceTerminalTargetSchema3).nullable();
+var DecisionBuiltinNameSchema3 = external_exports.enum(["locale", "platform"]);
+var DecisionVariableRefSchema3 = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema3 }),
+  external_exports.object({ kind: external_exports.literal("sdk"), key: external_exports.string().min(1).max(128) }),
+  external_exports.object({ kind: external_exports.literal("field"), fieldKey: external_exports.string().min(1).max(128) })
+]);
+var DecisionStringPredicateSchema3 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("contains"), value: external_exports.string() })
+]);
+var DecisionNumberPredicateSchema3 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lte"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gte"), value: external_exports.number() })
+]);
+var DecisionChoicePredicateSchema3 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), optionId: external_exports.string().min(1) }),
+  external_exports.object({ op: external_exports.literal("one_of"), optionIds: external_exports.array(external_exports.string().min(1)).min(1) })
+]);
+var DecisionMultiPredicateSchema3 = external_exports.discriminatedUnion("op", [
+  external_exports.object({
+    op: external_exports.literal("intersects"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("contains_all"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("subset_of"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  })
+]);
+var DecisionBooleanPredicateSchema3 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.boolean() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.boolean() })
+]);
+var DecisionPredicatePayloadSchema3 = external_exports.discriminatedUnion("type", [
+  external_exports.object({ type: external_exports.literal("string"), pred: DecisionStringPredicateSchema3 }),
+  external_exports.object({ type: external_exports.literal("number"), pred: DecisionNumberPredicateSchema3 }),
+  external_exports.object({ type: external_exports.literal("boolean"), pred: DecisionBooleanPredicateSchema3 }),
+  external_exports.object({ type: external_exports.literal("choice"), pred: DecisionChoicePredicateSchema3 }),
+  external_exports.object({ type: external_exports.literal("multi"), pred: DecisionMultiPredicateSchema3 })
+]);
+var DecisionExprSchema3 = external_exports.lazy(
+  () => external_exports.discriminatedUnion("kind", [
+    external_exports.object({ kind: external_exports.literal("empty") }),
+    external_exports.object({
+      kind: external_exports.literal("group"),
+      op: external_exports.enum(["and", "or"]),
+      children: external_exports.array(DecisionExprSchema3).min(1)
+    }),
+    external_exports.object({
+      kind: external_exports.literal("predicate"),
+      variable: DecisionVariableRefSchema3,
+      predicate: DecisionPredicatePayloadSchema3
+    })
+  ])
+);
+var DecisionCaseSchema3 = external_exports.object({
+  id: external_exports.string().min(1).max(80),
+  /** Display label in the editor (e.g. “Engaged users”). */
+  name: external_exports.string().min(1).max(80).optional(),
+  expression: DecisionExprSchema3,
+  next: FlowJumpTargetSchema3
+});
+external_exports.object({
+  id: DecisionNodeIdSchema3,
+  name: external_exports.string().min(1).max(80).optional(),
+  cases: external_exports.array(DecisionCaseSchema3).min(1).max(16),
+  elseNext: FlowJumpTargetSchema3
+});
+var ANIMATABLE_PROPERTIES2 = [
+  "opacity",
+  "translateX",
+  "translateY",
+  "scale"
+];
+var AnimatablePropertySchema2 = external_exports.enum(ANIMATABLE_PROPERTIES2);
+var EASING_TOKENS2 = [
+  "linear",
+  "ease-in",
+  "ease-out",
+  "ease-in-out",
+  "standard",
+  "emphasized"
+];
+var EasingTokenSchema2 = external_exports.enum(EASING_TOKENS2);
+var KeyframeSchema2 = external_exports.object({
+  t: external_exports.number().min(0).max(1),
+  value: external_exports.number(),
+  /** Easing applied from this keyframe to the next; defaults to linear. */
+  easing: EasingTokenSchema2.optional()
+}).strict();
+var KeyframeTrackSchema2 = external_exports.object({
+  property: AnimatablePropertySchema2,
+  keyframes: external_exports.array(KeyframeSchema2).min(2)
+}).strict().superRefine((track, ctx) => {
+  let last = -Infinity;
+  for (const k of track.keyframes) {
+    if (k.t < last) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `keyframe times must be monotonically non-decreasing on track "${track.property}"`
+      });
+      return;
+    }
+    last = k.t;
+  }
+  if (track.keyframes[0].t !== 0) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: `track "${track.property}" first keyframe must start at t=0`
+    });
+  }
+  if (track.keyframes[track.keyframes.length - 1].t !== 1) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: `track "${track.property}" last keyframe must end at t=1`
+    });
+  }
+});
+var ANIMATION_TRIGGERS2 = ["mount", "stagger", "unmount"];
+var AnimationTriggerSchema2 = external_exports.enum(ANIMATION_TRIGGERS2);
+var AnimationClipSchema2 = external_exports.object({
+  id: external_exports.string().min(1).max(64),
+  targetLayerId: LayerIdSchema4,
+  trigger: AnimationTriggerSchema2,
+  /** Position in the screen's stagger order. Required when trigger is `stagger`. */
+  staggerIndex: external_exports.number().int().min(0).max(64).optional(),
+  /** Total clip duration in milliseconds (renderer scales 0..1 keyframes by this). */
+  durationMs: external_exports.number().int().min(0).max(36e5),
+  /** Pre-roll delay before the clip begins, in ms. Stagger adds on top of this. */
+  delayMs: external_exports.number().int().min(0).max(36e5).optional(),
+  tracks: external_exports.array(KeyframeTrackSchema2).min(1)
+}).strict().superRefine((clip, ctx) => {
+  if (clip.trigger === "unmount" && clip.staggerIndex !== void 0) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: `clip "${clip.id}" with trigger "unmount" must not set staggerIndex`,
+      path: ["staggerIndex"]
+    });
+  }
+  if (clip.trigger === "stagger" && clip.staggerIndex === void 0) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: `clip "${clip.id}" with trigger "stagger" must define staggerIndex`,
+      path: ["staggerIndex"]
+    });
+  }
+  const seenProps = /* @__PURE__ */ new Set();
+  for (const track of clip.tracks) {
+    if (seenProps.has(track.property)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `clip "${clip.id}" has duplicate track for property "${track.property}"`
+      });
+    }
+    seenProps.add(track.property);
+  }
+});
+var ScreenStaggerSchema2 = external_exports.object({
+  /** Per-index delay multiplier in ms. */
+  stepMs: external_exports.number().int().min(0).max(2e3)
+}).strict();
+var ScreenNextSchema2 = external_exports.object({
+  default: FlowJumpTargetSchema3
+});
+var ScreenRegionsSchema2 = external_exports.object({
+  header: StackLayerSchema4.optional(),
+  body: StackLayerSchema4,
+  footer: StackLayerSchema4.optional()
+});
+var ScreenContainerStyleSchema2 = external_exports.object({
+  padding: PaddingSchema4.optional(),
+  margin: PaddingSchema4.optional(),
+  /** When true, runtimes add device safe-area insets to shell padding (in addition to manual padding). */
+  insetSafeArea: external_exports.boolean().optional(),
+  backgroundFill: ScreenBackgroundFillSchema2.optional()
+}).partial();
+var ScreenSchema2 = external_exports.object({
+  id: ScreenIdSchema4,
+  name: external_exports.string().min(1).max(80),
+  regions: ScreenRegionsSchema2,
+  next: ScreenNextSchema2,
+  /** Ordered animation clips bound to layers on this screen. */
+  animations: external_exports.array(AnimationClipSchema2).optional(),
+  /** Defaults for clips with `trigger: stagger`. */
+  stagger: ScreenStaggerSchema2.optional(),
+  /** Chrome on the outer screen container (wraps all regions). */
+  containerStyle: ScreenContainerStyleSchema2.optional(),
+  containerStyleBreakpoints: ScreenContainerStyleBreakpointsSchema2
+});
+
+// ../../node_modules/.pnpm/@getrheo+flow-runtime@2.0.1/node_modules/@getrheo/flow-runtime/dist/index.js
+var findScreen = (manifest, screenId) => manifest.screens.find((s) => s.id === screenId);
+var BRAND_GRADIENT_PREFIX = "$brandGradient:";
+var brandGradientToCss = (g) => {
+  const stops = g.stops.map((s) => `${s.color} ${(s.offset * 100).toFixed(0)}%`).join(", ");
+  if (g.type === "linear") {
+    const angle = g.angle ?? 180;
+    return `linear-gradient(${angle}deg, ${stops})`;
+  }
+  return `radial-gradient(circle, ${stops})`;
+};
+var isBrandGradientToken = (s) => s.startsWith(BRAND_GRADIENT_PREFIX);
+var resolveBrandGradientToken = (branding, token) => {
+  if (!isBrandGradientToken(token)) return void 0;
+  const id = token.slice(BRAND_GRADIENT_PREFIX.length);
+  const preset = branding?.gradientPresets.find((x) => x.id === id);
+  return preset ? brandGradientToCss(preset) : void 0;
+};
+var isStoredLinearGradientCss = (s) => /^\s*linear-gradient\s*\(/i.test(s.trim());
+var walkLayers = (root, fn) => {
+  const visit = (l, depth) => {
+    fn(l, depth);
+    if (l.kind === "stack") l.children.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "carousel") l.slides.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "button") l.children.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "back_button") l.children.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "hyperlink") l.children.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "single_choice" || l.kind === "multiple_choice") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "text_input" || l.kind === "scale_input") {
+      l.children?.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "oauth_login") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "oauth_provider" && l.variant === "custom") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "email_password_auth") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "email_password_field") {
+      l.children?.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "email_password_submit") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    }
+  };
+  visit(root, 0);
+};
+var walkScreen = (screen, fn) => {
+  if (screen.regions.header) walkLayers(screen.regions.header, fn);
+  walkLayers(screen.regions.body, fn);
+  if (screen.regions.footer) walkLayers(screen.regions.footer, fn);
+};
+var findInputLayer = (screen) => {
+  let found = null;
+  walkScreen(screen, (l) => {
+    if (!found && isInputLayer(l)) found = l;
+  });
+  return found;
+};
+var findLayerById = (screen, id) => {
+  let found = null;
+  walkScreen(screen, (l) => {
+    if (!found && l.id === id) found = l;
+  });
+  return found;
+};
+var collectFieldKeys = (manifest) => {
+  const out = [];
+  for (const screen of manifest.screens) {
+    walkScreen(screen, (l) => {
+      if (isInputLayer(l)) out.push({ fieldKey: l.fieldKey, screenId: screen.id });
+      if (l.kind === "checkbox") out.push({ fieldKey: l.fieldKey, screenId: screen.id });
+      if (l.kind === "email_password_auth") {
+        out.push({ fieldKey: l.fieldKey, screenId: screen.id });
+      }
+    });
+  }
+  return out;
+};
 var validateManifest = (data) => {
   const migrated = migrateLegacyManifest(data);
   const result = FlowManifestSchema.safeParse(migrated);
@@ -6853,9 +10243,7 @@ var validatePublishable = (manifest) => {
   }
   return { ok: issues.length === 0, issues, warnings };
 };
-
-// ../flow-runtime/src/flowBuilderRules.ts
-var FIELD_KEY_RE2 = /^[a-z][a-z0-9_]*$/;
+var FIELD_KEY_RE6 = /^[a-z][a-z0-9_]*$/;
 var styleBucketHasColor = (s) => s !== void 0 && s.color !== void 0;
 var textLayerHasAuthoringColor = (l) => {
   if (styleBucketHasColor(l.style)) return true;
@@ -6965,7 +10353,7 @@ var collectFlowBuilderIssues = (manifest) => {
         const label = screen.name || screen.id;
         if (!key || key.length === 0) {
           issues.push(`Screen "${label}" is missing a variable name (fieldKey).`);
-        } else if (!FIELD_KEY_RE2.test(key)) {
+        } else if (!FIELD_KEY_RE6.test(key)) {
           issues.push(
             `Screen "${label}" has an invalid variable name "${key}" \u2014 use snake_case (a\u2013z, 0\u20139, _).`
           );
@@ -7160,8 +10548,6 @@ var collectFlowBuilderIssues = (manifest) => {
   }
   return issues;
 };
-
-// ../flow-runtime/src/brandGradientManifestIssues.ts
 var BP_KEYS = ["sm", "md", "lg", "xl", "2xl"];
 var themedStrings = (tc) => {
   if (tc === void 0) return [];
@@ -7406,8 +10792,6 @@ var collectBrandGradientManifestIssues = (manifest, branding) => {
   }
   return issues;
 };
-
-// ../flow-runtime/src/restingMotion/restingMotionEffects.ts
 var RESTING_MOTION_KEYFRAMES_CSS = `
 @keyframes ob-rm-translate {
   0%, 100% { transform: translate(0, 0); }
@@ -7446,8 +10830,6 @@ var RESTING_MOTION_KEYFRAMES_CSS = `
   100% { transform: rotate(var(--ob-rm-rotate-peak, 5deg)); }
 }
 `.trim();
-
-// ../flow-runtime/src/interpolateTemplate.ts
 var extractLiquidTemplateBodies = (s) => {
   const out = [];
   let i = 0;
@@ -7461,7 +10843,7 @@ var extractLiquidTemplateBodies = (s) => {
   }
   return out;
 };
-var FIELD_KEY_SOURCE = FIELD_KEY_RE.source.replace(/^\^|\$$/g, "");
+var FIELD_KEY_SOURCE = FIELD_KEY_RE4.source.replace(/^\^|\$$/g, "");
 var parseDefaultFilter = (inner) => {
   const m = inner.match(/\s*\|\s*default\s*:/i);
   if (!m || m.index === void 0) return { exprPart: inner.trim() };
@@ -7491,8 +10873,6 @@ var analyzeLiquidTemplateInner = (inner) => {
   if (p.kind === "custom") return { expr: { kind: "custom", key: p.key }, defaultValue };
   return { expr: { kind: "field", fieldKey: p.fieldKey, mode: p.mode }, defaultValue };
 };
-
-// ../flow-runtime/src/flowGraph.ts
 var localizedStrings = (t) => {
   const out = [t.default];
   if (t.translations) {
@@ -7518,8 +10898,8 @@ var collectOutgoingTargets = (screen) => {
     if (l.kind === "button" && l.action.kind === "request_os_permission") {
       const o = l.action.outcomes;
       for (const t of [o.granted, o.denied, o.blocked]) {
-        if (t === OS_PERMISSION_OUTCOME_END) {
-        } else if (t === OS_PERMISSION_OUTCOME_CONTINUE) {
+        if (t === OS_PERMISSION_OUTCOME_END) ;
+        else if (t === OS_PERMISSION_OUTCOME_CONTINUE) {
           if (screen.next.default) out.push(screen.next.default);
         } else {
           out.push(t);
@@ -7717,8 +11097,6 @@ var collectDecisionWarnings = (manifest) => {
   }
   return out;
 };
-
-// ../flow-runtime/src/layout/scalarLayoutDefaults.ts
 var DEFAULT_PROGRESS_LINEAR_HEIGHT_PX = 6;
 var DEFAULT_LOADER_LINEAR_HEIGHT_PX = 6;
 var DEFAULT_LOADER_CIRCULAR_SIZE_PX = 48;
@@ -7749,8 +11127,6 @@ var defaultFeedbackStyleScalars = (kind, variant) => {
   }
   return { height: DEFAULT_LOADER_LINEAR_HEIGHT_PX };
 };
-
-// ../flow-runtime/src/layout/authoringLayoutDefaults.ts
 var LAYOUT_FULL_HUG = { width: "full", height: "auto" };
 var LAYOUT_FULL_FILL = { width: "full", height: "fill" };
 var LAYOUT_HUG_HUG = { width: "auto", height: "auto" };
@@ -7808,8 +11184,6 @@ var mergeLayoutDefaultsIntoStyle = (kind, style) => {
   if (!defaults) return style ?? {};
   return { ...defaults, ...style };
 };
-
-// ../flow-runtime/src/layout/normalizeLayerLayout.ts
 var isObj = (v) => typeof v === "object" && v !== null && !Array.isArray(v);
 var applyAxisDefaultsInPlace = (layer, kind) => {
   const current = isObj(layer.style) ? layer.style : void 0;
@@ -7946,6 +11320,15 @@ var collectAnimationImportWarnings = (manifest) => {
 // src/collectBundleImportWarnings.ts
 import { readFile } from "node:fs/promises";
 import { dirname as dirname2, join as join2 } from "node:path";
+
+// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/constants/index.js
+var MAX_IMAGE_BYTES2 = 5 * 1024 * 1024;
+var MAX_LOTTIE_BYTES2 = 10 * 1024 * 1024;
+var MAX_VIDEO_BYTES2 = 50 * 1024 * 1024;
+var FONT_FILE_EXTENSIONS = [".ttf", ".otf", ".woff", ".woff2"];
+var MAX_FONT_BYTES2 = 10 * 1024 * 1024;
+
+// src/collectBundleImportWarnings.ts
 var FONT_EXT_SET = new Set(FONT_FILE_EXTENSIONS);
 var isFontPath = (path) => {
   const lower = path.toLowerCase();
@@ -7981,6 +11364,39 @@ var collectBundleImportWarnings = async (manifestPath) => {
   return issues;
 };
 
+// ../../node_modules/.pnpm/@getrheo+flow-runtime@2.0.1/node_modules/@getrheo/flow-runtime/dist/layers.js
+var walkLayers2 = (root, fn) => {
+  const visit = (l, depth) => {
+    fn(l, depth);
+    if (l.kind === "stack") l.children.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "carousel") l.slides.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "button") l.children.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "back_button") l.children.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "hyperlink") l.children.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "single_choice" || l.kind === "multiple_choice") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "text_input" || l.kind === "scale_input") {
+      l.children?.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "oauth_login") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "oauth_provider" && l.variant === "custom") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "email_password_auth") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "email_password_field") {
+      l.children?.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "email_password_submit") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    }
+  };
+  visit(root, 0);
+};
+var walkScreen2 = (screen, fn) => {
+  if (screen.regions.header) walkLayers2(screen.regions.header, fn);
+  walkLayers2(screen.regions.body, fn);
+  if (screen.regions.footer) walkLayers2(screen.regions.footer, fn);
+};
+
 // src/audit/i18nKeyHeuristics.ts
 var looksLikeI18nKey = (value) => {
   const trimmed = value.trim();
@@ -8013,7 +11429,7 @@ var localizedFieldsFromLayer = (layer, basePath) => {
 var collectLocalizationImportWarnings = (manifest) => {
   const issues = [];
   manifest.screens.forEach((screen, screenIndex) => {
-    walkScreen(screen, (layer) => {
+    walkScreen2(screen, (layer) => {
       const layerPath = ["screens", String(screenIndex), layer.id ?? layer.kind];
       const fields = localizedFieldsFromLayer(layer, layerPath);
       fields.forEach((field) => {
@@ -9386,8 +12802,6 @@ var analyzeRnContent = (content, file, screenSlug) => {
       durationMs: extractDurationMs(content, content.search(/withTiming/i))
     });
   }
-  void file;
-  void screenSlug;
   return motions;
 };
 var analyzeSwiftContent = (content) => {
@@ -10426,7 +13840,7 @@ var ActionObjectSchema = external_exports.discriminatedUnion("kind", [
   external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: external_exports.string().min(1) }),
   external_exports.object({
     kind: external_exports.literal("request_os_permission"),
-    permissionKey: OsPermissionKeySchema,
+    permissionKey: OsPermissionKeySchema3,
     outcomes: external_exports.object({
       granted: external_exports.string().min(1),
       denied: external_exports.string().min(1),
@@ -10704,7 +14118,7 @@ var FlowSpecSchema = external_exports.object({
   theme: ThemeSchema.optional(),
   sdkAttributeKeys: external_exports.array(external_exports.string().min(1).max(128)).optional(),
   screens: external_exports.array(ScreenSpecSchema).min(1),
-  decisions: external_exports.array(DecisionNodeSchema).optional(),
+  decisions: external_exports.array(DecisionNodeSchema2).optional(),
   externalSurfaces: external_exports.array(ExternalSurfaceSpecSchema).optional()
 });
 var parseFlowSpec = (data) => {
