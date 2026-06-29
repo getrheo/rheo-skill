@@ -1,8 +1,15 @@
 #!/usr/bin/env tsx
 import { build } from 'esbuild';
-import { chmod } from 'node:fs/promises';
+import { chmod, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+/** esbuild path comments reflect pnpm's on-disk layout, which differs by OS. */
+const normalizeEsbuildPathComments = (code: string): string =>
+  code.replace(
+    /^\/\/ (\.\.\/)+node_modules\/\.pnpm\/[^/\n]+\/node_modules\//gm,
+    '// ../../node_modules/',
+  );
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const entry = resolve(packageRoot, 'src/cli.ts');
@@ -32,10 +39,14 @@ const main = async (): Promise<void> => {
     metafile: true,
   });
 
-  const bytes = Object.values(result.metafile.outputs)[0]?.bytes ?? 0;
+  const raw = await readFile(outfile, 'utf8');
+  const normalized = normalizeEsbuildPathComments(raw);
+  if (normalized !== raw) {
+    await writeFile(outfile, normalized);
+  }
   await chmod(outfile, 0o644);
   console.log(`bundle=${outfile}`);
-  console.log(`bundle_size=${(bytes / 1024).toFixed(1)}kb`);
+  console.log(`bundle_size=${(normalized.length / 1024).toFixed(1)}kb`);
 };
 
 main().catch((err: unknown) => {
