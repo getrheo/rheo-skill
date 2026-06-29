@@ -225,8 +225,7 @@ export const collectPublishGateIssues = (
   const publishable = validatePublishable(manifest);
   blocking.push(...toBlocking(publishable.issues, fixForSchemaOrPublishCode));
 
-  const warnings: PublishGateIssue[] = [
-    ...toWarning(publishable.warnings, fixForSchemaOrPublishCode),
+  blocking.push(
     ...collectBrandGradientManifestIssues(manifest, branding).map((issue) => ({
       severity: 'blocking' as const,
       code: issue.code,
@@ -235,6 +234,10 @@ export const collectPublishGateIssues = (
       stepId: issue.stepId,
       path: issue.path,
     })),
+  );
+
+  const warnings: PublishGateIssue[] = [
+    ...toWarning(publishable.warnings, fixForSchemaOrPublishCode),
     ...collectInterpolationWarnings(manifest).map((message) => ({
       severity: 'warning' as const,
       code: 'interpolation.warning',

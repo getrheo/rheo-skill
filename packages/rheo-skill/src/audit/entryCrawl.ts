@@ -1,6 +1,6 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
-import { dirname, join, relative, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import type { AuditFile } from './auditTypes.js';
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.swift']);
@@ -100,8 +100,14 @@ export const resolveImportToRelPath = (
 const toRelPath = (root: string, absolutePath: string): string =>
   relative(root, absolutePath).replace(/^\.\//, '');
 
+export const isPathUnderRoot = (root: string, target: string): boolean => {
+  const rel = relative(resolve(root), resolve(target));
+  return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+};
+
 const loadAuditFile = async (root: string, relPath: string): Promise<AuditFile | null> => {
   const absolutePath = resolve(root, relPath);
+  if (!isPathUnderRoot(root, absolutePath)) return null;
   if (!existsSync(absolutePath) || !statSync(absolutePath).isFile()) return null;
   if (!isInterestingPath(relPath)) return null;
   const size = (await stat(absolutePath)).size;
@@ -222,7 +228,7 @@ export const crawlFromEntries = async (opts: EntryCrawlOptions): Promise<EntryCr
 
   for (const entryRel of normalizedEntries) {
     const abs = resolve(root, entryRel);
-    if (!existsSync(abs)) continue;
+    if (!isPathUnderRoot(root, abs) || !existsSync(abs)) continue;
 
     if (statSync(abs).isDirectory()) {
       scopeMode = scopeMode === 'import-graph' ? 'directory' : 'mixed';
