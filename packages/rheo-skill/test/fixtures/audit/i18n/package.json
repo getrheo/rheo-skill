@@ -1,0 +1,7 @@
+{
+  "name": "fixture-i18n-app",
+  "dependencies": {
+    "i18next": "23.0.0",
+    "react-i18next": "14.0.0"
+  }
+}

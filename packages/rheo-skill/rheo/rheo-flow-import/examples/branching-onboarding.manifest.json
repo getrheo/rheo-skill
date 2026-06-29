@@ -1,0 +1,155 @@
+{
+  "flowId": "00000000-0000-0000-0000-000000000001",
+  "schemaVersion": 7,
+  "version": 1,
+  "defaultLocale": "en",
+  "locales": ["en"],
+  "entryScreenId": "dec_platform",
+  "theme": {
+    "primary": "#111827",
+    "primaryForeground": "#FFFFFF",
+    "background": "#FFFFFF",
+    "foreground": "#111827",
+    "borderRadius": 14
+  },
+  "screens": [
+    {
+      "id": "scr_ios_intro",
+      "name": "iOS intro",
+      "regions": {
+        "body": {
+          "id": "lyr_ios_body",
+          "kind": "stack",
+          "direction": "vertical",
+          "gap": 14,
+          "style": { "padding": { "t": 24, "r": 20, "b": 24, "l": 20 } },
+          "children": [
+            {
+              "id": "lyr_ios_title",
+              "kind": "text",
+              "text": { "default": "Welcome on iOS" },
+              "style": { "fontSize": 24, "fontWeight": 700, "color": "#111827" }
+            },
+            {
+              "id": "lyr_ios_continue",
+              "kind": "button",
+              "variant": "primary",
+              "action": { "kind": "continue" },
+              "direction": "horizontal",
+              "align": "center",
+              "distribution": "center",
+              "children": [
+                {
+                  "id": "lyr_ios_continue_text",
+                  "kind": "text",
+                  "text": { "default": "Continue" },
+                  "style": { "color": "#FFFFFF" }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "next": { "default": "scr_done" }
+    },
+    {
+      "id": "scr_android_intro",
+      "name": "Android intro",
+      "regions": {
+        "body": {
+          "id": "lyr_android_body",
+          "kind": "stack",
+          "direction": "vertical",
+          "gap": 14,
+          "style": { "padding": { "t": 24, "r": 20, "b": 24, "l": 20 } },
+          "children": [
+            {
+              "id": "lyr_android_title",
+              "kind": "text",
+              "text": { "default": "Welcome on Android" },
+              "style": { "fontSize": 24, "fontWeight": 700, "color": "#111827" }
+            },
+            {
+              "id": "lyr_android_continue",
+              "kind": "button",
+              "variant": "primary",
+              "action": { "kind": "continue" },
+              "direction": "horizontal",
+              "align": "center",
+              "distribution": "center",
+              "children": [
+                {
+                  "id": "lyr_android_continue_text",
+                  "kind": "text",
+                  "text": { "default": "Continue" },
+                  "style": { "color": "#FFFFFF" }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "next": { "default": "scr_done" }
+    },
+    {
+      "id": "scr_done",
+      "name": "Done",
+      "regions": {
+        "body": {
+          "id": "lyr_done_body",
+          "kind": "stack",
+          "direction": "vertical",
+          "gap": 14,
+          "style": { "padding": { "t": 24, "r": 20, "b": 24, "l": 20 } },
+          "children": [
+            {
+              "id": "lyr_done_title",
+              "kind": "text",
+              "text": { "default": "All set" },
+              "style": { "fontSize": 24, "fontWeight": 700, "color": "#111827" }
+            },
+            {
+              "id": "lyr_done_end",
+              "kind": "button",
+              "variant": "primary",
+              "action": { "kind": "end_flow" },
+              "direction": "horizontal",
+              "align": "center",
+              "distribution": "center",
+              "children": [
+                {
+                  "id": "lyr_done_end_text",
+                  "kind": "text",
+                  "text": { "default": "Finish" },
+                  "style": { "color": "#FFFFFF" }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "next": { "default": null }
+    }
+  ],
+  "decisionNodes": [
+    {
+      "id": "dec_platform",
+      "name": "Platform",
+      "cases": [
+        {
+          "id": "case_ios",
+          "name": "iOS",
+          "expression": {
+            "kind": "predicate",
+            "variable": { "kind": "builtin", "name": "platform" },
+            "predicate": { "type": "string", "pred": { "op": "eq", "value": "ios" } }
+          },
+          "next": "scr_ios_intro"
+        }
+      ],
+      "elseNext": "scr_android_intro"
+    }
+  ],
+  "externalSurfaceNodes": [],
+  "sdkAttributeKeys": []
+}

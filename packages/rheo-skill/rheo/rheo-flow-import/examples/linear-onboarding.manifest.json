@@ -1,0 +1,104 @@
+{
+  "flowId": "00000000-0000-0000-0000-000000000001",
+  "schemaVersion": 7,
+  "version": 1,
+  "defaultLocale": "en",
+  "locales": ["en"],
+  "entryScreenId": "scr_welcome",
+  "theme": {
+    "primary": "#0A0A0A",
+    "primaryForeground": "#FFFFFF",
+    "background": "#FFFFFF",
+    "foreground": "#0A0A0A",
+    "borderRadius": 16
+  },
+  "screens": [
+    {
+      "id": "scr_welcome",
+      "name": "Welcome",
+      "regions": {
+        "body": {
+          "id": "lyr_welcome_body",
+          "kind": "stack",
+          "direction": "vertical",
+          "gap": 16,
+          "style": { "padding": { "t": 24, "r": 20, "b": 24, "l": 20 } },
+          "children": [
+            {
+              "id": "lyr_welcome_title",
+              "kind": "text",
+              "text": { "default": "Welcome to Acme" },
+              "style": { "fontSize": 28, "fontWeight": 700, "align": "center", "color": "#0A0A0A" }
+            },
+            {
+              "id": "lyr_welcome_body_text",
+              "kind": "text",
+              "text": { "default": "Set up your account in a few quick steps." },
+              "style": { "fontSize": 16, "fontWeight": 400, "align": "center", "color": "#0A0A0A" }
+            },
+            {
+              "id": "lyr_welcome_continue",
+              "kind": "button",
+              "variant": "primary",
+              "action": { "kind": "continue" },
+              "direction": "horizontal",
+              "align": "center",
+              "distribution": "center",
+              "children": [
+                {
+                  "id": "lyr_welcome_continue_text",
+                  "kind": "text",
+                  "text": { "default": "Get started" },
+                  "style": { "color": "#FFFFFF" }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "next": { "default": "scr_done" }
+    },
+    {
+      "id": "scr_done",
+      "name": "Done",
+      "regions": {
+        "body": {
+          "id": "lyr_done_body",
+          "kind": "stack",
+          "direction": "vertical",
+          "gap": 16,
+          "style": { "padding": { "t": 24, "r": 20, "b": 24, "l": 20 } },
+          "children": [
+            {
+              "id": "lyr_done_title",
+              "kind": "text",
+              "text": { "default": "You are ready" },
+              "style": { "fontSize": 24, "fontWeight": 700, "align": "center", "color": "#0A0A0A" }
+            },
+            {
+              "id": "lyr_done_finish",
+              "kind": "button",
+              "variant": "primary",
+              "action": { "kind": "end_flow" },
+              "direction": "horizontal",
+              "align": "center",
+              "distribution": "center",
+              "children": [
+                {
+                  "id": "lyr_done_finish_text",
+                  "kind": "text",
+                  "text": { "default": "Finish" },
+                  "style": { "color": "#FFFFFF" }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "next": { "default": null }
+    }
+  ],
+  "decisionNodes": [],
+  "externalSurfaceNodes": [],
+  "sdkAttributeKeys": []
+}

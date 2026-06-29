@@ -1,0 +1,28 @@
+name: Rheo agent skill
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  rheo-skill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @getrheo/rheo-skill build
+      - run: git diff --exit-code -- packages/rheo-skill/rheo/rheo-flow-import/scripts/lib/rheo-cli.mjs packages/rheo-skill/rheo/rheo-flow-import/references/capabilities.md
+      - run: pnpm --filter @getrheo/rheo-skill validate:skill-format
+      - run: pnpm --filter @getrheo/rheo-skill test
+      - run: pnpm --filter @getrheo/rheo-skill validate:examples
