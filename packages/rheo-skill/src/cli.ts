@@ -9,7 +9,6 @@ import { normalizeManifestFile } from './normalizeManifestFile.js';
 import { fetchManifestProfile } from './fetchManifestProfile.js';
 import { summarizeManifest } from './manifestSummary.js';
 import { auditImportToMarkdownFile } from './audit/auditImport.js';
-import { isPathUnderRoot } from './audit/entryCrawl.js';
 import { auditManifestPublishToFile } from './publishGates/auditManifestPublish.js';
 import { scaffoldManifestFromFile } from './scaffold/scaffoldManifest.js';
 
@@ -226,15 +225,6 @@ const runArgv = async (argv: string[]): Promise<number> => {
 
     const root =
       explicitRoot ?? (inferProjectRoot(resolvedEntries[0]!) ?? cwd);
-
-    const auditRoot = resolve(root);
-    for (const entryPath of resolvedEntries) {
-      if (!isPathUnderRoot(auditRoot, entryPath)) {
-        console.error(`Entry is outside audit root: ${entryPath}`);
-        console.error(`Audit root: ${auditRoot}`);
-        return 1;
-      }
-    }
 
     if (looksLikeSkillRoot(root)) {
       console.error(`Audit root resolves inside the Rheo skill itself: ${root}`);

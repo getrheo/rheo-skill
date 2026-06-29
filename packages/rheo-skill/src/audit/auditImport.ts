@@ -89,7 +89,7 @@ export const auditImportToMarkdownFile = async (
     ? isAbsolute(opts.out)
       ? opts.out
       : resolve(reportRoot, opts.out)
-    : resolve(process.cwd(), 'rheo-import.audit.md');
+    : resolve(reportRoot, 'rheo-import.audit.md');
   await writeFile(outPath, markdown);
 
   if (opts.suggestAnimations && report.animationSuggestions?.length) {

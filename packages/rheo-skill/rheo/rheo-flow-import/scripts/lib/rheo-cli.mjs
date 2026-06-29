@@ -13,7 +13,7 @@ import { existsSync as existsSync4 } from "node:fs";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 import { isAbsolute as isAbsolute3, resolve as resolve7 } from "node:path";
 
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/external.js
+// ../../node_modules/zod/v3/external.js
 var external_exports = {};
 __export(external_exports, {
   BRAND: () => BRAND,
@@ -125,7 +125,7 @@ __export(external_exports, {
   void: () => voidType
 });
 
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/util.js
+// ../../node_modules/zod/v3/helpers/util.js
 var util;
 (function(util2) {
   util2.assertEqual = (_) => {
@@ -259,7 +259,7 @@ var getParsedType = (data) => {
   }
 };
 
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/ZodError.js
+// ../../node_modules/zod/v3/ZodError.js
 var ZodIssueCode = util.arrayToEnum([
   "invalid_type",
   "invalid_literal",
@@ -377,7 +377,7 @@ ZodError.create = (issues) => {
   return error;
 };
 
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/locales/en.js
+// ../../node_modules/zod/v3/locales/en.js
 var errorMap = (issue, _ctx) => {
   let message;
   switch (issue.code) {
@@ -480,7 +480,7 @@ var errorMap = (issue, _ctx) => {
 };
 var en_default = errorMap;
 
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/errors.js
+// ../../node_modules/zod/v3/errors.js
 var overrideErrorMap = en_default;
 function setErrorMap(map) {
   overrideErrorMap = map;
@@ -489,7 +489,7 @@ function getErrorMap() {
   return overrideErrorMap;
 }
 
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/parseUtil.js
+// ../../node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
   const { data, path, errorMaps, issueData } = params;
   const fullPath = [...path, ...issueData.path || []];
@@ -599,14 +599,14 @@ var isDirty = (x) => x.status === "dirty";
 var isValid = (x) => x.status === "valid";
 var isAsync = (x) => typeof Promise !== "undefined" && x instanceof Promise;
 
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/errorUtil.js
+// ../../node_modules/zod/v3/helpers/errorUtil.js
 var errorUtil;
 (function(errorUtil2) {
   errorUtil2.errToObj = (message) => typeof message === "string" ? { message } : message || {};
   errorUtil2.toString = (message) => typeof message === "string" ? message : message?.message;
 })(errorUtil || (errorUtil = {}));
 
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/types.js
+// ../../node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
   constructor(parent, value, path, key) {
     this._cachedPath = [];
@@ -4054,7 +4054,7 @@ var coerce = {
 };
 var NEVER = INVALID;
 
-// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/layers.js
+// ../../node_modules/@getrheo/contracts/dist/layers.js
 var layerSchemaStore = {};
 var LocaleCode = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
 var LocalizedTextSchema = external_exports.object({
@@ -5093,14 +5093,14 @@ layerSchemaStore.schema = external_exports.lazy(
 var LayerSchema = layerSchemaStore.schema;
 var isInputLayer = (l) => l.kind === "single_choice" || l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input";
 
-// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/localized.js
+// ../../node_modules/@getrheo/contracts/dist/localized.js
 var LocaleCode2 = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
 var LocalizedTextSchema2 = external_exports.object({
   default: external_exports.string().min(1, "default copy is required"),
   translations: external_exports.record(LocaleCode2, external_exports.string()).optional()
 });
 
-// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/decisions.js
+// ../../node_modules/@getrheo/contracts/dist/decisions.js
 var layerSchemaStore2 = {};
 var LocaleCode3 = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
 var LocalizedTextSchema3 = external_exports.object({
@@ -6238,7 +6238,7 @@ var collectDecisionFieldKeysFromNode = (node) => {
   return [...seen];
 };
 
-// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/index.js
+// ../../node_modules/@getrheo/contracts/dist/index.js
 var LocaleCode4 = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
 var LocalizedTextSchema4 = external_exports.object({
   default: external_exports.string().min(1, "default copy is required"),
@@ -8680,13 +8680,13 @@ var collectCanvasGateViolations = (manifest, gates) => {
   return issues;
 };
 
-// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/fields.js
+// ../../node_modules/@getrheo/contracts/dist/fields.js
 var FIELD_CLASSIFICATIONS4 = ["safe", "sensitive"];
 var FIELD_KEY_RE4 = /^[a-z][a-z0-9_]*$/;
 var FieldKeySchema4 = external_exports.string().min(1).max(64).regex(FIELD_KEY_RE4, "field key must be snake_case");
 var FieldClassificationSchema4 = external_exports.enum(FIELD_CLASSIFICATIONS4);
 
-// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/screens.js
+// ../../node_modules/@getrheo/contracts/dist/screens.js
 var layerSchemaStore4 = {};
 var LocaleCode5 = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
 var LocalizedTextSchema5 = external_exports.object({
@@ -9983,7 +9983,7 @@ var ScreenSchema2 = external_exports.object({
   containerStyleBreakpoints: ScreenContainerStyleBreakpointsSchema2
 });
 
-// ../../node_modules/.pnpm/@getrheo+flow-runtime@2.0.1/node_modules/@getrheo/flow-runtime/dist/index.js
+// ../../node_modules/@getrheo/flow-runtime/dist/index.js
 var findScreen = (manifest, screenId) => manifest.screens.find((s) => s.id === screenId);
 var BRAND_GRADIENT_PREFIX = "$brandGradient:";
 var brandGradientToCss = (g) => {
@@ -11321,7 +11321,7 @@ var collectAnimationImportWarnings = (manifest) => {
 import { readFile } from "node:fs/promises";
 import { dirname as dirname2, join as join2 } from "node:path";
 
-// ../../node_modules/.pnpm/@getrheo+contracts@2.0.1/node_modules/@getrheo/contracts/dist/constants/index.js
+// ../../node_modules/@getrheo/contracts/dist/constants/index.js
 var MAX_IMAGE_BYTES2 = 5 * 1024 * 1024;
 var MAX_LOTTIE_BYTES2 = 10 * 1024 * 1024;
 var MAX_VIDEO_BYTES2 = 50 * 1024 * 1024;
@@ -11364,7 +11364,7 @@ var collectBundleImportWarnings = async (manifestPath) => {
   return issues;
 };
 
-// ../../node_modules/.pnpm/@getrheo+flow-runtime@2.0.1/node_modules/@getrheo/flow-runtime/dist/layers.js
+// ../../node_modules/@getrheo/flow-runtime/dist/layers.js
 var walkLayers2 = (root, fn) => {
   const visit = (l, depth) => {
     fn(l, depth);
@@ -13729,7 +13729,7 @@ var auditImportToMarkdownFile = async (opts) => {
   const reportRoot = resolve4(opts.root ?? process.cwd());
   const report = await auditImport({ ...opts, root: reportRoot });
   const markdown = renderAuditMarkdown(report);
-  const outPath = opts.out ? isAbsolute(opts.out) ? opts.out : resolve4(reportRoot, opts.out) : resolve4(process.cwd(), "rheo-import.audit.md");
+  const outPath = opts.out ? isAbsolute(opts.out) ? opts.out : resolve4(reportRoot, opts.out) : resolve4(reportRoot, "rheo-import.audit.md");
   await writeFile2(outPath, markdown);
   if (opts.suggestAnimations && report.animationSuggestions?.length) {
     const suggestPath = isAbsolute(opts.suggestAnimations) ? opts.suggestAnimations : resolve4(reportRoot, opts.suggestAnimations);
