@@ -1,0 +1,54 @@
+{
+  "name": "@getrheo/rheo-skill",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Rheo agent skill — SDK install guidance and flow manifest import tooling.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "gen:capabilities": "tsx src/capabilities/generateCapabilities.ts",
+    "bundle": "tsx scripts/build-skill.ts",
+    "build": "pnpm gen:capabilities && pnpm bundle",
+    "audit": "tsx src/cli.ts audit",
+    "scaffold": "tsx src/cli.ts scaffold",
+    "validate": "tsx src/cli.ts validate",
+    "normalize": "tsx src/cli.ts normalize",
+    "summary": "tsx src/cli.ts summary",
+    "validate:examples": "tsx src/cli.ts validate rheo/rheo-flow-import/examples/linear-onboarding.manifest.json && tsx src/cli.ts validate rheo/rheo-flow-import/examples/branching-onboarding.manifest.json && tsx src/cli.ts validate rheo/rheo-flow-import/examples/revenuecat-paywall.manifest.json",
+    "validate:skill-format": "node scripts/validate-skill-format.mjs",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@getrheo/contracts": "2.0.0",
+    "@getrheo/flow-runtime": "2.0.0"
+  },
+  "devDependencies": {
+    "@rheo/config": "workspace:*",
+    "@types/node": "^22.10.1",
+    "esbuild": "^0.24.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.6",
+    "@rheo/contracts-fixtures": "workspace:*"
+  },
+  "files": [
+    "README.md",
+    "rheo"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://docs.getrheo.io/docs/developer-guide/agent-import",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/getrheo/rheo-skill.git",
+    "directory": "packages/rheo-skill"
+  }
+}

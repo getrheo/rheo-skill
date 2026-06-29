@@ -1,0 +1,422 @@
+---
+title: Rheo Manifest Agent Profile
+description: LLM-friendly manifest rules for agents generating Rheo FlowManifest JSON.
+summary: Current manifest-generation guidance for agent skills and local import tools.
+tags: [agents, manifest, import]
+audience: [developer]
+related: [developer-guide/agent-import, developer-guide/sdk, user-guide/flow-builder]
+last_reviewed: "2026-06-23"
+---
+
+# Rheo Manifest Agent Profile
+
+Profile version: 2026-05-22
+Manifest schema version: 7
+Audience: AI agents generating Rheo `FlowManifest` JSON.
+
+Use this page as current generation guidance. It is not the final validator. Generated manifests must still pass the Rheo agent skill's local validation and Rheo dashboard import validation.
+
+## Audit-First Import
+
+Before generating a manifest, agents should run the Rheo skill's **audit-import** command against your flow entry file (for example `app/onboarding.tsx`) and write an audit report.
+
+The audit is evidence, not a manifest generator. Use it to decide regions, style tokens, screen backgrounds, local assets, Lottie files, motion, and follow-up questions. If the audit cannot run, explain why and manually cover the same sections.
+
+When intake question 6 is **yes**, request animation suggestions in the audit and follow animation import rules in the agent skill reference.
+
+**Mandatory intake (blocking):** Ask every question below and record answers in chat before audit or manifest generation. Do not skip when the repo looks obvious.
+
+1. Which file, route, or coordinator starts the existing flow?
+2. What is the business purpose of this flow in one sentence?
+3. Should the import optimize for visual fidelity or editable structure?
+4. If source code and screenshots disagree, which is more current?
+5. Which steps must stay native/host-owned vs approximated in Rheo?
+6. Match motion from the codebase (may differ slightly from Rheo presets)? (yes/no)
+
+Run audit with `--entry` after question 1 is answered. Apply `screen.animations` and conservative `restingMotion` only when question 6 is **yes** and the workspace plan includes animations (Grow+). After audit, ask targeted follow-up questions when ambiguity changes the manifest materially.
+
+## Import Output Contract
+
+Generate one raw JSON `FlowManifest`, normally saved as `rheo-import.manifest.json`. If the imported flow uses local media, package the manifest and assets as `rheo-import.zip`. Asset bundling is mandatory when traced screens reference local images, Lottie JSON, or videos. Do not include Markdown, comments, source code, private URLs, API keys, SDK keys, tokens, or credentials.
+
+ZIP bundles must contain:
+
+- `rheo-import.manifest.json`
+- `rheo-import.assets.json`
+- local files under `assets/`
+
+Use valid placeholder UUIDs in `media.mediaAssetId`; the dashboard replaces them with uploaded Rheo media asset ids.
+
+Agents must not finish with JSON-only output until they have audited the traced flow for local media references. JSON-only output is acceptable only when the final response states `no local assets found`.
+
+## Required Top-Level Fields
+
+- `flowId` — use a placeholder UUID outside Rheo; dashboard import replaces it.
+- `schemaVersion` — `7`.
+- `version` — normally `1`.
+- `defaultLocale` — usually `en`.
+- `locales` — include `defaultLocale`.
+- `entryScreenId` — must point to an existing screen, decision, or external surface.
+- `theme` — object; use brand colors only when known.
+- `screens` — screen nodes.
+- `decisionNodes` — use `[]` when none.
+- `externalSurfaceNodes` — use `[]` when none.
+- `sdkAttributeKeys` — use `[]` when none.
+
+## ID Rules
+
+- Screen ids: `scr_*`
+- Layer ids: `lyr_*`
+- Decision ids: `dec_*`
+- External surface ids: `surf_*`
+
+Prefer readable ids such as `scr_welcome`, `lyr_welcome_title`, and `surf_paywall`.
+
+## Layer Kinds
+
+Use only these layer kinds:
+
+```text
+stack, text, image, lottie, video, icon, button, back_button, progress, loader, counter, single_choice, multiple_choice, text_input, scale_input, oauth_provider, oauth_login, email_password_auth, email_password_field, email_password_submit, carousel, hyperlink, checkbox
+```
+
+## Screen Pattern
+
+Use header/body/footer regions when the source flow implies them:
+
+- `regions.header` — top chrome: back button, close button, step title, progress.
+- `regions.body` — main content and scrollable content.
+- `regions.footer` — sticky bottom CTA area, legal copy, terms checkboxes.
+
+Audit evidence examples:
+
+- `BackButton`, `CloseButton`, `Toolbar`, `OnboardingHeader`, `ProgressBar` → use `regions.header`.
+- `StickyFooter`, `BottomActions`, bottom safe-area wrappers, buttons outside `ScrollView` → use `regions.footer`.
+- `ScrollView`, `FlatList`, and main copy/media groups → use `regions.body`.
+
+Prefer one body stack per screen when there is no obvious header or footer:
+
+```json
+{
+  "id": "scr_welcome",
+  "name": "Welcome",
+  "regions": {
+    "body": {
+      "id": "lyr_welcome_body",
+      "kind": "stack",
+      "direction": "vertical",
+      "gap": 16,
+      "style": { "padding": { "t": 24, "r": 20, "b": 24, "l": 20 } },
+      "children": []
+    }
+  },
+  "next": { "default": null }
+}
+```
+
+## Text
+
+- Use `text: { "default": "..." }`.
+- Put translations under `text.translations`.
+- Use numeric `fontWeight` values such as `400`, `600`, or `700`.
+- Use `style.align`, not `textAlign`.
+
+## Buttons And Actions
+
+- Button labels are nested text layers.
+- Good first-draft actions: `continue`, `skip`, `end_flow`.
+- **`request_app_review`** is allowed in manifests but agents should **not** emit it by default (dashboard AI flow gen also excludes it). Use only when the user explicitly wants an in-app store review CTA; requires `screen.next.default`.
+- Use navigation actions only when the source flow clearly jumps to a specific step.
+- If a CTA sits in a bottom safe-area/sticky container in source, put it in `regions.footer`.
+- If a back or close control sits above content, use `back_button` in `regions.header`.
+
+```json
+{
+  "id": "lyr_continue",
+  "kind": "button",
+  "variant": "primary",
+  "action": { "kind": "continue" },
+  "direction": "horizontal",
+  "align": "center",
+  "distribution": "center",
+  "children": [
+    {
+      "id": "lyr_continue_text",
+      "kind": "text",
+      "text": { "default": "Continue" }
+    }
+  ]
+}
+```
+
+## Inputs
+
+- Use at most one input layer kind per screen.
+- Use stable snake_case `fieldKey` values.
+- `text_input` needs `classification` set to `safe` or `sensitive`.
+- When source uses in-screen pagers (`infoSteps`, horizontal `translateX`, `pagingEnabled` lists), emit `kind: "carousel"` with one vertical `stack` slide per page. Do not collapse multi-slide routes to a single static screen.
+
+### Choice option styling (`single_choice` / `multiple_choice`)
+
+Each selectable option is a child `stack` on the input layer. Map unselected UI to `style` and selected UI to `selectedStyle` on the **same** stack (border, background, padding, radius). The renderer merges `selectedStyle` over `style` when the option is active.
+
+When source uses `selected === value ? '…selected classes…' : '…default classes…'`, do not import only the default branch.
+
+```json
+{
+  "id": "lyr_goal_a",
+  "kind": "stack",
+  "style": {
+    "border": { "width": 1, "color": "#E5E7EB" },
+    "background": "#F9FAFB",
+    "radius": 12,
+    "padding": 16
+  },
+  "selectedStyle": {
+    "border": { "width": 1, "color": "#6D5DF6" },
+    "background": "#6D5DF610"
+  },
+  "children": [{ "kind": "text", "text": { "default": "Option A" } }]
+}
+```
+
+## Progress And Header Chrome
+
+- Use `progress` layers for visual step progress.
+- Put progress in `regions.header` when it appears with navigation chrome.
+- Use `back_button` for back/close-style top controls. Add nested text/icon children only when source UI has visible label or custom glyph semantics.
+
+## Style Tokens
+
+Agents must inspect the host codebase before falling back to black-and-white defaults:
+
+- Tailwind/NativeWind config and CSS variables.
+- theme files, design-token files, color palettes, and typography constants.
+- shared primitives such as `Button`, `Text`, `Typography`, `Screen`, `Header`, `Footer`.
+- React Native `StyleSheet.create` constants.
+- SwiftUI `Color`, `Font`, and modifier extensions.
+
+Map clear values into `manifest.theme`, layer `style`, button variants, spacing, border radius, and progress colors. Prefer established tokens over arbitrary colors.
+
+- Set `style.color` on text layers when screens use dark or saturated `containerStyle.backgroundFill` (e.g. `#FFFFFF` on red/teal education screens).
+- Map `StyleSheet.create`, Tailwind classes, and shared button/text primitives — not only standalone theme files.
+
+Black-and-white fallback is acceptable only when the audit finds no style-token evidence **and** the user confirms there is no theme source.
+
+## Screen Backgrounds
+
+Screen-level styling is not always a layer. Audit for:
+
+- `LinearGradient`, `expo-linear-gradient`, SwiftUI `LinearGradient`, `CAGradientLayer`
+- `ImageBackground`, background image constants, background videos
+- screen shell components such as `Screen`, `Container`, `OnboardingScreenShell`
+- `backgroundColor`, `background`, `bg-*`, CSS variables, and scrim overlays
+
+Map clear screen-level colors to `screen.containerStyle.backgroundFill` or `manifest.theme.background`. Map image/video backgrounds to screen background media fills and bundle those assets.
+
+**Gradients:** Rheo accepts CSS gradient strings on `backgroundFill.color` when `kind` is `color`, for example:
+
+```json
+"containerStyle": {
+  "backgroundFill": {
+    "kind": "color",
+    "color": "linear-gradient(180deg, #CCFBF1 0%, #F5F5F4 100%)"
+  }
+}
+```
+
+Apply shell gradients (e.g. shared `BackgroundGradient`) to every default onboarding screen unless a screen overrides with a solid brand color. Do not store multi-stop gradients only in `manifest.theme.background`.
+
+## Carousels
+
+When audit or source shows `infoSteps`, `currentInfoStep`, horizontal pagers, or dot indicators:
+
+```json
+{
+  "kind": "carousel",
+  "slides": [
+    {
+      "id": "lyr_slide_1",
+      "kind": "stack",
+      "direction": "vertical",
+      "align": "center",
+      "gap": 16,
+      "children": []
+    }
+  ],
+  "pageControl": { "position": "bottom" }
+}
+```
+
+Bundle every slide asset.
+
+**Swipe-only paging**
+
+- Carousels are **swipe-only** (horizontal snap scroll). Optional `pageControl` adds dots. There is no Next/Continue button on the carousel layer.
+- Do **not** add `regions.footer` or body `button` layers that only advance pager index when the source footer increments `currentInfoStep`.
+- Use `regions.footer` for a sticky CTA that advances the **whole flow** (next screen/route), or rely on swipe-to-last-slide completion when `loop` is false and there are 2+ slides.
+- `screen.next.default` is the edge to the **next screen** after carousel completion (swipe to last slide, or a screen-level Continue on single-slide carousels).
+
+## Layout, alignment, borders, shadows
+
+- Center hero images: parent vertical `stack` with `align: "center"`.
+- Text centering: `style.align: "center"` (not `textAlign`).
+- Card chrome (rating, testimonials, stacked info cards): wrapping `stack` with `style.background`, `style.radius`, `style.padding`, `style.border`, and `style.shadow` from source — not flat unstyled siblings.
+
+## Custom fonts
+
+When source loads custom fonts (`Font.loadAsync`, `useFonts`, bundled `.ttf`/`.otf`/`.woff`/`.woff2`):
+
+1. Copy font files into `assets/fonts/` in the import ZIP.
+2. Add `rheo-import.fonts.json` with placeholder UUIDs per style (weight + italic).
+3. Set `manifest.theme.fontFamily` to the primary family name string (e.g. `CalSans`).
+
+```json
+{
+  "fontFamilies": [
+    {
+      "name": "CalSans",
+      "styles": [
+        {
+          "id": "00000000-0000-0000-0000-000000000501",
+          "weight": 400,
+          "italic": false,
+          "path": "assets/fonts/CalSans-Regular.ttf",
+          "filename": "CalSans-Regular.ttf"
+        }
+      ]
+    }
+  ]
+}
+```
+
+On dashboard import, Rheo uploads font files and merges families into app branding. The manifest keeps the family name on `theme.fontFamily`; runtime resolves uploaded font media from branding.
+
+## Assets
+
+Follow local image, Lottie, video, and font references from source code:
+
+- static imports
+- `require(...)`
+- asset maps/constants
+- Lottie JSON imports
+- video imports
+- screen background assets
+- shared visual components such as `Illustration`, `Logo`, `Avatar`, `Mascot`, `HeroImage`, and `ImageBackground`
+- platform asset catalogs or bundled asset directories
+
+For each bundled asset:
+
+1. Generate a stable placeholder UUID.
+2. Use that UUID in `media.mediaAssetId`.
+3. Copy the file into `assets/`.
+4. Add an entry to `rheo-import.assets.json`.
+
+```json
+{
+  "assets": [
+    {
+      "id": "00000000-0000-0000-0000-000000000101",
+      "path": "assets/hero.png",
+      "type": "image",
+      "contentType": "image/png",
+      "name": "hero.png"
+    }
+  ]
+}
+```
+
+Do not put file paths directly in `mediaAssetId`.
+
+If any traced screen references local media, the import output must be `rheo-import.zip`; do not provide only `rheo-import.manifest.json`. If an asset cannot be copied, report the missing file instead of dropping the media layer.
+
+Lottie detection should include `LottieView`, `lottie-react-native`, `.lottie`, `.json` animation files, Swift Lottie references, and animation maps/constants.
+
+Before finalizing an import, verify:
+
+- every traced screen and shared visual component was checked for local assets
+- every local media reference is either bundled or explicitly reported missing
+- every placeholder `mediaAssetId` appears in `rheo-import.assets.json`
+- every file listed in `rheo-import.assets.json` exists in the ZIP
+
+## Auth
+
+- `oauth_provider` rows must be children of `oauth_login`.
+- Email/password fields and submit buttons must be children of `email_password_auth`.
+- Host code must wire auth callbacks; the manifest does not authenticate by itself.
+
+## External Surfaces
+
+RevenueCat paywalls map to external surface nodes:
+
+```json
+{
+  "id": "surf_paywall",
+  "name": "RevenueCat paywall",
+  "config": {
+    "provider": "revenuecat",
+    "offeringId": "default",
+    "presentation": "paywall"
+  },
+  "outcomes": {
+    "purchase_completed": "scr_premium",
+    "restore_completed": "scr_premium",
+    "dismissed": "scr_free",
+    "failed": "scr_free"
+  },
+  "fallback": "scr_free"
+}
+```
+
+Every external surface needs `fallback`. The target app must have the matching integration enabled in Rheo.
+
+## Decision Nodes
+
+Use decision nodes for source-code branches. Non-reserved `sdk.*` keys referenced by decisions must be listed in `sdkAttributeKeys`.
+
+```json
+{
+  "id": "dec_platform",
+  "name": "Platform",
+  "cases": [
+    {
+      "id": "case_ios",
+      "name": "iOS",
+      "expression": {
+        "kind": "predicate",
+        "variable": { "kind": "builtin", "name": "platform" },
+        "predicate": { "type": "string", "pred": { "op": "eq", "value": "ios" } }
+      },
+      "next": "scr_ios_intro"
+    }
+  ],
+  "elseNext": "scr_android_intro"
+}
+```
+
+## Publish Readiness
+
+The dashboard **Publish** button runs the same checks as the agent skill's publish-gate audit. Agents must pass these before calling an import complete:
+
+- The entry target must exist (`entryScreenId`).
+- A completion path from entry (`end_flow`, terminal screen `next`, or external surface end).
+- **Every text and icon layer** has explicit `style.color` (including nested **button label** text — native does not inherit colors).
+- Screens with `text_input`, `multiple_choice`, or `scale_input` include a `button` with `action.kind: "continue"`.
+- At most one input layer per screen; do not combine OAuth or email/password login with other inputs on the same screen.
+- Valid `fieldKey` (snake_case) on inputs; choice branches and `go_to_step` targets must reference existing ids.
+- External surfaces: real `config.provider`, connected `fallback`, RevenueCat enabled when used.
+- Run the skill's **audit-publish** command on `rheo-import.manifest.json` and fix all blocking issues in the publish-gates report.
+
+## Common Invalid Outputs
+
+- Using unsupported layer kinds.
+- Using `label` instead of nested text.
+- Omitting `decisionNodes`, `externalSurfaceNodes`, or `sdkAttributeKeys`.
+- Referencing `sdk.*` decision keys without allowlisting them.
+- Missing external surface fallback.
+- Reusing ids across layers.
+- Generating copy that was not present in source code or screenshots.
+
+## Validation
+
+From your app project, ask the agent to run the Rheo skill's **validate** and **audit-publish** commands on `rheo-import.manifest.json`. The bundled scripts are self-contained—no Rheo npm install required.

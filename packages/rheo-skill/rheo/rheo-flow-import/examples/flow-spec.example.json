@@ -1,0 +1,56 @@
+{
+  "defaultLocale": "en",
+  "entry": "scr_welcome",
+  "theme": {
+    "primary": "#6D5DF6",
+    "primaryForeground": "#FFFFFF",
+    "background": "#FFFFFF",
+    "foreground": "#0A0A0A",
+    "borderRadius": 16
+  },
+  "screens": [
+    {
+      "id": "scr_welcome",
+      "name": "Welcome",
+      "header": [
+        { "kind": "back_button", "variant": "outline" }
+      ],
+      "body": [
+        { "kind": "text", "text": "Welcome to Acme", "style": { "fontSize": 28, "fontWeight": 700, "align": "center", "color": "#0A0A0A" } },
+        { "kind": "text", "text": "A few quick questions to set you up.", "style": { "fontSize": 16, "align": "center", "color": "#0A0A0A" } }
+      ],
+      "footer": [
+        { "kind": "button", "label": "Get started", "action": "continue", "labelStyle": { "color": "#FFFFFF" } }
+      ],
+      "next": "scr_goal"
+    },
+    {
+      "id": "scr_goal",
+      "name": "Goal",
+      "body": [
+        { "kind": "text", "text": "What's your main goal?", "style": { "fontSize": 22, "fontWeight": 700, "color": "#0A0A0A" } },
+        {
+          "kind": "single_choice",
+          "fieldKey": "goal",
+          "options": [
+            { "optionId": "focus", "label": "Stay focused", "style": { "border": { "width": 1, "color": "#E5E7EB" }, "radius": 12, "padding": { "t": 16, "r": 16, "b": 16, "l": 16 } }, "selectedStyle": { "border": { "width": 1, "color": "#6D5DF6" } }, "labelStyle": { "color": "#0A0A0A" } },
+            { "optionId": "relax", "label": "Relax more", "style": { "border": { "width": 1, "color": "#E5E7EB" }, "radius": 12, "padding": { "t": 16, "r": 16, "b": 16, "l": 16 } }, "selectedStyle": { "border": { "width": 1, "color": "#6D5DF6" } }, "labelStyle": { "color": "#0A0A0A" } }
+          ]
+        }
+      ],
+      "footer": [
+        { "kind": "button", "label": "Continue", "action": "continue", "labelStyle": { "color": "#FFFFFF" } }
+      ],
+      "next": "scr_done"
+    },
+    {
+      "id": "scr_done",
+      "name": "Done",
+      "body": [
+        { "kind": "text", "text": "You're all set", "style": { "fontSize": 24, "fontWeight": 700, "align": "center", "color": "#0A0A0A" } },
+        { "kind": "button", "label": "Finish", "action": "end_flow", "labelStyle": { "color": "#FFFFFF" } }
+      ],
+      "next": null
+    }
+  ]
+}

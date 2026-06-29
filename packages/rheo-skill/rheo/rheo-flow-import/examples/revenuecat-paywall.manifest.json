@@ -1,0 +1,154 @@
+{
+  "flowId": "00000000-0000-0000-0000-000000000001",
+  "schemaVersion": 7,
+  "version": 1,
+  "defaultLocale": "en",
+  "locales": ["en"],
+  "entryScreenId": "scr_intro",
+  "theme": {
+    "primary": "#18181B",
+    "primaryForeground": "#FFFFFF",
+    "background": "#FFFFFF",
+    "foreground": "#18181B",
+    "borderRadius": 16
+  },
+  "screens": [
+    {
+      "id": "scr_intro",
+      "name": "Intro",
+      "regions": {
+        "body": {
+          "id": "lyr_intro_body",
+          "kind": "stack",
+          "direction": "vertical",
+          "gap": 16,
+          "style": { "padding": { "t": 24, "r": 20, "b": 24, "l": 20 } },
+          "children": [
+            {
+              "id": "lyr_intro_title",
+              "kind": "text",
+              "text": { "default": "Unlock premium" },
+              "style": { "fontSize": 26, "fontWeight": 700, "align": "center", "color": "#18181B" }
+            },
+            {
+              "id": "lyr_intro_continue",
+              "kind": "button",
+              "variant": "primary",
+              "action": { "kind": "continue" },
+              "direction": "horizontal",
+              "align": "center",
+              "distribution": "center",
+              "children": [
+                {
+                  "id": "lyr_intro_continue_text",
+                  "kind": "text",
+                  "text": { "default": "See plans" },
+                  "style": { "color": "#FFFFFF" }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "next": { "default": "surf_paywall" }
+    },
+    {
+      "id": "scr_premium",
+      "name": "Premium success",
+      "regions": {
+        "body": {
+          "id": "lyr_premium_body",
+          "kind": "stack",
+          "direction": "vertical",
+          "gap": 16,
+          "style": { "padding": { "t": 24, "r": 20, "b": 24, "l": 20 } },
+          "children": [
+            {
+              "id": "lyr_premium_title",
+              "kind": "text",
+              "text": { "default": "Premium is ready" },
+              "style": { "fontSize": 24, "fontWeight": 700, "color": "#18181B" }
+            },
+            {
+              "id": "lyr_premium_end",
+              "kind": "button",
+              "variant": "primary",
+              "action": { "kind": "end_flow" },
+              "direction": "horizontal",
+              "align": "center",
+              "distribution": "center",
+              "children": [
+                {
+                  "id": "lyr_premium_end_text",
+                  "kind": "text",
+                  "text": { "default": "Finish" },
+                  "style": { "color": "#FFFFFF" }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "next": { "default": null }
+    },
+    {
+      "id": "scr_free",
+      "name": "Continue free",
+      "regions": {
+        "body": {
+          "id": "lyr_free_body",
+          "kind": "stack",
+          "direction": "vertical",
+          "gap": 16,
+          "style": { "padding": { "t": 24, "r": 20, "b": 24, "l": 20 } },
+          "children": [
+            {
+              "id": "lyr_free_title",
+              "kind": "text",
+              "text": { "default": "Continue with free" },
+              "style": { "fontSize": 24, "fontWeight": 700, "color": "#18181B" }
+            },
+            {
+              "id": "lyr_free_end",
+              "kind": "button",
+              "variant": "secondary",
+              "action": { "kind": "end_flow" },
+              "direction": "horizontal",
+              "align": "center",
+              "distribution": "center",
+              "children": [
+                {
+                  "id": "lyr_free_end_text",
+                  "kind": "text",
+                  "text": { "default": "Finish" },
+                  "style": { "color": "#FFFFFF" }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "next": { "default": null }
+    }
+  ],
+  "decisionNodes": [],
+  "externalSurfaceNodes": [
+    {
+      "id": "surf_paywall",
+      "name": "RevenueCat paywall",
+      "config": {
+        "provider": "revenuecat",
+        "offeringId": "default",
+        "presentation": "paywall"
+      },
+      "outcomes": {
+        "purchase_completed": "scr_premium",
+        "restore_completed": "scr_premium",
+        "dismissed": "scr_free",
+        "failed": "scr_free"
+      },
+      "fallback": "scr_free"
+    }
+  ],
+  "sdkAttributeKeys": []
+}

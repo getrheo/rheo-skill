@@ -1,0 +1,10 @@
+{
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome aboard"
+    },
+    "cta": {
+      "continue": "Continue"
+    }
+  }
+}
