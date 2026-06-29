@@ -19,3 +19,4 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify
+      - run: git diff --exit-code -- packages/rheo-skill/rheo/rheo-flow-import/scripts/lib/rheo-cli.mjs packages/rheo-skill/rheo/rheo-flow-import/references/capabilities.md

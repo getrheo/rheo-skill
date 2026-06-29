@@ -13729,7 +13729,7 @@ var auditImportToMarkdownFile = async (opts) => {
   const reportRoot = resolve4(opts.root ?? process.cwd());
   const report = await auditImport({ ...opts, root: reportRoot });
   const markdown = renderAuditMarkdown(report);
-  const outPath = opts.out ? isAbsolute(opts.out) ? opts.out : resolve4(reportRoot, opts.out) : resolve4(reportRoot, "rheo-import.audit.md");
+  const outPath = opts.out ? isAbsolute(opts.out) ? opts.out : resolve4(reportRoot, opts.out) : resolve4(process.cwd(), "rheo-import.audit.md");
   await writeFile2(outPath, markdown);
   if (opts.suggestAnimations && report.animationSuggestions?.length) {
     const suggestPath = isAbsolute(opts.suggestAnimations) ? opts.suggestAnimations : resolve4(reportRoot, opts.suggestAnimations);
