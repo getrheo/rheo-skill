@@ -24,6 +24,7 @@ Use the audit report for header/footer, style tokens, screen backgrounds, carous
 4. Source code vs screenshots when they disagree
 5. Native-only steps vs Rheo-approximated steps
 6. Match motion from the codebase (may differ slightly from Rheo presets)? (yes/no)
+7. Does the app use i18n/localization? If yes, which locale is the default/fallback? All `text.default` values must be resolved strings from that locale — never raw keys.
 
 When intake Q6 is yes and the plan supports animations, read [animation-import.md](animation-import.md) and use `--suggest-animations rheo-import.animations.json` on the audit command.
 
