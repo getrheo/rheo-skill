@@ -39,8 +39,8 @@ importers:
   packages/contracts-fixtures:
     dependencies:
       '@getrheo/contracts':
-        specifier: 2.0.3
-        version: 2.0.3
+        specifier: 2.1.0
+        version: 2.1.0
     devDependencies:
       '@rheo/config':
         specifier: workspace:*
@@ -52,11 +52,11 @@ importers:
   packages/rheo-skill:
     dependencies:
       '@getrheo/contracts':
-        specifier: 2.0.3
-        version: 2.0.3
+        specifier: 2.1.0
+        version: 2.1.0
       '@getrheo/flow-runtime':
-        specifier: 2.0.3
-        version: 2.0.3
+        specifier: 2.1.0
+        version: 2.1.0
       zod:
         specifier: ^3.23.8
         version: 3.25.76
@@ -836,16 +836,16 @@ packages:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  /@getrheo/contracts@2.0.3:
-    resolution: {integrity: sha512-pKv4jmz6H9J0eAy7JydBt38ak7Fx+KO+ccCPSm5ruJQBVD9Ri2aQYj4z9tW1F9tKE2uFUxagwykiWapbSrGRQg==}
+  /@getrheo/contracts@2.1.0:
+    resolution: {integrity: sha512-Ju9QXPY0AVf2iD2XtJsQRukGJ+3jgVuLhnPW2g8O4WMOy1pxdtl9VS8MildgUwGybK+nAyVeODCHJWvbN2WlVg==}
     dependencies:
       zod: 3.25.76
     dev: false
 
-  /@getrheo/flow-runtime@2.0.3:
-    resolution: {integrity: sha512-RT6shbTUH5kyaaxjaFbgHZNWDyTCfxvquQRRRw5rJ8lr1mVQ0cqJ88J9LweZ8dzoA50dw4Jz1eirkCyzhVsbgg==}
+  /@getrheo/flow-runtime@2.1.0:
+    resolution: {integrity: sha512-Eqx0LuR9r6R/QFtm5MntKtFe9XS/gHq8PpDu1nsUvu6G00RcLiZ7wo1IIEBdC1lBqZ7mEI8z+OUYkM6LlmJDEw==}
     dependencies:
-      '@getrheo/contracts': 2.0.3
+      '@getrheo/contracts': 2.1.0
     dev: false
 
   /@humanfs/core@0.19.2:

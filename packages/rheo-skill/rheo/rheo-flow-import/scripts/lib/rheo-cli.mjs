@@ -8475,6 +8475,7 @@ var BrandingSchema = external_exports.object({
   gradientPresets: external_exports.array(BrandGradientSchema),
   fontFamilies: external_exports.array(FontFamilySchema)
 });
+var SdkLogLevelSchema = external_exports.enum(["silent", "warn", "debug"]);
 var SdkResolveRequestSchema = external_exports.object({
   identity: SdkIdentitySchema,
   context: SdkContextSchema.optional()
