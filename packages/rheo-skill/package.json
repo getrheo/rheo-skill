@@ -1,6 +1,6 @@
 {
   "name": "@getrheo/rheo-skill",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "type": "module",
   "description": "Rheo agent skill — SDK install guidance and flow manifest import tooling.",
   "main": "./src/index.ts",
@@ -25,8 +25,8 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@getrheo/contracts": "2.0.2",
-    "@getrheo/flow-runtime": "2.0.2",
+    "@getrheo/contracts": "2.0.3",
+    "@getrheo/flow-runtime": "2.0.3",
     "zod": "^3.23.8"
   },
   "devDependencies": {

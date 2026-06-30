@@ -3,7 +3,7 @@ name: rheo
 description: Work with Rheo, the headless onboarding/paywall flow engine for mobile apps. Use when a user wants to install or wire the Rheo SDK (React Native, Expo, or SwiftUI), follow Rheo SDK best practices, configure integrations (RevenueCat, AppsFlyer), wire auth/permissions/terminal callbacks, OR import/migrate an existing mobile flow into a compliant Rheo FlowManifest and validate it. Routes to the `rheo-best-practices` and `rheo-flow-import` sub-skills.
 compatibility: Requires Node.js 20+. rheo-flow-import scripts are fully self-contained (no install step). Internet access fetches the latest Manifest Agent Profile; a bundled fallback works offline.
 metadata:
-  rheo-version: "2.0.2"
+  rheo-version: "2.0.3"
   manifest-schema-version: "7"
 ---
 
