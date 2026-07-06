@@ -8,7 +8,7 @@ Public home for [`@getrheo/rheo-skill`](https://www.npmjs.com/package/%40getrheo
 | --- | --- |
 | [`@getrheo/rheo-skill`](https://www.npmjs.com/package/%40getrheo%2Frheo-skill) | `rheo/` skill tree + bundled CLI |
 
-**Current release line:** `2.1.0.x` (publish on git tag `v2.1.0`).
+**Current release line:** `2.2.0.x` (publish on git tag `v2.2.0`).
 
 ## Install
 

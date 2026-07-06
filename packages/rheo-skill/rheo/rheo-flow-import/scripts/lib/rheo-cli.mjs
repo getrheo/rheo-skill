@@ -4196,9 +4196,10 @@ var ThemedColorModesSchema = external_exports.object({
   message: "at least one of light or dark is required"
 });
 var ThemedColorSchema = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema]);
-var WIDTH_PRESETS = ["auto", "full", "1/2", "1/3", "2/3", "1/4", "3/4"];
+var LAYOUT_FRACTION_PRESETS = ["1/2", "1/3", "2/3", "1/4", "3/4"];
+var WIDTH_PRESETS = ["auto", "full", ...LAYOUT_FRACTION_PRESETS];
 var WidthValueSchema = external_exports.union([external_exports.enum(WIDTH_PRESETS), external_exports.number().int().min(0).max(2e3)]);
-var HEIGHT_PRESETS = ["auto", "full", "fill"];
+var HEIGHT_PRESETS = ["auto", "full", "fill", ...LAYOUT_FRACTION_PRESETS];
 var CommonLayoutHeightSchema = external_exports.union([
   external_exports.enum(HEIGHT_PRESETS),
   external_exports.number().int().min(0).max(2e3)
@@ -4238,7 +4239,7 @@ var CommonStyleSchema = external_exports.object({
   zIndex: external_exports.number().int().min(-999).max(999).optional(),
   /** Static rotation in degrees (CSS `rotate`); not timeline animation. */
   rotate: external_exports.number().min(-360).max(360).optional(),
-  /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), or fixed px. No fractions. */
+  /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), fractions, or fixed px. */
   height: CommonLayoutHeightSchema.optional(),
   /** Stroke thickness in px for layers that render a stroke primitive (e.g. loader ring). */
   strokeWidth: external_exports.number().int().min(0).max(64).optional()
@@ -4330,6 +4331,11 @@ var ButtonLayoutBreakpointsSchema = external_exports.object({
   xl: ButtonLayoutBreakpointPatchSchema.optional(),
   "2xl": ButtonLayoutBreakpointPatchSchema.optional()
 }).partial().optional();
+var DecisionNodeJumpIdSchema = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i);
+var ExternalSurfaceJumpIdSchema = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i);
+var FlowGraphNodeJumpTargetSchema = ScreenIdSchema.or(DecisionNodeJumpIdSchema).or(
+  ExternalSurfaceJumpIdSchema
+);
 var OS_PERMISSION_KEYS = [
   "notifications",
   "camera",
@@ -4359,11 +4365,9 @@ var PERMISSION_OUTCOME_VALUES = ["granted", "denied", "blocked"];
 var PermissionOutcomeSchema = external_exports.enum(PERMISSION_OUTCOME_VALUES);
 var OS_PERMISSION_OUTCOME_CONTINUE = "continue";
 var OS_PERMISSION_OUTCOME_END = "end";
-var OsPermissionOutcomeBranchTargetSchema = external_exports.union([
-  ScreenIdSchema,
-  external_exports.literal(OS_PERMISSION_OUTCOME_CONTINUE),
-  external_exports.literal(OS_PERMISSION_OUTCOME_END)
-]);
+var OsPermissionOutcomeBranchTargetSchema = FlowGraphNodeJumpTargetSchema.or(
+  external_exports.literal(OS_PERMISSION_OUTCOME_CONTINUE)
+).or(external_exports.literal(OS_PERMISSION_OUTCOME_END));
 var OsPermissionOutcomesSchema = external_exports.object({
   granted: OsPermissionOutcomeBranchTargetSchema,
   denied: OsPermissionOutcomeBranchTargetSchema,
@@ -4380,7 +4384,7 @@ var ButtonActionSchema = external_exports.discriminatedUnion("kind", [
     kind: external_exports.literal("go_back_one_screen"),
     fallbackScreenId: ScreenIdSchema.optional()
   }),
-  external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: ScreenIdSchema }),
+  external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: FlowGraphNodeJumpTargetSchema }),
   external_exports.object({
     kind: external_exports.literal("request_os_permission"),
     permissionKey: OsPermissionKeySchema,
@@ -4462,7 +4466,7 @@ var ProgressLayerSchema = external_exports.object({
 var LoaderOnCompleteSchema = external_exports.discriminatedUnion("mode", [
   external_exports.object({ mode: external_exports.literal("none") }),
   external_exports.object({ mode: external_exports.literal("next") }),
-  external_exports.object({ mode: external_exports.literal("screen"), screenId: ScreenIdSchema })
+  external_exports.object({ mode: external_exports.literal("screen"), screenId: FlowGraphNodeJumpTargetSchema })
 ]);
 var LoaderLayerSchema = external_exports.object({
   ...baseLayerShape,
@@ -4943,7 +4947,7 @@ var ChoiceOptionBindingSchema = external_exports.object({
 });
 var BranchConditionSchema = external_exports.object({
   choiceId: external_exports.string().min(1),
-  goTo: ScreenIdSchema
+  goTo: FlowGraphNodeJumpTargetSchema
 });
 var ChoiceBranchingSchema = external_exports.object({
   enabled: external_exports.boolean(),
@@ -5242,9 +5246,10 @@ var ThemedColorModesSchema2 = external_exports.object({
   message: "at least one of light or dark is required"
 });
 var ThemedColorSchema2 = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema2]);
-var WIDTH_PRESETS2 = ["auto", "full", "1/2", "1/3", "2/3", "1/4", "3/4"];
+var LAYOUT_FRACTION_PRESETS2 = ["1/2", "1/3", "2/3", "1/4", "3/4"];
+var WIDTH_PRESETS2 = ["auto", "full", ...LAYOUT_FRACTION_PRESETS2];
 var WidthValueSchema2 = external_exports.union([external_exports.enum(WIDTH_PRESETS2), external_exports.number().int().min(0).max(2e3)]);
-var HEIGHT_PRESETS2 = ["auto", "full", "fill"];
+var HEIGHT_PRESETS2 = ["auto", "full", "fill", ...LAYOUT_FRACTION_PRESETS2];
 var CommonLayoutHeightSchema2 = external_exports.union([
   external_exports.enum(HEIGHT_PRESETS2),
   external_exports.number().int().min(0).max(2e3)
@@ -5284,7 +5289,7 @@ var CommonStyleSchema2 = external_exports.object({
   zIndex: external_exports.number().int().min(-999).max(999).optional(),
   /** Static rotation in degrees (CSS `rotate`); not timeline animation. */
   rotate: external_exports.number().min(-360).max(360).optional(),
-  /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), or fixed px. No fractions. */
+  /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), fractions, or fixed px. */
   height: CommonLayoutHeightSchema2.optional(),
   /** Stroke thickness in px for layers that render a stroke primitive (e.g. loader ring). */
   strokeWidth: external_exports.number().int().min(0).max(64).optional()
@@ -5376,6 +5381,11 @@ var ButtonLayoutBreakpointsSchema2 = external_exports.object({
   xl: ButtonLayoutBreakpointPatchSchema2.optional(),
   "2xl": ButtonLayoutBreakpointPatchSchema2.optional()
 }).partial().optional();
+var DecisionNodeJumpIdSchema2 = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i);
+var ExternalSurfaceJumpIdSchema2 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i);
+var FlowGraphNodeJumpTargetSchema2 = ScreenIdSchema2.or(DecisionNodeJumpIdSchema2).or(
+  ExternalSurfaceJumpIdSchema2
+);
 var OS_PERMISSION_KEYS2 = [
   "notifications",
   "camera",
@@ -5405,11 +5415,9 @@ var PERMISSION_OUTCOME_VALUES2 = ["granted", "denied", "blocked"];
 external_exports.enum(PERMISSION_OUTCOME_VALUES2);
 var OS_PERMISSION_OUTCOME_CONTINUE2 = "continue";
 var OS_PERMISSION_OUTCOME_END2 = "end";
-var OsPermissionOutcomeBranchTargetSchema2 = external_exports.union([
-  ScreenIdSchema2,
-  external_exports.literal(OS_PERMISSION_OUTCOME_CONTINUE2),
-  external_exports.literal(OS_PERMISSION_OUTCOME_END2)
-]);
+var OsPermissionOutcomeBranchTargetSchema2 = FlowGraphNodeJumpTargetSchema2.or(
+  external_exports.literal(OS_PERMISSION_OUTCOME_CONTINUE2)
+).or(external_exports.literal(OS_PERMISSION_OUTCOME_END2));
 var OsPermissionOutcomesSchema2 = external_exports.object({
   granted: OsPermissionOutcomeBranchTargetSchema2,
   denied: OsPermissionOutcomeBranchTargetSchema2,
@@ -5426,7 +5434,7 @@ var ButtonActionSchema2 = external_exports.discriminatedUnion("kind", [
     kind: external_exports.literal("go_back_one_screen"),
     fallbackScreenId: ScreenIdSchema2.optional()
   }),
-  external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: ScreenIdSchema2 }),
+  external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: FlowGraphNodeJumpTargetSchema2 }),
   external_exports.object({
     kind: external_exports.literal("request_os_permission"),
     permissionKey: OsPermissionKeySchema2,
@@ -5508,7 +5516,7 @@ var ProgressLayerSchema2 = external_exports.object({
 var LoaderOnCompleteSchema2 = external_exports.discriminatedUnion("mode", [
   external_exports.object({ mode: external_exports.literal("none") }),
   external_exports.object({ mode: external_exports.literal("next") }),
-  external_exports.object({ mode: external_exports.literal("screen"), screenId: ScreenIdSchema2 })
+  external_exports.object({ mode: external_exports.literal("screen"), screenId: FlowGraphNodeJumpTargetSchema2 })
 ]);
 var LoaderLayerSchema2 = external_exports.object({
   ...baseLayerShape2,
@@ -5989,7 +5997,7 @@ var ChoiceOptionBindingSchema2 = external_exports.object({
 });
 var BranchConditionSchema2 = external_exports.object({
   choiceId: external_exports.string().min(1),
-  goTo: ScreenIdSchema2
+  goTo: FlowGraphNodeJumpTargetSchema2
 });
 var ChoiceBranchingSchema2 = external_exports.object({
   enabled: external_exports.boolean(),
@@ -6137,10 +6145,10 @@ layerSchemaStore2.schema = external_exports.lazy(
   ])
 );
 var DecisionNodeIdSchema = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i, "decision node id must look like dec_<id>");
-var ExternalSurfaceJumpIdSchema = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
+var ExternalSurfaceJumpIdSchema22 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
 var EXTERNAL_SURFACE_NO_NEXT = "__onb_surface_no_next__";
 var ExternalSurfaceTerminalTargetSchema = external_exports.literal(EXTERNAL_SURFACE_NO_NEXT);
-var FlowJumpTargetSchema = ScreenIdSchema2.or(DecisionNodeIdSchema).or(ExternalSurfaceJumpIdSchema).or(ExternalSurfaceTerminalTargetSchema).nullable();
+var FlowJumpTargetSchema = ScreenIdSchema2.or(DecisionNodeIdSchema).or(ExternalSurfaceJumpIdSchema22).or(ExternalSurfaceTerminalTargetSchema).nullable();
 var DecisionBuiltinNameSchema = external_exports.enum(["locale", "platform"]);
 var DecisionVariableRefSchema = external_exports.discriminatedUnion("kind", [
   external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema }),
@@ -6407,9 +6415,10 @@ var ThemedColorModesSchema3 = external_exports.object({
   message: "at least one of light or dark is required"
 });
 var ThemedColorSchema3 = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema3]);
-var WIDTH_PRESETS3 = ["auto", "full", "1/2", "1/3", "2/3", "1/4", "3/4"];
+var LAYOUT_FRACTION_PRESETS3 = ["1/2", "1/3", "2/3", "1/4", "3/4"];
+var WIDTH_PRESETS3 = ["auto", "full", ...LAYOUT_FRACTION_PRESETS3];
 var WidthValueSchema3 = external_exports.union([external_exports.enum(WIDTH_PRESETS3), external_exports.number().int().min(0).max(2e3)]);
-var HEIGHT_PRESETS3 = ["auto", "full", "fill"];
+var HEIGHT_PRESETS3 = ["auto", "full", "fill", ...LAYOUT_FRACTION_PRESETS3];
 var CommonLayoutHeightSchema3 = external_exports.union([
   external_exports.enum(HEIGHT_PRESETS3),
   external_exports.number().int().min(0).max(2e3)
@@ -6449,7 +6458,7 @@ var CommonStyleSchema3 = external_exports.object({
   zIndex: external_exports.number().int().min(-999).max(999).optional(),
   /** Static rotation in degrees (CSS `rotate`); not timeline animation. */
   rotate: external_exports.number().min(-360).max(360).optional(),
-  /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), or fixed px. No fractions. */
+  /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), fractions, or fixed px. */
   height: CommonLayoutHeightSchema3.optional(),
   /** Stroke thickness in px for layers that render a stroke primitive (e.g. loader ring). */
   strokeWidth: external_exports.number().int().min(0).max(64).optional()
@@ -6541,6 +6550,11 @@ var ButtonLayoutBreakpointsSchema3 = external_exports.object({
   xl: ButtonLayoutBreakpointPatchSchema3.optional(),
   "2xl": ButtonLayoutBreakpointPatchSchema3.optional()
 }).partial().optional();
+var DecisionNodeJumpIdSchema3 = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i);
+var ExternalSurfaceJumpIdSchema3 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i);
+var FlowGraphNodeJumpTargetSchema3 = ScreenIdSchema3.or(DecisionNodeJumpIdSchema3).or(
+  ExternalSurfaceJumpIdSchema3
+);
 var OS_PERMISSION_KEYS3 = [
   "notifications",
   "camera",
@@ -6572,11 +6586,9 @@ var PERMISSION_OUTCOME_VALUES3 = ["granted", "denied", "blocked"];
 var PermissionOutcomeSchema2 = external_exports.enum(PERMISSION_OUTCOME_VALUES3);
 var OS_PERMISSION_OUTCOME_CONTINUE3 = "continue";
 var OS_PERMISSION_OUTCOME_END3 = "end";
-var OsPermissionOutcomeBranchTargetSchema3 = external_exports.union([
-  ScreenIdSchema3,
-  external_exports.literal(OS_PERMISSION_OUTCOME_CONTINUE3),
-  external_exports.literal(OS_PERMISSION_OUTCOME_END3)
-]);
+var OsPermissionOutcomeBranchTargetSchema3 = FlowGraphNodeJumpTargetSchema3.or(
+  external_exports.literal(OS_PERMISSION_OUTCOME_CONTINUE3)
+).or(external_exports.literal(OS_PERMISSION_OUTCOME_END3));
 var OsPermissionOutcomesSchema3 = external_exports.object({
   granted: OsPermissionOutcomeBranchTargetSchema3,
   denied: OsPermissionOutcomeBranchTargetSchema3,
@@ -6593,7 +6605,7 @@ var ButtonActionSchema3 = external_exports.discriminatedUnion("kind", [
     kind: external_exports.literal("go_back_one_screen"),
     fallbackScreenId: ScreenIdSchema3.optional()
   }),
-  external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: ScreenIdSchema3 }),
+  external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: FlowGraphNodeJumpTargetSchema3 }),
   external_exports.object({
     kind: external_exports.literal("request_os_permission"),
     permissionKey: OsPermissionKeySchema3,
@@ -6675,7 +6687,7 @@ var ProgressLayerSchema3 = external_exports.object({
 var LoaderOnCompleteSchema3 = external_exports.discriminatedUnion("mode", [
   external_exports.object({ mode: external_exports.literal("none") }),
   external_exports.object({ mode: external_exports.literal("next") }),
-  external_exports.object({ mode: external_exports.literal("screen"), screenId: ScreenIdSchema3 })
+  external_exports.object({ mode: external_exports.literal("screen"), screenId: FlowGraphNodeJumpTargetSchema3 })
 ]);
 var LoaderLayerSchema3 = external_exports.object({
   ...baseLayerShape3,
@@ -7153,7 +7165,7 @@ var ChoiceOptionBindingSchema3 = external_exports.object({
 });
 var BranchConditionSchema3 = external_exports.object({
   choiceId: external_exports.string().min(1),
-  goTo: ScreenIdSchema3
+  goTo: FlowGraphNodeJumpTargetSchema3
 });
 var ChoiceBranchingSchema3 = external_exports.object({
   enabled: external_exports.boolean(),
@@ -7560,10 +7572,10 @@ var ScreenContainerStyleBreakpointsSchema = external_exports.object({
   "2xl": ScreenContainerBreakpointPatchSchema.optional()
 }).partial().optional();
 var DecisionNodeIdSchema2 = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i, "decision node id must look like dec_<id>");
-var ExternalSurfaceJumpIdSchema2 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
+var ExternalSurfaceJumpIdSchema23 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
 var EXTERNAL_SURFACE_NO_NEXT2 = "__onb_surface_no_next__";
 var ExternalSurfaceTerminalTargetSchema2 = external_exports.literal(EXTERNAL_SURFACE_NO_NEXT2);
-var FlowJumpTargetSchema2 = ScreenIdSchema3.or(DecisionNodeIdSchema2).or(ExternalSurfaceJumpIdSchema2).or(ExternalSurfaceTerminalTargetSchema2).nullable();
+var FlowJumpTargetSchema2 = ScreenIdSchema3.or(DecisionNodeIdSchema2).or(ExternalSurfaceJumpIdSchema23).or(ExternalSurfaceTerminalTargetSchema2).nullable();
 var DecisionBuiltinNameSchema2 = external_exports.enum(["locale", "platform"]);
 var DecisionVariableRefSchema2 = external_exports.discriminatedUnion("kind", [
   external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema2 }),
@@ -8223,7 +8235,7 @@ var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys
         );
         const knownOptionIds = new Set(l.optionBindings.map((b) => b.optionId));
         for (const cond of l.branching.conditions) {
-          if (!screenIds.has(cond.goTo)) {
+          if (!jumpTargets.has(cond.goTo)) {
             ctx.addIssue({
               code: external_exports.ZodIssueCode.custom,
               message: `screen "${screen.id}" branch condition "${cond.choiceId}" -> "${cond.goTo}" not found`,
@@ -8240,7 +8252,7 @@ var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys
         }
       }
       if (l.kind === "button" && l.action.kind === "go_to_step") {
-        if (!screenIds.has(l.action.screenId)) {
+        if (!jumpTargets.has(l.action.screenId)) {
           ctx.addIssue({
             code: external_exports.ZodIssueCode.custom,
             message: `screen "${screen.id}" button action go_to_step "${l.action.screenId}" not found`,
@@ -8278,6 +8290,24 @@ var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys
               path: ["screens", screenIdx]
             });
           }
+        }
+      }
+      if (l.kind === "loader" && l.onComplete?.mode === "screen") {
+        if (!jumpTargets.has(l.onComplete.screenId)) {
+          ctx.addIssue({
+            code: external_exports.ZodIssueCode.custom,
+            message: `screen "${screen.id}" loader "${l.id}" onComplete targets missing destination "${l.onComplete.screenId}"`,
+            path: ["screens", screenIdx]
+          });
+        }
+      }
+      if ((l.kind === "lottie" || l.kind === "video") && l.onComplete?.mode === "screen") {
+        if (!jumpTargets.has(l.onComplete.screenId)) {
+          ctx.addIssue({
+            code: external_exports.ZodIssueCode.custom,
+            message: `screen "${screen.id}" ${l.kind} "${l.id}" onComplete targets missing destination "${l.onComplete.screenId}"`,
+            path: ["screens", screenIdx]
+          });
         }
       }
       if (l.kind === "back_button" && l.fallbackScreenId && !screenIds.has(l.fallbackScreenId)) {
@@ -8829,9 +8859,10 @@ var ThemedColorModesSchema4 = external_exports.object({
   message: "at least one of light or dark is required"
 });
 var ThemedColorSchema4 = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema4]);
-var WIDTH_PRESETS4 = ["auto", "full", "1/2", "1/3", "2/3", "1/4", "3/4"];
+var LAYOUT_FRACTION_PRESETS4 = ["1/2", "1/3", "2/3", "1/4", "3/4"];
+var WIDTH_PRESETS4 = ["auto", "full", ...LAYOUT_FRACTION_PRESETS4];
 var WidthValueSchema4 = external_exports.union([external_exports.enum(WIDTH_PRESETS4), external_exports.number().int().min(0).max(2e3)]);
-var HEIGHT_PRESETS4 = ["auto", "full", "fill"];
+var HEIGHT_PRESETS4 = ["auto", "full", "fill", ...LAYOUT_FRACTION_PRESETS4];
 var CommonLayoutHeightSchema4 = external_exports.union([
   external_exports.enum(HEIGHT_PRESETS4),
   external_exports.number().int().min(0).max(2e3)
@@ -8871,7 +8902,7 @@ var CommonStyleSchema4 = external_exports.object({
   zIndex: external_exports.number().int().min(-999).max(999).optional(),
   /** Static rotation in degrees (CSS `rotate`); not timeline animation. */
   rotate: external_exports.number().min(-360).max(360).optional(),
-  /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), or fixed px. No fractions. */
+  /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), fractions, or fixed px. */
   height: CommonLayoutHeightSchema4.optional(),
   /** Stroke thickness in px for layers that render a stroke primitive (e.g. loader ring). */
   strokeWidth: external_exports.number().int().min(0).max(64).optional()
@@ -8963,6 +8994,11 @@ var ButtonLayoutBreakpointsSchema4 = external_exports.object({
   xl: ButtonLayoutBreakpointPatchSchema4.optional(),
   "2xl": ButtonLayoutBreakpointPatchSchema4.optional()
 }).partial().optional();
+var DecisionNodeJumpIdSchema4 = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i);
+var ExternalSurfaceJumpIdSchema4 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i);
+var FlowGraphNodeJumpTargetSchema4 = ScreenIdSchema4.or(DecisionNodeJumpIdSchema4).or(
+  ExternalSurfaceJumpIdSchema4
+);
 var OS_PERMISSION_KEYS4 = [
   "notifications",
   "camera",
@@ -8992,11 +9028,9 @@ var PERMISSION_OUTCOME_VALUES4 = ["granted", "denied", "blocked"];
 external_exports.enum(PERMISSION_OUTCOME_VALUES4);
 var OS_PERMISSION_OUTCOME_CONTINUE4 = "continue";
 var OS_PERMISSION_OUTCOME_END4 = "end";
-var OsPermissionOutcomeBranchTargetSchema4 = external_exports.union([
-  ScreenIdSchema4,
-  external_exports.literal(OS_PERMISSION_OUTCOME_CONTINUE4),
-  external_exports.literal(OS_PERMISSION_OUTCOME_END4)
-]);
+var OsPermissionOutcomeBranchTargetSchema4 = FlowGraphNodeJumpTargetSchema4.or(
+  external_exports.literal(OS_PERMISSION_OUTCOME_CONTINUE4)
+).or(external_exports.literal(OS_PERMISSION_OUTCOME_END4));
 var OsPermissionOutcomesSchema4 = external_exports.object({
   granted: OsPermissionOutcomeBranchTargetSchema4,
   denied: OsPermissionOutcomeBranchTargetSchema4,
@@ -9013,7 +9047,7 @@ var ButtonActionSchema4 = external_exports.discriminatedUnion("kind", [
     kind: external_exports.literal("go_back_one_screen"),
     fallbackScreenId: ScreenIdSchema4.optional()
   }),
-  external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: ScreenIdSchema4 }),
+  external_exports.object({ kind: external_exports.literal("go_to_step"), screenId: FlowGraphNodeJumpTargetSchema4 }),
   external_exports.object({
     kind: external_exports.literal("request_os_permission"),
     permissionKey: OsPermissionKeySchema4,
@@ -9095,7 +9129,7 @@ var ProgressLayerSchema4 = external_exports.object({
 var LoaderOnCompleteSchema4 = external_exports.discriminatedUnion("mode", [
   external_exports.object({ mode: external_exports.literal("none") }),
   external_exports.object({ mode: external_exports.literal("next") }),
-  external_exports.object({ mode: external_exports.literal("screen"), screenId: ScreenIdSchema4 })
+  external_exports.object({ mode: external_exports.literal("screen"), screenId: FlowGraphNodeJumpTargetSchema4 })
 ]);
 var LoaderLayerSchema4 = external_exports.object({
   ...baseLayerShape4,
@@ -9576,7 +9610,7 @@ var ChoiceOptionBindingSchema4 = external_exports.object({
 });
 var BranchConditionSchema4 = external_exports.object({
   choiceId: external_exports.string().min(1),
-  goTo: ScreenIdSchema4
+  goTo: FlowGraphNodeJumpTargetSchema4
 });
 var ChoiceBranchingSchema4 = external_exports.object({
   enabled: external_exports.boolean(),
@@ -9782,10 +9816,10 @@ var ScreenContainerStyleBreakpointsSchema2 = external_exports.object({
   "2xl": ScreenContainerBreakpointPatchSchema2.optional()
 }).partial().optional();
 var DecisionNodeIdSchema3 = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i, "decision node id must look like dec_<id>");
-var ExternalSurfaceJumpIdSchema3 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
+var ExternalSurfaceJumpIdSchema24 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
 var EXTERNAL_SURFACE_NO_NEXT3 = "__onb_surface_no_next__";
 var ExternalSurfaceTerminalTargetSchema3 = external_exports.literal(EXTERNAL_SURFACE_NO_NEXT3);
-var FlowJumpTargetSchema3 = ScreenIdSchema4.or(DecisionNodeIdSchema3).or(ExternalSurfaceJumpIdSchema3).or(ExternalSurfaceTerminalTargetSchema3).nullable();
+var FlowJumpTargetSchema3 = ScreenIdSchema4.or(DecisionNodeIdSchema3).or(ExternalSurfaceJumpIdSchema24).or(ExternalSurfaceTerminalTargetSchema3).nullable();
 var DecisionBuiltinNameSchema3 = external_exports.enum(["locale", "platform"]);
 var DecisionVariableRefSchema3 = external_exports.discriminatedUnion("kind", [
   external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema3 }),
@@ -10365,18 +10399,32 @@ var collectFlowBuilderIssues = (manifest) => {
         }
         if (l.kind === "single_choice" || l.kind === "multiple_choice") {
           for (const cond of l.branching.conditions) {
-            if (!screenIds.has(cond.goTo)) {
+            if (!jumpTargetIds.has(cond.goTo)) {
               issues.push(
-                `Screen "${label}" branches choice "${cond.choiceId}" to a missing screen "${cond.goTo}".`
+                `Screen "${label}" branches choice "${cond.choiceId}" to a missing destination "${cond.goTo}".`
               );
             }
           }
         }
       }
       if (l.kind === "button" && l.action.kind === "go_to_step") {
-        if (!screenIds.has(l.action.screenId)) {
+        if (!jumpTargetIds.has(l.action.screenId)) {
           issues.push(
-            `Button "${l.name || l.id}" on screen "${screen.name || screen.id}" targets a missing screen "${l.action.screenId}".`
+            `Button "${l.name || l.id}" on screen "${screen.name || screen.id}" targets a missing destination "${l.action.screenId}".`
+          );
+        }
+      }
+      if (l.kind === "loader" && l.onComplete?.mode === "screen") {
+        if (!jumpTargetIds.has(l.onComplete.screenId)) {
+          issues.push(
+            `Loader "${l.name || l.id}" on screen "${screen.name || screen.id}" onComplete targets a missing destination "${l.onComplete.screenId}".`
+          );
+        }
+      }
+      if ((l.kind === "lottie" || l.kind === "video") && l.onComplete?.mode === "screen") {
+        if (!jumpTargetIds.has(l.onComplete.screenId)) {
+          issues.push(
+            `${l.kind === "video" ? "Video" : "Lottie"} "${l.name || l.id}" on screen "${screen.name || screen.id}" onComplete targets a missing destination "${l.onComplete.screenId}".`
           );
         }
       }
@@ -10404,16 +10452,16 @@ var collectFlowBuilderIssues = (manifest) => {
             if (def == null) {
               continue;
             }
-            if (!screenIds.has(def) && !manifest.decisionNodes?.some((d) => d.id === def)) {
+            if (!jumpTargetIds.has(def)) {
               issues.push(
                 `Button "${l.name || l.id}" on screen "${screen.name || screen.id}" (${slot}) continues to missing target "${def}".`
               );
             }
             continue;
           }
-          if (!screenIds.has(sid)) {
+          if (!jumpTargetIds.has(sid)) {
             issues.push(
-              `Button "${l.name || l.id}" on screen "${screen.name || screen.id}" (${slot}) targets a missing screen "${sid}".`
+              `Button "${l.name || l.id}" on screen "${screen.name || screen.id}" (${slot}) targets a missing destination "${sid}".`
             );
           }
         }

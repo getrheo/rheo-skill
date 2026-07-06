@@ -89,8 +89,8 @@ enum automatically.
 
 Action shorthands: `"none"`, `"continue"`, `"skip"`, `"end_flow"`,
 `"go_back_one_screen"`, `"request_app_review"`. Object forms:
-`{ "kind": "go_to_step", "screenId": "scr_x" }`,
-`{ "kind": "request_os_permission", "permissionKey": "…", "outcomes": { "granted": "scr_a", "denied": "scr_b", "blocked": "scr_c" } }`,
+`{ "kind": "go_to_step", "screenId": "scr_x" }` (or `dec_*` / `surf_*`),
+`{ "kind": "request_os_permission", "permissionKey": "…", "outcomes": { "granted": "scr_a", "denied": "dec_b", "blocked": "surf_c" } }` (targets may be `scr_*`, `dec_*`, `surf_*`, `"continue"`, or `"end"`),
 `{ "kind": "play_media", "targetLayerIds": ["lyr_video"] }`.
 
 ### Stacks (layout)
@@ -127,6 +127,7 @@ Map unselected chrome to `style` and selected chrome to `selectedStyle` per opti
 
 `multiple_choice` adds optional `minSelections`/`maxSelections`. To branch per
 option, set `branching: { "enabled": true, "conditions": [{ "choiceId": "male", "goTo": "scr_x" }] }`.
+`goTo` may be any `FlowGraphNodeJumpTarget` (`scr_*`, `dec_*`, or `surf_*`).
 
 ### Inputs
 
@@ -182,6 +183,7 @@ No buttons inside a carousel — paging is swipe-only ([carousel-import.md](caro
 { "kind": "progress", "fillColor": "#6D5DF6", "trackColor": "#E5E7EB" }
 { "kind": "counter", "startValue": 0, "endValue": 1000, "durationMs": 1200 }
 { "kind": "loader", "variant": "circular", "targetPercent": 100, "onComplete": { "mode": "next" } }
+{ "kind": "loader", "onComplete": { "mode": "screen", "screenId": "dec_next" } } // screenId: scr_* | dec_* | surf_*
 ```
 
 ## Decisions and external surfaces
