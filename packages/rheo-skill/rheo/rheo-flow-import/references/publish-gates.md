@@ -29,7 +29,7 @@ These mirror `apps/web/src/features/builder/validateFlow.ts` and API `preflightP
 | **Continue button** | `text_input`, `multiple_choice`, or `scale_input` without a `button` with `action.kind: "continue"`. |
 | **One input per screen** | Multiple inputs, or OAuth/email-password combined with inputs. |
 | **fieldKey** | Missing or non–snake_case on input layers. |
-| **Graph targets** | `go_to_step`, choice `goTo`, permission outcomes, fallbacks point at missing ids. |
+| **Graph targets** | `go_to_step`, choice `goTo`, loader/lottie/video `onComplete` (screen mode), permission outcomes, and fallbacks point at missing `scr_*` / `dec_*` / `surf_*` ids. |
 | **Media triggers** | Lottie/video with `autoPlay: false` needs a `play_media` button targeting that layer. |
 | **Screen backgrounds** | Image/video fills need `mediaAssetId`; manual background video needs trigger wiring. |
 

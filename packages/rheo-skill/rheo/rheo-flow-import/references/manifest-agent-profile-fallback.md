@@ -50,7 +50,7 @@ Use only: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_b
 - Text copy goes in `text.default`.
 - Button labels are nested text layers.
 - `button` / `back_button` `variant` must be `primary`, `secondary`, `ghost`, or `destructive` (map source `outline`/`text`/`link` — do not copy). `back_button` has no `action`.
-- `single_choice` / `multiple_choice` require `fieldKey`, `children`, `optionBindings`, and `branching` — never `"options"` arrays.
+- `single_choice` / `multiple_choice` require `fieldKey`, `children`, `optionBindings`, and `branching` — never `"options"` arrays. `branching.conditions[].goTo` may target `scr_*`, `dec_*`, or `surf_*`.
 - Use `regions.header` for top chrome such as back buttons and progress, `regions.body` for main content, and `regions.footer` for sticky bottom CTAs.
 - Inspect theme/style/token files, StyleSheet, and Tailwind classes before using black-and-white defaults.
 - Set `style.color` on text for dark/saturated screen backgrounds.

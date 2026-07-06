@@ -60,8 +60,8 @@ Valid `action.kind` values on `button` layers:
 - `play_media`
 - `request_app_review`
 
-- `go_to_step` requires `screenId`.
-- `go_back_one_screen` accepts optional `fallbackScreenId`.
+- `FlowGraphNodeJumpTarget` (`scr_*` | `dec_*` | `surf_*`): `go_to_step.screenId`, choice `branching.conditions[].goTo`, loader/lottie/video `onComplete` when mode is `screen`, and `request_os_permission` outcomes (except `continue`/`end`).
+- `go_back_one_screen` and `back_button` accept optional `fallbackScreenId` (`scr_*` only).
 - `request_os_permission` requires `permissionKey` and `outcomes` (`granted`/`denied`/`blocked`).
 - `play_media` requires `targetLayerIds` (≥1) pointing at Lottie/video layers on the same screen.
 - `back_button` takes **no** `action` (back navigation is built in).

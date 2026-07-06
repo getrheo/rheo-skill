@@ -5,7 +5,7 @@ summary: Current manifest-generation guidance for agent skills and local import 
 tags: [agents, manifest, import]
 audience: [developer]
 related: [developer-guide/agent-import, developer-guide/sdk, user-guide/flow-builder]
-last_reviewed: "2026-06-23"
+last_reviewed: "2026-07-06"
 ---
 
 # Rheo Manifest Agent Profile
@@ -70,7 +70,25 @@ Agents must not finish with JSON-only output until they have audited the traced 
 - Decision ids: `dec_*`
 - External surface ids: `surf_*`
 
-Prefer readable ids such as `scr_welcome`, `lyr_welcome_title`, and `surf_paywall`.
+Prefer readable ids such as `scr_welcome`, `lyr_welcome_title`, `dec_platform`, and `surf_paywall`.
+
+## Flow jump targets
+
+`FlowGraphNodeJumpTarget` is any non-null graph hop id: `scr_*`, `dec_*`, or `surf_*`. Use it anywhere the manifest routes to another graph node (not flow end).
+
+| Location | Field | Allowed targets |
+|----------|-------|-----------------|
+| `screen.next.default` | linear Continue / auto-advance | `scr_*` \| `dec_*` \| `surf_*` \| `null` (end) |
+| `single_choice` / `multiple_choice` `.branching.conditions[]` | `goTo` | `scr_*` \| `dec_*` \| `surf_*` |
+| `button` `go_to_step` | `screenId` | `scr_*` \| `dec_*` \| `surf_*` |
+| `loader` / `lottie` / `video` `onComplete` (mode `screen`) | `screenId` | `scr_*` \| `dec_*` \| `surf_*` |
+| `request_os_permission` outcomes | `granted` / `denied` / `blocked` | `scr_*` \| `dec_*` \| `surf_*` \| `"continue"` \| `"end"` |
+| Decision node cases | `next`, `elseNext` | `scr_*` \| `dec_*` \| `surf_*` \| `null` |
+| External surface | `outcomes`, `fallback` | `scr_*` \| `dec_*` \| `surf_*` |
+
+**Screen-only fallbacks:** `go_back_one_screen.fallbackScreenId` and `back_button.fallbackScreenId` remain `scr_*` only (history navigation).
+
+**Routing pick:** same-screen questionnaire taps → choice layer `branching`; cross-screen field/platform/locale logic after leaving a screen → `dec_*` decision nodes on `screen.next.default`.
 
 ## Layer Kinds
 
@@ -113,6 +131,19 @@ Prefer one body stack per screen when there is no obvious header or footer:
   "next": { "default": null }
 }
 ```
+
+## Layout sizing
+
+Set explicit `style.width` and `style.height` on every layer:
+
+| Axis | Values |
+|------|--------|
+| Width | `"full"` (fill), `"auto"` (hug), fractions (`"1/2"`, `"1/3"`, `"2/3"`, `"1/4"`, `"3/4"`), or px |
+| Height | `"fill"` (or legacy `"full"`), `"auto"` (hug), the same fractions, or px |
+
+**Fill chains:** When a region must expand (split tap zones, scroll areas, carousel slide bodies), set `height: "fill"` on every stack ancestor up to the body root. The body region root stack fills its slot by default.
+
+**Hug:** Cards and buttons that should size to content use `height: "auto"`. Hug is never upgraded to fill because a parent uses stretch alignment.
 
 ## Text
 
@@ -194,7 +225,6 @@ Agents must inspect the host codebase before falling back to black-and-white def
 - theme files, design-token files, color palettes, and typography constants.
 - shared primitives such as `Button`, `Text`, `Typography`, `Screen`, `Header`, `Footer`.
 - React Native `StyleSheet.create` constants.
-- SwiftUI `Color`, `Font`, and modifier extensions.
 
 Map clear values into `manifest.theme`, layer `style`, button variants, spacing, border radius, and progress colors. Prefer established tokens over arbitrary colors.
 
@@ -207,7 +237,7 @@ Black-and-white fallback is acceptable only when the audit finds no style-token 
 
 Screen-level styling is not always a layer. Audit for:
 
-- `LinearGradient`, `expo-linear-gradient`, SwiftUI `LinearGradient`, `CAGradientLayer`
+- `LinearGradient`, `expo-linear-gradient`, `CAGradientLayer`
 - `ImageBackground`, background image constants, background videos
 - screen shell components such as `Screen`, `Container`, `OnboardingScreenShell`
 - `backgroundColor`, `background`, `bg-*`, CSS variables, and scrim overlays
@@ -403,7 +433,7 @@ The dashboard **Publish** button runs the same checks as the agent skill's publi
 - **Every text and icon layer** has explicit `style.color` (including nested **button label** text — native does not inherit colors).
 - Screens with `text_input`, `multiple_choice`, or `scale_input` include a `button` with `action.kind: "continue"`.
 - At most one input layer per screen; do not combine OAuth or email/password login with other inputs on the same screen.
-- Valid `fieldKey` (snake_case) on inputs; choice branches and `go_to_step` targets must reference existing ids.
+- Valid `fieldKey` (snake_case) on inputs; choice `goTo`, `go_to_step`, loader `onComplete`, and permission outcomes must reference existing `scr_*`, `dec_*`, or `surf_*` ids (or permission sentinels `continue` / `end`).
 - External surfaces: real `config.provider`, connected `fallback`, RevenueCat enabled when used.
 - Run the skill's **audit-publish** command on `rheo-import.manifest.json` and fix all blocking issues in the publish-gates report.
 
