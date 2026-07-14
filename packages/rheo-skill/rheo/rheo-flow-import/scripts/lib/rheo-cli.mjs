@@ -4198,7 +4198,10 @@ var ThemedColorModesSchema = external_exports.object({
 var ThemedColorSchema = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema]);
 var LAYOUT_FRACTION_PRESETS = ["1/2", "1/3", "2/3", "1/4", "3/4"];
 var WIDTH_PRESETS = ["auto", "full", ...LAYOUT_FRACTION_PRESETS];
-var WidthValueSchema = external_exports.union([external_exports.enum(WIDTH_PRESETS), external_exports.number().int().min(0).max(2e3)]);
+var WidthValueSchema = external_exports.preprocess(
+  (value) => value === "fill" ? "full" : value,
+  external_exports.union([external_exports.enum(WIDTH_PRESETS), external_exports.number().int().min(0).max(2e3)])
+);
 var HEIGHT_PRESETS = ["auto", "full", "fill", ...LAYOUT_FRACTION_PRESETS];
 var CommonLayoutHeightSchema = external_exports.union([
   external_exports.enum(HEIGHT_PRESETS),
@@ -4231,6 +4234,8 @@ var CommonStyleSchema = external_exports.object({
   border: BorderSchema.optional(),
   shadow: DropShadowSchema.optional(),
   opacity: external_exports.number().min(0).max(1).optional(),
+  /** Multiplier (0–1) applied to the resolved background color alpha only; children stay fully opaque unless `opacity` is set. */
+  backgroundOpacity: external_exports.number().min(0).max(1).optional(),
   width: WidthValueSchema.optional(),
   /** Omit for normal flow; `'absolute'` removes the layer from flex flow (non-root only). */
   position: external_exports.literal("absolute").optional(),
@@ -4241,6 +4246,11 @@ var CommonStyleSchema = external_exports.object({
   rotate: external_exports.number().min(-360).max(360).optional(),
   /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), fractions, or fixed px. */
   height: CommonLayoutHeightSchema.optional(),
+  /** Optional size clamps (px); applied on the flex shell / wrapper like width/height. */
+  minWidth: NonNegativePxSchema.max(2e3).optional(),
+  maxWidth: NonNegativePxSchema.max(2e3).optional(),
+  minHeight: NonNegativePxSchema.max(2e3).optional(),
+  maxHeight: NonNegativePxSchema.max(2e3).optional(),
   /** Stroke thickness in px for layers that render a stroke primitive (e.g. loader ring). */
   strokeWidth: external_exports.number().int().min(0).max(64).optional()
 }).partial();
@@ -4254,9 +4264,10 @@ var TextStyleSchema = CommonStyleSchema.extend({
   fontWeight: external_exports.number().int().min(100).max(900).optional(),
   color: ThemedColorSchema.optional(),
   align: external_exports.enum(["left", "center", "right"]).optional(),
+  /** Unitless line-height multiplier (CSS `line-height` without units). */
   lineHeight: external_exports.number().min(0.8).max(3).optional(),
-  /** Multiplier (0–1) applied to the resolved background color alpha only; text stays fully opaque unless `opacity` is set. */
-  backgroundOpacity: external_exports.number().min(0).max(1).optional()
+  /** Extra spacing between characters as a multiple of `fontSize` (CSS `em`; negative values tighten). */
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional()
 });
 var ImageStyleSchema = CommonStyleSchema.extend({
   fit: external_exports.enum(["cover", "contain", "fill"]).optional(),
@@ -4331,6 +4342,41 @@ var ButtonLayoutBreakpointsSchema = external_exports.object({
   xl: ButtonLayoutBreakpointPatchSchema.optional(),
   "2xl": ButtonLayoutBreakpointPatchSchema.optional()
 }).partial().optional();
+var AuthLayoutBreakpointPatchSchema = external_exports.object({
+  gap: NonNegativePxSchema.optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional()
+}).partial();
+var AuthLayoutBreakpointsSchema = external_exports.object({
+  sm: AuthLayoutBreakpointPatchSchema.optional(),
+  md: AuthLayoutBreakpointPatchSchema.optional(),
+  lg: AuthLayoutBreakpointPatchSchema.optional(),
+  xl: AuthLayoutBreakpointPatchSchema.optional(),
+  "2xl": AuthLayoutBreakpointPatchSchema.optional()
+}).partial().optional();
+var ChoiceLayoutBreakpointPatchSchema = external_exports.object({
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: NonNegativePxSchema.optional(),
+  columns: external_exports.number().int().min(1).max(6).optional()
+}).partial();
+var ChoiceLayoutBreakpointsSchema = external_exports.object({
+  sm: ChoiceLayoutBreakpointPatchSchema.optional(),
+  md: ChoiceLayoutBreakpointPatchSchema.optional(),
+  lg: ChoiceLayoutBreakpointPatchSchema.optional(),
+  xl: ChoiceLayoutBreakpointPatchSchema.optional(),
+  "2xl": ChoiceLayoutBreakpointPatchSchema.optional()
+}).partial().optional();
+var CarouselLayoutBreakpointPatchSchema = external_exports.object({
+  pageAlignment: external_exports.enum(["top", "center", "bottom"]).optional(),
+  pageSpacing: NonNegativePxSchema.optional(),
+  pagePeek: NonNegativePxSchema.optional()
+}).partial();
+var CarouselLayoutBreakpointsSchema = external_exports.object({
+  sm: CarouselLayoutBreakpointPatchSchema.optional(),
+  md: CarouselLayoutBreakpointPatchSchema.optional(),
+  lg: CarouselLayoutBreakpointPatchSchema.optional(),
+  xl: CarouselLayoutBreakpointPatchSchema.optional(),
+  "2xl": CarouselLayoutBreakpointPatchSchema.optional()
+}).partial().optional();
 var DecisionNodeJumpIdSchema = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i);
 var ExternalSurfaceJumpIdSchema = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i);
 var FlowGraphNodeJumpTargetSchema = ScreenIdSchema.or(DecisionNodeJumpIdSchema).or(
@@ -4396,7 +4442,7 @@ var ButtonActionSchema = external_exports.discriminatedUnion("kind", [
   }),
   external_exports.object({ kind: external_exports.literal("request_app_review") })
 ]);
-var TEXT_INPUT_TYPES = ["plain", "email", "phone", "url", "multiline"];
+var TEXT_INPUT_TYPES = ["plain", "email", "phone", "url", "number", "multiline"];
 var TextInputTypeSchema = external_exports.enum(TEXT_INPUT_TYPES);
 var COUNTER_DISPLAY_KINDS = ["number", "time"];
 var COUNTER_TIME_FORMATS = ["mm_ss", "hh_mm_ss", "dd_hh_mm_ss"];
@@ -4461,7 +4507,8 @@ var ProgressLayerSchema = external_exports.object({
   kind: external_exports.literal("progress"),
   trackColor: ThemedColorSchema.optional(),
   fillColor: ThemedColorSchema.optional(),
-  style: CommonStyleSchema.optional()
+  style: CommonStyleSchema.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema
 });
 var LoaderOnCompleteSchema = external_exports.discriminatedUnion("mode", [
   external_exports.object({ mode: external_exports.literal("none") }),
@@ -4481,7 +4528,8 @@ var LoaderLayerSchema = external_exports.object({
   fillColor: ThemedColorSchema.optional(),
   /** Horizontal alignment of the bar or ring within the layer box (default start). */
   align: external_exports.enum(["start", "center", "end"]).optional(),
-  style: CommonStyleSchema.optional()
+  style: CommonStyleSchema.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema
 }).superRefine((data, ctx) => {
   if (data.variant !== "circular") return;
   const w = data.style?.width;
@@ -4518,27 +4566,39 @@ var CheckboxLayerSchema = external_exports.object({
   styleBreakpoints: CommonStyleBreakpointsSchema
 });
 var lazyLayer2 = () => layerSchemaStore.schema;
-var StackLayerSchema = external_exports.object({
-  ...baseLayerShape,
-  kind: external_exports.literal("stack"),
-  style: CommonStyleSchema.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema,
-  stackLayoutBreakpoints: StackLayoutBreakpointsSchema,
-  selectedStyle: CommonStyleSchema.optional(),
-  direction: external_exports.enum(["vertical", "horizontal"]),
-  gap: external_exports.number().int().min(0).optional(),
-  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
-  justify: external_exports.enum(["start", "center", "end"]).optional(),
-  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
-  wrap: external_exports.boolean().optional(),
-  children: external_exports.lazy(() => external_exports.array(lazyLayer2()))
-});
+var migrateStackJustifyForParse = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = { ...raw };
+  if (o.justify != null && o.distribution == null) o.distribution = o.justify;
+  delete o.justify;
+  return o;
+};
+var StackLayerSchema = external_exports.preprocess(
+  migrateStackJustifyForParse,
+  external_exports.object({
+    ...baseLayerShape,
+    kind: external_exports.literal("stack"),
+    style: CommonStyleSchema.optional(),
+    styleBreakpoints: CommonStyleBreakpointsSchema,
+    stackLayoutBreakpoints: StackLayoutBreakpointsSchema,
+    selectedStyle: CommonStyleSchema.optional(),
+    selectedStyleBreakpoints: CommonStyleBreakpointsSchema,
+    direction: external_exports.enum(["vertical", "horizontal"]),
+    gap: external_exports.number().int().min(0).optional(),
+    align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+    distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+    wrap: external_exports.boolean().optional(),
+    children: external_exports.lazy(() => external_exports.array(lazyLayer2()))
+  })
+);
 var TextLayerSchema = external_exports.object({
   ...baseLayerShape,
   kind: external_exports.literal("text"),
   text: LocalizedTextSchema,
   style: TextStyleSchema.optional(),
-  styleBreakpoints: TextStyleBreakpointsSchema
+  styleBreakpoints: TextStyleBreakpointsSchema,
+  /** Merged on top of resolved `style` when this layer is inside a selected choice option. */
+  selectedStyle: TextStyleSchema.optional()
 });
 var migrateLegacyHyperlinkForParse = (raw) => {
   if (!raw || typeof raw !== "object") return raw;
@@ -4577,7 +4637,8 @@ var HyperlinkLayerSchemaInner = external_exports.object({
   distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
   wrap: external_exports.boolean().optional(),
   style: CommonStyleSchema.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema
+  styleBreakpoints: CommonStyleBreakpointsSchema,
+  hyperlinkLayoutBreakpoints: StackLayoutBreakpointsSchema
 }).superRefine((data, ctx) => {
   const p = parseHyperlinkHref(data.href.trim());
   if (!p.ok) {
@@ -4598,7 +4659,8 @@ var ImageLayerSchema = external_exports.object({
   media: MediaReferenceSchema.optional(),
   alt: external_exports.string().max(280).optional(),
   style: ImageStyleSchema.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema
+  styleBreakpoints: ImageStyleBreakpointsSchema,
+  selectedStyle: ImageStyleSchema.optional()
 });
 var LottieLayerSchema = external_exports.object({
   ...baseLayerShape,
@@ -4609,7 +4671,8 @@ var LottieLayerSchema = external_exports.object({
   triggerLayerId: external_exports.string().min(1).optional(),
   onComplete: LoaderOnCompleteSchema.optional(),
   style: ImageStyleSchema.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema
+  styleBreakpoints: ImageStyleBreakpointsSchema,
+  selectedStyle: ImageStyleSchema.optional()
 });
 var VideoLayerSchema = external_exports.object({
   ...baseLayerShape,
@@ -4621,7 +4684,8 @@ var VideoLayerSchema = external_exports.object({
   onComplete: LoaderOnCompleteSchema.optional(),
   audioEnabled: external_exports.boolean().optional(),
   style: ImageStyleSchema.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema
+  styleBreakpoints: ImageStyleBreakpointsSchema,
+  selectedStyle: ImageStyleSchema.optional()
 });
 var IconLayerSchema = external_exports.object({
   ...baseLayerShape,
@@ -4629,7 +4693,8 @@ var IconLayerSchema = external_exports.object({
   family: external_exports.enum(ICON_FAMILIES),
   iconName: external_exports.string().min(1).max(128),
   style: IconStyleSchema.optional(),
-  styleBreakpoints: IconStyleBreakpointsSchema
+  styleBreakpoints: IconStyleBreakpointsSchema,
+  selectedStyle: IconStyleSchema.optional()
 });
 var lazyLayer3 = () => layerSchemaStore.schema;
 var OAuthProviderPresetLayerSchema = external_exports.object({
@@ -4783,6 +4848,7 @@ var OAuthLoginLayerSchemaValidated = external_exports.object({
   ),
   gap: external_exports.number().int().min(0).optional(),
   align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  authLayoutBreakpoints: AuthLayoutBreakpointsSchema,
   style: CommonStyleSchema.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema
 });
@@ -4934,6 +5000,7 @@ var EmailPasswordAuthLayerSchemaValidated = external_exports.object({
   ),
   gap: external_exports.number().int().min(0).optional(),
   align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  authLayoutBreakpoints: AuthLayoutBreakpointsSchema,
   style: CommonStyleSchema.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema
 }).superRefine(refineEmailPasswordAuthChildren);
@@ -4967,7 +5034,8 @@ var SingleChoiceLayerSchema = external_exports.object({
   gap: external_exports.number().int().min(0).optional(),
   columns: external_exports.number().int().min(1).max(12).optional(),
   style: CommonStyleSchema.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema
+  styleBreakpoints: CommonStyleBreakpointsSchema,
+  choiceLayoutBreakpoints: ChoiceLayoutBreakpointsSchema
 });
 var MultipleChoiceLayerSchema = external_exports.object({
   ...baseLayerShape,
@@ -4984,8 +5052,19 @@ var MultipleChoiceLayerSchema = external_exports.object({
   gap: external_exports.number().int().min(0).optional(),
   columns: external_exports.number().int().min(1).max(12).optional(),
   style: CommonStyleSchema.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema
+  styleBreakpoints: CommonStyleBreakpointsSchema,
+  choiceLayoutBreakpoints: ChoiceLayoutBreakpointsSchema
 });
+var TextInputFieldStyleSchema = external_exports.object({
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional(),
+  lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
 var TextInputLayerSchema = external_exports.object({
   ...baseLayerShape,
   kind: external_exports.literal("text_input"),
@@ -4997,7 +5076,10 @@ var TextInputLayerSchema = external_exports.object({
   maxLength: external_exports.number().int().positive().max(2e3).optional(),
   classification: FieldClassificationSchema,
   children: external_exports.lazy(() => external_exports.array(lazyLayer5())).optional(),
-  style: CommonStyleSchema.optional()
+  /** Typography for the native input's typed text. */
+  fieldStyle: TextInputFieldStyleSchema.optional(),
+  style: CommonStyleSchema.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema
 });
 var ScaleInputLabelStyleSchema = external_exports.object({
   fontFamily: external_exports.string().min(1).max(128).optional(),
@@ -5006,6 +5088,7 @@ var ScaleInputLabelStyleSchema = external_exports.object({
   color: ThemedColorSchema.optional(),
   align: external_exports.enum(["left", "center", "right"]).optional(),
   lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
   opacity: external_exports.number().min(0).max(1).optional()
 }).partial();
 var ScaleInputLayerSchema = external_exports.object({
@@ -5028,7 +5111,40 @@ var ScaleInputLayerSchema = external_exports.object({
   thumbSize: external_exports.number().int().min(8).max(48).optional(),
   thumbColor: ThemedColorSchema.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer5())).optional(),
-  style: CommonStyleSchema.optional()
+  style: CommonStyleSchema.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema
+});
+var WheelPickerOptionSchema = external_exports.object({
+  optionId: external_exports.string().min(1).max(64),
+  label: LocalizedTextSchema
+});
+var WheelPickerItemStyleSchema = external_exports.object({
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema.optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
+var WheelPickerLayerSchema = external_exports.object({
+  ...baseLayerShape,
+  kind: external_exports.literal("wheel_picker"),
+  fieldKey: FieldKeySchema,
+  mode: external_exports.enum(["options", "date"]).optional(),
+  options: external_exports.array(WheelPickerOptionSchema).min(2).optional(),
+  defaultOptionId: external_exports.string().optional(),
+  datePart: external_exports.enum(["year", "month", "day"]).optional(),
+  minYear: external_exports.number().int().min(1e3).max(9999).optional(),
+  maxYear: external_exports.number().int().min(1e3).max(9999).optional(),
+  defaultValue: external_exports.string().optional(),
+  placeholder: LocalizedTextSchema.optional(),
+  itemHeight: external_exports.number().int().min(28).max(72).optional(),
+  visibleItemCount: external_exports.number().int().min(3).max(9).optional(),
+  selectionBackgroundColor: ThemedColorSchema.optional(),
+  itemStyle: WheelPickerItemStyleSchema.optional(),
+  selectedItemStyle: WheelPickerItemStyleSchema.optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer5())).optional(),
+  style: CommonStyleSchema.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema
 });
 var CarouselIndicatorsStyleSchema = external_exports.object({
   width: external_exports.number().int().min(1).max(64).optional(),
@@ -5064,7 +5180,8 @@ var CarouselLayerSchema = external_exports.object({
   autoAdvanceMs: external_exports.number().int().min(500).max(6e4).optional(),
   pageControl: CarouselPageControlSchema.optional(),
   style: CommonStyleSchema.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema
+  styleBreakpoints: CommonStyleBreakpointsSchema,
+  carouselLayoutBreakpoints: CarouselLayoutBreakpointsSchema
 });
 layerSchemaStore.schema = external_exports.lazy(
   () => external_exports.union([
@@ -5085,6 +5202,7 @@ layerSchemaStore.schema = external_exports.lazy(
     MultipleChoiceLayerSchema,
     TextInputLayerSchema,
     ScaleInputLayerSchema,
+    WheelPickerLayerSchema,
     OAuthLoginLayerSchema,
     OAuthProviderPresetLayerSchema,
     OAuthProviderCustomLayerSchema,
@@ -5095,7 +5213,7 @@ layerSchemaStore.schema = external_exports.lazy(
   ])
 );
 var LayerSchema = layerSchemaStore.schema;
-var isInputLayer = (l) => l.kind === "single_choice" || l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input";
+var isInputLayer = (l) => l.kind === "single_choice" || l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker";
 
 // ../../node_modules/@getrheo/contracts/dist/localized.js
 var LocaleCode2 = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
@@ -5248,7 +5366,10 @@ var ThemedColorModesSchema2 = external_exports.object({
 var ThemedColorSchema2 = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema2]);
 var LAYOUT_FRACTION_PRESETS2 = ["1/2", "1/3", "2/3", "1/4", "3/4"];
 var WIDTH_PRESETS2 = ["auto", "full", ...LAYOUT_FRACTION_PRESETS2];
-var WidthValueSchema2 = external_exports.union([external_exports.enum(WIDTH_PRESETS2), external_exports.number().int().min(0).max(2e3)]);
+var WidthValueSchema2 = external_exports.preprocess(
+  (value) => value === "fill" ? "full" : value,
+  external_exports.union([external_exports.enum(WIDTH_PRESETS2), external_exports.number().int().min(0).max(2e3)])
+);
 var HEIGHT_PRESETS2 = ["auto", "full", "fill", ...LAYOUT_FRACTION_PRESETS2];
 var CommonLayoutHeightSchema2 = external_exports.union([
   external_exports.enum(HEIGHT_PRESETS2),
@@ -5281,6 +5402,8 @@ var CommonStyleSchema2 = external_exports.object({
   border: BorderSchema2.optional(),
   shadow: DropShadowSchema2.optional(),
   opacity: external_exports.number().min(0).max(1).optional(),
+  /** Multiplier (0–1) applied to the resolved background color alpha only; children stay fully opaque unless `opacity` is set. */
+  backgroundOpacity: external_exports.number().min(0).max(1).optional(),
   width: WidthValueSchema2.optional(),
   /** Omit for normal flow; `'absolute'` removes the layer from flex flow (non-root only). */
   position: external_exports.literal("absolute").optional(),
@@ -5291,6 +5414,11 @@ var CommonStyleSchema2 = external_exports.object({
   rotate: external_exports.number().min(-360).max(360).optional(),
   /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), fractions, or fixed px. */
   height: CommonLayoutHeightSchema2.optional(),
+  /** Optional size clamps (px); applied on the flex shell / wrapper like width/height. */
+  minWidth: NonNegativePxSchema2.max(2e3).optional(),
+  maxWidth: NonNegativePxSchema2.max(2e3).optional(),
+  minHeight: NonNegativePxSchema2.max(2e3).optional(),
+  maxHeight: NonNegativePxSchema2.max(2e3).optional(),
   /** Stroke thickness in px for layers that render a stroke primitive (e.g. loader ring). */
   strokeWidth: external_exports.number().int().min(0).max(64).optional()
 }).partial();
@@ -5304,9 +5432,10 @@ var TextStyleSchema2 = CommonStyleSchema2.extend({
   fontWeight: external_exports.number().int().min(100).max(900).optional(),
   color: ThemedColorSchema2.optional(),
   align: external_exports.enum(["left", "center", "right"]).optional(),
+  /** Unitless line-height multiplier (CSS `line-height` without units). */
   lineHeight: external_exports.number().min(0.8).max(3).optional(),
-  /** Multiplier (0–1) applied to the resolved background color alpha only; text stays fully opaque unless `opacity` is set. */
-  backgroundOpacity: external_exports.number().min(0).max(1).optional()
+  /** Extra spacing between characters as a multiple of `fontSize` (CSS `em`; negative values tighten). */
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional()
 });
 var ImageStyleSchema2 = CommonStyleSchema2.extend({
   fit: external_exports.enum(["cover", "contain", "fill"]).optional(),
@@ -5381,6 +5510,41 @@ var ButtonLayoutBreakpointsSchema2 = external_exports.object({
   xl: ButtonLayoutBreakpointPatchSchema2.optional(),
   "2xl": ButtonLayoutBreakpointPatchSchema2.optional()
 }).partial().optional();
+var AuthLayoutBreakpointPatchSchema2 = external_exports.object({
+  gap: NonNegativePxSchema2.optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional()
+}).partial();
+var AuthLayoutBreakpointsSchema2 = external_exports.object({
+  sm: AuthLayoutBreakpointPatchSchema2.optional(),
+  md: AuthLayoutBreakpointPatchSchema2.optional(),
+  lg: AuthLayoutBreakpointPatchSchema2.optional(),
+  xl: AuthLayoutBreakpointPatchSchema2.optional(),
+  "2xl": AuthLayoutBreakpointPatchSchema2.optional()
+}).partial().optional();
+var ChoiceLayoutBreakpointPatchSchema2 = external_exports.object({
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: NonNegativePxSchema2.optional(),
+  columns: external_exports.number().int().min(1).max(6).optional()
+}).partial();
+var ChoiceLayoutBreakpointsSchema2 = external_exports.object({
+  sm: ChoiceLayoutBreakpointPatchSchema2.optional(),
+  md: ChoiceLayoutBreakpointPatchSchema2.optional(),
+  lg: ChoiceLayoutBreakpointPatchSchema2.optional(),
+  xl: ChoiceLayoutBreakpointPatchSchema2.optional(),
+  "2xl": ChoiceLayoutBreakpointPatchSchema2.optional()
+}).partial().optional();
+var CarouselLayoutBreakpointPatchSchema2 = external_exports.object({
+  pageAlignment: external_exports.enum(["top", "center", "bottom"]).optional(),
+  pageSpacing: NonNegativePxSchema2.optional(),
+  pagePeek: NonNegativePxSchema2.optional()
+}).partial();
+var CarouselLayoutBreakpointsSchema2 = external_exports.object({
+  sm: CarouselLayoutBreakpointPatchSchema2.optional(),
+  md: CarouselLayoutBreakpointPatchSchema2.optional(),
+  lg: CarouselLayoutBreakpointPatchSchema2.optional(),
+  xl: CarouselLayoutBreakpointPatchSchema2.optional(),
+  "2xl": CarouselLayoutBreakpointPatchSchema2.optional()
+}).partial().optional();
 var DecisionNodeJumpIdSchema2 = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i);
 var ExternalSurfaceJumpIdSchema2 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i);
 var FlowGraphNodeJumpTargetSchema2 = ScreenIdSchema2.or(DecisionNodeJumpIdSchema2).or(
@@ -5446,7 +5610,7 @@ var ButtonActionSchema2 = external_exports.discriminatedUnion("kind", [
   }),
   external_exports.object({ kind: external_exports.literal("request_app_review") })
 ]);
-var TEXT_INPUT_TYPES2 = ["plain", "email", "phone", "url", "multiline"];
+var TEXT_INPUT_TYPES2 = ["plain", "email", "phone", "url", "number", "multiline"];
 var TextInputTypeSchema2 = external_exports.enum(TEXT_INPUT_TYPES2);
 var COUNTER_DISPLAY_KINDS2 = ["number", "time"];
 var COUNTER_TIME_FORMATS2 = ["mm_ss", "hh_mm_ss", "dd_hh_mm_ss"];
@@ -5511,7 +5675,8 @@ var ProgressLayerSchema2 = external_exports.object({
   kind: external_exports.literal("progress"),
   trackColor: ThemedColorSchema2.optional(),
   fillColor: ThemedColorSchema2.optional(),
-  style: CommonStyleSchema2.optional()
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
 });
 var LoaderOnCompleteSchema2 = external_exports.discriminatedUnion("mode", [
   external_exports.object({ mode: external_exports.literal("none") }),
@@ -5531,7 +5696,8 @@ var LoaderLayerSchema2 = external_exports.object({
   fillColor: ThemedColorSchema2.optional(),
   /** Horizontal alignment of the bar or ring within the layer box (default start). */
   align: external_exports.enum(["start", "center", "end"]).optional(),
-  style: CommonStyleSchema2.optional()
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
 }).superRefine((data, ctx) => {
   if (data.variant !== "circular") return;
   const w = data.style?.width;
@@ -5568,27 +5734,39 @@ var CheckboxLayerSchema2 = external_exports.object({
   styleBreakpoints: CommonStyleBreakpointsSchema2
 });
 var lazyLayer22 = () => layerSchemaStore2.schema;
-var StackLayerSchema2 = external_exports.object({
-  ...baseLayerShape2,
-  kind: external_exports.literal("stack"),
-  style: CommonStyleSchema2.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema2,
-  stackLayoutBreakpoints: StackLayoutBreakpointsSchema2,
-  selectedStyle: CommonStyleSchema2.optional(),
-  direction: external_exports.enum(["vertical", "horizontal"]),
-  gap: external_exports.number().int().min(0).optional(),
-  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
-  justify: external_exports.enum(["start", "center", "end"]).optional(),
-  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
-  wrap: external_exports.boolean().optional(),
-  children: external_exports.lazy(() => external_exports.array(lazyLayer22()))
-});
+var migrateStackJustifyForParse2 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = { ...raw };
+  if (o.justify != null && o.distribution == null) o.distribution = o.justify;
+  delete o.justify;
+  return o;
+};
+var StackLayerSchema2 = external_exports.preprocess(
+  migrateStackJustifyForParse2,
+  external_exports.object({
+    ...baseLayerShape2,
+    kind: external_exports.literal("stack"),
+    style: CommonStyleSchema2.optional(),
+    styleBreakpoints: CommonStyleBreakpointsSchema2,
+    stackLayoutBreakpoints: StackLayoutBreakpointsSchema2,
+    selectedStyle: CommonStyleSchema2.optional(),
+    selectedStyleBreakpoints: CommonStyleBreakpointsSchema2,
+    direction: external_exports.enum(["vertical", "horizontal"]),
+    gap: external_exports.number().int().min(0).optional(),
+    align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+    distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+    wrap: external_exports.boolean().optional(),
+    children: external_exports.lazy(() => external_exports.array(lazyLayer22()))
+  })
+);
 var TextLayerSchema2 = external_exports.object({
   ...baseLayerShape2,
   kind: external_exports.literal("text"),
   text: LocalizedTextSchema3,
   style: TextStyleSchema2.optional(),
-  styleBreakpoints: TextStyleBreakpointsSchema2
+  styleBreakpoints: TextStyleBreakpointsSchema2,
+  /** Merged on top of resolved `style` when this layer is inside a selected choice option. */
+  selectedStyle: TextStyleSchema2.optional()
 });
 var migrateLegacyHyperlinkForParse2 = (raw) => {
   if (!raw || typeof raw !== "object") return raw;
@@ -5627,7 +5805,8 @@ var HyperlinkLayerSchemaInner2 = external_exports.object({
   distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
   wrap: external_exports.boolean().optional(),
   style: CommonStyleSchema2.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema2
+  styleBreakpoints: CommonStyleBreakpointsSchema2,
+  hyperlinkLayoutBreakpoints: StackLayoutBreakpointsSchema2
 }).superRefine((data, ctx) => {
   const p = parseHyperlinkHref2(data.href.trim());
   if (!p.ok) {
@@ -5648,7 +5827,8 @@ var ImageLayerSchema2 = external_exports.object({
   media: MediaReferenceSchema2.optional(),
   alt: external_exports.string().max(280).optional(),
   style: ImageStyleSchema2.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema2
+  styleBreakpoints: ImageStyleBreakpointsSchema2,
+  selectedStyle: ImageStyleSchema2.optional()
 });
 var LottieLayerSchema2 = external_exports.object({
   ...baseLayerShape2,
@@ -5659,7 +5839,8 @@ var LottieLayerSchema2 = external_exports.object({
   triggerLayerId: external_exports.string().min(1).optional(),
   onComplete: LoaderOnCompleteSchema2.optional(),
   style: ImageStyleSchema2.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema2
+  styleBreakpoints: ImageStyleBreakpointsSchema2,
+  selectedStyle: ImageStyleSchema2.optional()
 });
 var VideoLayerSchema2 = external_exports.object({
   ...baseLayerShape2,
@@ -5671,7 +5852,8 @@ var VideoLayerSchema2 = external_exports.object({
   onComplete: LoaderOnCompleteSchema2.optional(),
   audioEnabled: external_exports.boolean().optional(),
   style: ImageStyleSchema2.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema2
+  styleBreakpoints: ImageStyleBreakpointsSchema2,
+  selectedStyle: ImageStyleSchema2.optional()
 });
 var IconLayerSchema2 = external_exports.object({
   ...baseLayerShape2,
@@ -5679,7 +5861,8 @@ var IconLayerSchema2 = external_exports.object({
   family: external_exports.enum(ICON_FAMILIES2),
   iconName: external_exports.string().min(1).max(128),
   style: IconStyleSchema2.optional(),
-  styleBreakpoints: IconStyleBreakpointsSchema2
+  styleBreakpoints: IconStyleBreakpointsSchema2,
+  selectedStyle: IconStyleSchema2.optional()
 });
 var lazyLayer32 = () => layerSchemaStore2.schema;
 var OAuthProviderPresetLayerSchema2 = external_exports.object({
@@ -5833,6 +6016,7 @@ var OAuthLoginLayerSchemaValidated2 = external_exports.object({
   ),
   gap: external_exports.number().int().min(0).optional(),
   align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  authLayoutBreakpoints: AuthLayoutBreakpointsSchema2,
   style: CommonStyleSchema2.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema2
 });
@@ -5984,6 +6168,7 @@ var EmailPasswordAuthLayerSchemaValidated2 = external_exports.object({
   ),
   gap: external_exports.number().int().min(0).optional(),
   align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  authLayoutBreakpoints: AuthLayoutBreakpointsSchema2,
   style: CommonStyleSchema2.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema2
 }).superRefine(refineEmailPasswordAuthChildren2);
@@ -6017,7 +6202,8 @@ var SingleChoiceLayerSchema2 = external_exports.object({
   gap: external_exports.number().int().min(0).optional(),
   columns: external_exports.number().int().min(1).max(12).optional(),
   style: CommonStyleSchema2.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema2
+  styleBreakpoints: CommonStyleBreakpointsSchema2,
+  choiceLayoutBreakpoints: ChoiceLayoutBreakpointsSchema2
 });
 var MultipleChoiceLayerSchema2 = external_exports.object({
   ...baseLayerShape2,
@@ -6034,8 +6220,19 @@ var MultipleChoiceLayerSchema2 = external_exports.object({
   gap: external_exports.number().int().min(0).optional(),
   columns: external_exports.number().int().min(1).max(12).optional(),
   style: CommonStyleSchema2.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema2
+  styleBreakpoints: CommonStyleBreakpointsSchema2,
+  choiceLayoutBreakpoints: ChoiceLayoutBreakpointsSchema2
 });
+var TextInputFieldStyleSchema2 = external_exports.object({
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema2.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional(),
+  lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
 var TextInputLayerSchema2 = external_exports.object({
   ...baseLayerShape2,
   kind: external_exports.literal("text_input"),
@@ -6047,7 +6244,10 @@ var TextInputLayerSchema2 = external_exports.object({
   maxLength: external_exports.number().int().positive().max(2e3).optional(),
   classification: FieldClassificationSchema2,
   children: external_exports.lazy(() => external_exports.array(lazyLayer52())).optional(),
-  style: CommonStyleSchema2.optional()
+  /** Typography for the native input's typed text. */
+  fieldStyle: TextInputFieldStyleSchema2.optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
 });
 var ScaleInputLabelStyleSchema2 = external_exports.object({
   fontFamily: external_exports.string().min(1).max(128).optional(),
@@ -6056,6 +6256,7 @@ var ScaleInputLabelStyleSchema2 = external_exports.object({
   color: ThemedColorSchema2.optional(),
   align: external_exports.enum(["left", "center", "right"]).optional(),
   lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
   opacity: external_exports.number().min(0).max(1).optional()
 }).partial();
 var ScaleInputLayerSchema2 = external_exports.object({
@@ -6078,7 +6279,40 @@ var ScaleInputLayerSchema2 = external_exports.object({
   thumbSize: external_exports.number().int().min(8).max(48).optional(),
   thumbColor: ThemedColorSchema2.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer52())).optional(),
-  style: CommonStyleSchema2.optional()
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+});
+var WheelPickerOptionSchema2 = external_exports.object({
+  optionId: external_exports.string().min(1).max(64),
+  label: LocalizedTextSchema3
+});
+var WheelPickerItemStyleSchema2 = external_exports.object({
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema2.optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
+var WheelPickerLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("wheel_picker"),
+  fieldKey: FieldKeySchema2,
+  mode: external_exports.enum(["options", "date"]).optional(),
+  options: external_exports.array(WheelPickerOptionSchema2).min(2).optional(),
+  defaultOptionId: external_exports.string().optional(),
+  datePart: external_exports.enum(["year", "month", "day"]).optional(),
+  minYear: external_exports.number().int().min(1e3).max(9999).optional(),
+  maxYear: external_exports.number().int().min(1e3).max(9999).optional(),
+  defaultValue: external_exports.string().optional(),
+  placeholder: LocalizedTextSchema3.optional(),
+  itemHeight: external_exports.number().int().min(28).max(72).optional(),
+  visibleItemCount: external_exports.number().int().min(3).max(9).optional(),
+  selectionBackgroundColor: ThemedColorSchema2.optional(),
+  itemStyle: WheelPickerItemStyleSchema2.optional(),
+  selectedItemStyle: WheelPickerItemStyleSchema2.optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer52())).optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
 });
 var CarouselIndicatorsStyleSchema2 = external_exports.object({
   width: external_exports.number().int().min(1).max(64).optional(),
@@ -6114,7 +6348,8 @@ var CarouselLayerSchema2 = external_exports.object({
   autoAdvanceMs: external_exports.number().int().min(500).max(6e4).optional(),
   pageControl: CarouselPageControlSchema2.optional(),
   style: CommonStyleSchema2.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema2
+  styleBreakpoints: CommonStyleBreakpointsSchema2,
+  carouselLayoutBreakpoints: CarouselLayoutBreakpointsSchema2
 });
 layerSchemaStore2.schema = external_exports.lazy(
   () => external_exports.union([
@@ -6135,6 +6370,7 @@ layerSchemaStore2.schema = external_exports.lazy(
     MultipleChoiceLayerSchema2,
     TextInputLayerSchema2,
     ScaleInputLayerSchema2,
+    WheelPickerLayerSchema2,
     OAuthLoginLayerSchema2,
     OAuthProviderPresetLayerSchema2,
     OAuthProviderCustomLayerSchema2,
@@ -6417,7 +6653,10 @@ var ThemedColorModesSchema3 = external_exports.object({
 var ThemedColorSchema3 = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema3]);
 var LAYOUT_FRACTION_PRESETS3 = ["1/2", "1/3", "2/3", "1/4", "3/4"];
 var WIDTH_PRESETS3 = ["auto", "full", ...LAYOUT_FRACTION_PRESETS3];
-var WidthValueSchema3 = external_exports.union([external_exports.enum(WIDTH_PRESETS3), external_exports.number().int().min(0).max(2e3)]);
+var WidthValueSchema3 = external_exports.preprocess(
+  (value) => value === "fill" ? "full" : value,
+  external_exports.union([external_exports.enum(WIDTH_PRESETS3), external_exports.number().int().min(0).max(2e3)])
+);
 var HEIGHT_PRESETS3 = ["auto", "full", "fill", ...LAYOUT_FRACTION_PRESETS3];
 var CommonLayoutHeightSchema3 = external_exports.union([
   external_exports.enum(HEIGHT_PRESETS3),
@@ -6450,6 +6689,8 @@ var CommonStyleSchema3 = external_exports.object({
   border: BorderSchema3.optional(),
   shadow: DropShadowSchema3.optional(),
   opacity: external_exports.number().min(0).max(1).optional(),
+  /** Multiplier (0–1) applied to the resolved background color alpha only; children stay fully opaque unless `opacity` is set. */
+  backgroundOpacity: external_exports.number().min(0).max(1).optional(),
   width: WidthValueSchema3.optional(),
   /** Omit for normal flow; `'absolute'` removes the layer from flex flow (non-root only). */
   position: external_exports.literal("absolute").optional(),
@@ -6460,6 +6701,11 @@ var CommonStyleSchema3 = external_exports.object({
   rotate: external_exports.number().min(-360).max(360).optional(),
   /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), fractions, or fixed px. */
   height: CommonLayoutHeightSchema3.optional(),
+  /** Optional size clamps (px); applied on the flex shell / wrapper like width/height. */
+  minWidth: NonNegativePxSchema3.max(2e3).optional(),
+  maxWidth: NonNegativePxSchema3.max(2e3).optional(),
+  minHeight: NonNegativePxSchema3.max(2e3).optional(),
+  maxHeight: NonNegativePxSchema3.max(2e3).optional(),
   /** Stroke thickness in px for layers that render a stroke primitive (e.g. loader ring). */
   strokeWidth: external_exports.number().int().min(0).max(64).optional()
 }).partial();
@@ -6473,9 +6719,10 @@ var TextStyleSchema3 = CommonStyleSchema3.extend({
   fontWeight: external_exports.number().int().min(100).max(900).optional(),
   color: ThemedColorSchema3.optional(),
   align: external_exports.enum(["left", "center", "right"]).optional(),
+  /** Unitless line-height multiplier (CSS `line-height` without units). */
   lineHeight: external_exports.number().min(0.8).max(3).optional(),
-  /** Multiplier (0–1) applied to the resolved background color alpha only; text stays fully opaque unless `opacity` is set. */
-  backgroundOpacity: external_exports.number().min(0).max(1).optional()
+  /** Extra spacing between characters as a multiple of `fontSize` (CSS `em`; negative values tighten). */
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional()
 });
 var ImageStyleSchema3 = CommonStyleSchema3.extend({
   fit: external_exports.enum(["cover", "contain", "fill"]).optional(),
@@ -6550,6 +6797,41 @@ var ButtonLayoutBreakpointsSchema3 = external_exports.object({
   xl: ButtonLayoutBreakpointPatchSchema3.optional(),
   "2xl": ButtonLayoutBreakpointPatchSchema3.optional()
 }).partial().optional();
+var AuthLayoutBreakpointPatchSchema3 = external_exports.object({
+  gap: NonNegativePxSchema3.optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional()
+}).partial();
+var AuthLayoutBreakpointsSchema3 = external_exports.object({
+  sm: AuthLayoutBreakpointPatchSchema3.optional(),
+  md: AuthLayoutBreakpointPatchSchema3.optional(),
+  lg: AuthLayoutBreakpointPatchSchema3.optional(),
+  xl: AuthLayoutBreakpointPatchSchema3.optional(),
+  "2xl": AuthLayoutBreakpointPatchSchema3.optional()
+}).partial().optional();
+var ChoiceLayoutBreakpointPatchSchema3 = external_exports.object({
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: NonNegativePxSchema3.optional(),
+  columns: external_exports.number().int().min(1).max(6).optional()
+}).partial();
+var ChoiceLayoutBreakpointsSchema3 = external_exports.object({
+  sm: ChoiceLayoutBreakpointPatchSchema3.optional(),
+  md: ChoiceLayoutBreakpointPatchSchema3.optional(),
+  lg: ChoiceLayoutBreakpointPatchSchema3.optional(),
+  xl: ChoiceLayoutBreakpointPatchSchema3.optional(),
+  "2xl": ChoiceLayoutBreakpointPatchSchema3.optional()
+}).partial().optional();
+var CarouselLayoutBreakpointPatchSchema3 = external_exports.object({
+  pageAlignment: external_exports.enum(["top", "center", "bottom"]).optional(),
+  pageSpacing: NonNegativePxSchema3.optional(),
+  pagePeek: NonNegativePxSchema3.optional()
+}).partial();
+var CarouselLayoutBreakpointsSchema3 = external_exports.object({
+  sm: CarouselLayoutBreakpointPatchSchema3.optional(),
+  md: CarouselLayoutBreakpointPatchSchema3.optional(),
+  lg: CarouselLayoutBreakpointPatchSchema3.optional(),
+  xl: CarouselLayoutBreakpointPatchSchema3.optional(),
+  "2xl": CarouselLayoutBreakpointPatchSchema3.optional()
+}).partial().optional();
 var DecisionNodeJumpIdSchema3 = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i);
 var ExternalSurfaceJumpIdSchema3 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i);
 var FlowGraphNodeJumpTargetSchema3 = ScreenIdSchema3.or(DecisionNodeJumpIdSchema3).or(
@@ -6617,7 +6899,7 @@ var ButtonActionSchema3 = external_exports.discriminatedUnion("kind", [
   }),
   external_exports.object({ kind: external_exports.literal("request_app_review") })
 ]);
-var TEXT_INPUT_TYPES3 = ["plain", "email", "phone", "url", "multiline"];
+var TEXT_INPUT_TYPES3 = ["plain", "email", "phone", "url", "number", "multiline"];
 var TextInputTypeSchema3 = external_exports.enum(TEXT_INPUT_TYPES3);
 var COUNTER_DISPLAY_KINDS3 = ["number", "time"];
 var COUNTER_TIME_FORMATS3 = ["mm_ss", "hh_mm_ss", "dd_hh_mm_ss"];
@@ -6682,7 +6964,8 @@ var ProgressLayerSchema3 = external_exports.object({
   kind: external_exports.literal("progress"),
   trackColor: ThemedColorSchema3.optional(),
   fillColor: ThemedColorSchema3.optional(),
-  style: CommonStyleSchema3.optional()
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
 });
 var LoaderOnCompleteSchema3 = external_exports.discriminatedUnion("mode", [
   external_exports.object({ mode: external_exports.literal("none") }),
@@ -6702,7 +6985,8 @@ var LoaderLayerSchema3 = external_exports.object({
   fillColor: ThemedColorSchema3.optional(),
   /** Horizontal alignment of the bar or ring within the layer box (default start). */
   align: external_exports.enum(["start", "center", "end"]).optional(),
-  style: CommonStyleSchema3.optional()
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
 }).superRefine((data, ctx) => {
   if (data.variant !== "circular") return;
   const w = data.style?.width;
@@ -6739,27 +7023,39 @@ var CheckboxLayerSchema3 = external_exports.object({
   styleBreakpoints: CommonStyleBreakpointsSchema3
 });
 var lazyLayer23 = () => layerSchemaStore3.schema;
-var StackLayerSchema3 = external_exports.object({
-  ...baseLayerShape3,
-  kind: external_exports.literal("stack"),
-  style: CommonStyleSchema3.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema3,
-  stackLayoutBreakpoints: StackLayoutBreakpointsSchema3,
-  selectedStyle: CommonStyleSchema3.optional(),
-  direction: external_exports.enum(["vertical", "horizontal"]),
-  gap: external_exports.number().int().min(0).optional(),
-  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
-  justify: external_exports.enum(["start", "center", "end"]).optional(),
-  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
-  wrap: external_exports.boolean().optional(),
-  children: external_exports.lazy(() => external_exports.array(lazyLayer23()))
-});
+var migrateStackJustifyForParse3 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = { ...raw };
+  if (o.justify != null && o.distribution == null) o.distribution = o.justify;
+  delete o.justify;
+  return o;
+};
+var StackLayerSchema3 = external_exports.preprocess(
+  migrateStackJustifyForParse3,
+  external_exports.object({
+    ...baseLayerShape3,
+    kind: external_exports.literal("stack"),
+    style: CommonStyleSchema3.optional(),
+    styleBreakpoints: CommonStyleBreakpointsSchema3,
+    stackLayoutBreakpoints: StackLayoutBreakpointsSchema3,
+    selectedStyle: CommonStyleSchema3.optional(),
+    selectedStyleBreakpoints: CommonStyleBreakpointsSchema3,
+    direction: external_exports.enum(["vertical", "horizontal"]),
+    gap: external_exports.number().int().min(0).optional(),
+    align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+    distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+    wrap: external_exports.boolean().optional(),
+    children: external_exports.lazy(() => external_exports.array(lazyLayer23()))
+  })
+);
 var TextLayerSchema3 = external_exports.object({
   ...baseLayerShape3,
   kind: external_exports.literal("text"),
   text: LocalizedTextSchema4,
   style: TextStyleSchema3.optional(),
-  styleBreakpoints: TextStyleBreakpointsSchema3
+  styleBreakpoints: TextStyleBreakpointsSchema3,
+  /** Merged on top of resolved `style` when this layer is inside a selected choice option. */
+  selectedStyle: TextStyleSchema3.optional()
 });
 var migrateLegacyHyperlinkForParse3 = (raw) => {
   if (!raw || typeof raw !== "object") return raw;
@@ -6798,7 +7094,8 @@ var HyperlinkLayerSchemaInner3 = external_exports.object({
   distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
   wrap: external_exports.boolean().optional(),
   style: CommonStyleSchema3.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema3
+  styleBreakpoints: CommonStyleBreakpointsSchema3,
+  hyperlinkLayoutBreakpoints: StackLayoutBreakpointsSchema3
 }).superRefine((data, ctx) => {
   const p = parseHyperlinkHref3(data.href.trim());
   if (!p.ok) {
@@ -6819,7 +7116,8 @@ var ImageLayerSchema3 = external_exports.object({
   media: MediaReferenceSchema3.optional(),
   alt: external_exports.string().max(280).optional(),
   style: ImageStyleSchema3.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema3
+  styleBreakpoints: ImageStyleBreakpointsSchema3,
+  selectedStyle: ImageStyleSchema3.optional()
 });
 var LottieLayerSchema3 = external_exports.object({
   ...baseLayerShape3,
@@ -6830,7 +7128,8 @@ var LottieLayerSchema3 = external_exports.object({
   triggerLayerId: external_exports.string().min(1).optional(),
   onComplete: LoaderOnCompleteSchema3.optional(),
   style: ImageStyleSchema3.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema3
+  styleBreakpoints: ImageStyleBreakpointsSchema3,
+  selectedStyle: ImageStyleSchema3.optional()
 });
 var VideoLayerSchema3 = external_exports.object({
   ...baseLayerShape3,
@@ -6842,7 +7141,8 @@ var VideoLayerSchema3 = external_exports.object({
   onComplete: LoaderOnCompleteSchema3.optional(),
   audioEnabled: external_exports.boolean().optional(),
   style: ImageStyleSchema3.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema3
+  styleBreakpoints: ImageStyleBreakpointsSchema3,
+  selectedStyle: ImageStyleSchema3.optional()
 });
 var IconLayerSchema3 = external_exports.object({
   ...baseLayerShape3,
@@ -6850,7 +7150,8 @@ var IconLayerSchema3 = external_exports.object({
   family: external_exports.enum(ICON_FAMILIES3),
   iconName: external_exports.string().min(1).max(128),
   style: IconStyleSchema3.optional(),
-  styleBreakpoints: IconStyleBreakpointsSchema3
+  styleBreakpoints: IconStyleBreakpointsSchema3,
+  selectedStyle: IconStyleSchema3.optional()
 });
 var lazyLayer33 = () => layerSchemaStore3.schema;
 var OAuthProviderPresetLayerSchema3 = external_exports.object({
@@ -7004,6 +7305,7 @@ var OAuthLoginLayerSchemaValidated3 = external_exports.object({
   ),
   gap: external_exports.number().int().min(0).optional(),
   align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  authLayoutBreakpoints: AuthLayoutBreakpointsSchema3,
   style: CommonStyleSchema3.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema3
 });
@@ -7152,6 +7454,7 @@ var EmailPasswordAuthLayerSchemaValidated3 = external_exports.object({
   ),
   gap: external_exports.number().int().min(0).optional(),
   align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  authLayoutBreakpoints: AuthLayoutBreakpointsSchema3,
   style: CommonStyleSchema3.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema3
 }).superRefine(refineEmailPasswordAuthChildren3);
@@ -7232,7 +7535,8 @@ var SingleChoiceLayerSchema3 = external_exports.object({
   gap: external_exports.number().int().min(0).optional(),
   columns: external_exports.number().int().min(1).max(12).optional(),
   style: CommonStyleSchema3.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema3
+  styleBreakpoints: CommonStyleBreakpointsSchema3,
+  choiceLayoutBreakpoints: ChoiceLayoutBreakpointsSchema3
 });
 var MultipleChoiceLayerSchema3 = external_exports.object({
   ...baseLayerShape3,
@@ -7249,9 +7553,20 @@ var MultipleChoiceLayerSchema3 = external_exports.object({
   gap: external_exports.number().int().min(0).optional(),
   columns: external_exports.number().int().min(1).max(12).optional(),
   style: CommonStyleSchema3.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema3
+  styleBreakpoints: CommonStyleBreakpointsSchema3,
+  choiceLayoutBreakpoints: ChoiceLayoutBreakpointsSchema3
 });
 var validateChoiceChildrenAndBindings = ChoiceChildrenAndBindingsRefinement;
+var TextInputFieldStyleSchema3 = external_exports.object({
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema3.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional(),
+  lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
 var TextInputLayerSchema3 = external_exports.object({
   ...baseLayerShape3,
   kind: external_exports.literal("text_input"),
@@ -7263,7 +7578,10 @@ var TextInputLayerSchema3 = external_exports.object({
   maxLength: external_exports.number().int().positive().max(2e3).optional(),
   classification: FieldClassificationSchema3,
   children: external_exports.lazy(() => external_exports.array(lazyLayer53())).optional(),
-  style: CommonStyleSchema3.optional()
+  /** Typography for the native input's typed text. */
+  fieldStyle: TextInputFieldStyleSchema3.optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
 });
 var ScaleInputLabelStyleSchema3 = external_exports.object({
   fontFamily: external_exports.string().min(1).max(128).optional(),
@@ -7272,6 +7590,7 @@ var ScaleInputLabelStyleSchema3 = external_exports.object({
   color: ThemedColorSchema3.optional(),
   align: external_exports.enum(["left", "center", "right"]).optional(),
   lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
   opacity: external_exports.number().min(0).max(1).optional()
 }).partial();
 var ScaleInputLayerSchema3 = external_exports.object({
@@ -7294,7 +7613,40 @@ var ScaleInputLayerSchema3 = external_exports.object({
   thumbSize: external_exports.number().int().min(8).max(48).optional(),
   thumbColor: ThemedColorSchema3.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer53())).optional(),
-  style: CommonStyleSchema3.optional()
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+});
+var WheelPickerOptionSchema3 = external_exports.object({
+  optionId: external_exports.string().min(1).max(64),
+  label: LocalizedTextSchema4
+});
+var WheelPickerItemStyleSchema3 = external_exports.object({
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema3.optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
+var WheelPickerLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("wheel_picker"),
+  fieldKey: FieldKeySchema3,
+  mode: external_exports.enum(["options", "date"]).optional(),
+  options: external_exports.array(WheelPickerOptionSchema3).min(2).optional(),
+  defaultOptionId: external_exports.string().optional(),
+  datePart: external_exports.enum(["year", "month", "day"]).optional(),
+  minYear: external_exports.number().int().min(1e3).max(9999).optional(),
+  maxYear: external_exports.number().int().min(1e3).max(9999).optional(),
+  defaultValue: external_exports.string().optional(),
+  placeholder: LocalizedTextSchema4.optional(),
+  itemHeight: external_exports.number().int().min(28).max(72).optional(),
+  visibleItemCount: external_exports.number().int().min(3).max(9).optional(),
+  selectionBackgroundColor: ThemedColorSchema3.optional(),
+  itemStyle: WheelPickerItemStyleSchema3.optional(),
+  selectedItemStyle: WheelPickerItemStyleSchema3.optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer53())).optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
 });
 var CarouselIndicatorsStyleSchema3 = external_exports.object({
   width: external_exports.number().int().min(1).max(64).optional(),
@@ -7330,7 +7682,8 @@ var CarouselLayerSchema3 = external_exports.object({
   autoAdvanceMs: external_exports.number().int().min(500).max(6e4).optional(),
   pageControl: CarouselPageControlSchema3.optional(),
   style: CommonStyleSchema3.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema3
+  styleBreakpoints: CommonStyleBreakpointsSchema3,
+  carouselLayoutBreakpoints: CarouselLayoutBreakpointsSchema3
 });
 layerSchemaStore3.schema = external_exports.lazy(
   () => external_exports.union([
@@ -7351,6 +7704,7 @@ layerSchemaStore3.schema = external_exports.lazy(
     MultipleChoiceLayerSchema3,
     TextInputLayerSchema3,
     ScaleInputLayerSchema3,
+    WheelPickerLayerSchema3,
     OAuthLoginLayerSchema3,
     OAuthProviderPresetLayerSchema3,
     OAuthProviderCustomLayerSchema3,
@@ -7392,6 +7746,7 @@ var layerHasAbsolutePositionAuthored = (layer) => {
       return commonStyleHasAbsolutePosition(layer.style, void 0);
     case "text_input":
     case "scale_input":
+    case "wheel_picker":
       return commonStyleHasAbsolutePosition(layer.style, void 0);
     case "oauth_provider":
       if (layer.variant === "preset") {
@@ -7416,7 +7771,7 @@ var layerHasAbsolutePositionAuthored = (layer) => {
       return false;
   }
 };
-var isInputLayer2 = (l) => l.kind === "single_choice" || l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input";
+var isInputLayer2 = (l) => l.kind === "single_choice" || l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker";
 var ANIMATABLE_PROPERTIES = [
   "opacity",
   "translateX",
@@ -8536,9 +8891,20 @@ var SdkResolveResponseSchema = external_exports.object({
 var SdkResolveAllResponseSchema = external_exports.object({
   channels: external_exports.array(SdkResolveResponseSchema)
 });
-var SdkResolveAssignmentSchema = SdkResolveResponseSchema.omit({
-  manifest: true,
-  mediaMap: true
+var SdkResolveAssignmentSchema = external_exports.object({
+  flowId: external_exports.string().uuid(),
+  versionId: external_exports.string().uuid(),
+  versionNumber: external_exports.number().int().positive(),
+  assignmentVersion: external_exports.number().int().nonnegative(),
+  environment: external_exports.enum(["test", "live"]),
+  channelId: external_exports.string(),
+  experimentId: external_exports.string().uuid().nullable(),
+  variantId: external_exports.string().nullable(),
+  branding: BrandingSchema.optional(),
+  features: external_exports.object({
+    attribution: external_exports.boolean()
+  }).optional(),
+  integrations: ResolvedAppIntegrationsSchema
 });
 var FlowTerminalCorrelationSchema = external_exports.object({
   channelId: external_exports.string(),
@@ -8861,7 +9227,10 @@ var ThemedColorModesSchema4 = external_exports.object({
 var ThemedColorSchema4 = external_exports.union([external_exports.string().min(1), ThemedColorModesSchema4]);
 var LAYOUT_FRACTION_PRESETS4 = ["1/2", "1/3", "2/3", "1/4", "3/4"];
 var WIDTH_PRESETS4 = ["auto", "full", ...LAYOUT_FRACTION_PRESETS4];
-var WidthValueSchema4 = external_exports.union([external_exports.enum(WIDTH_PRESETS4), external_exports.number().int().min(0).max(2e3)]);
+var WidthValueSchema4 = external_exports.preprocess(
+  (value) => value === "fill" ? "full" : value,
+  external_exports.union([external_exports.enum(WIDTH_PRESETS4), external_exports.number().int().min(0).max(2e3)])
+);
 var HEIGHT_PRESETS4 = ["auto", "full", "fill", ...LAYOUT_FRACTION_PRESETS4];
 var CommonLayoutHeightSchema4 = external_exports.union([
   external_exports.enum(HEIGHT_PRESETS4),
@@ -8894,6 +9263,8 @@ var CommonStyleSchema4 = external_exports.object({
   border: BorderSchema4.optional(),
   shadow: DropShadowSchema4.optional(),
   opacity: external_exports.number().min(0).max(1).optional(),
+  /** Multiplier (0–1) applied to the resolved background color alpha only; children stay fully opaque unless `opacity` is set. */
+  backgroundOpacity: external_exports.number().min(0).max(1).optional(),
   width: WidthValueSchema4.optional(),
   /** Omit for normal flow; `'absolute'` removes the layer from flex flow (non-root only). */
   position: external_exports.literal("absolute").optional(),
@@ -8904,6 +9275,11 @@ var CommonStyleSchema4 = external_exports.object({
   rotate: external_exports.number().min(-360).max(360).optional(),
   /** Cross-axis size: `auto` (hug), `full`/`fill` (parent height), fractions, or fixed px. */
   height: CommonLayoutHeightSchema4.optional(),
+  /** Optional size clamps (px); applied on the flex shell / wrapper like width/height. */
+  minWidth: NonNegativePxSchema4.max(2e3).optional(),
+  maxWidth: NonNegativePxSchema4.max(2e3).optional(),
+  minHeight: NonNegativePxSchema4.max(2e3).optional(),
+  maxHeight: NonNegativePxSchema4.max(2e3).optional(),
   /** Stroke thickness in px for layers that render a stroke primitive (e.g. loader ring). */
   strokeWidth: external_exports.number().int().min(0).max(64).optional()
 }).partial();
@@ -8917,9 +9293,10 @@ var TextStyleSchema4 = CommonStyleSchema4.extend({
   fontWeight: external_exports.number().int().min(100).max(900).optional(),
   color: ThemedColorSchema4.optional(),
   align: external_exports.enum(["left", "center", "right"]).optional(),
+  /** Unitless line-height multiplier (CSS `line-height` without units). */
   lineHeight: external_exports.number().min(0.8).max(3).optional(),
-  /** Multiplier (0–1) applied to the resolved background color alpha only; text stays fully opaque unless `opacity` is set. */
-  backgroundOpacity: external_exports.number().min(0).max(1).optional()
+  /** Extra spacing between characters as a multiple of `fontSize` (CSS `em`; negative values tighten). */
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional()
 });
 var ImageStyleSchema4 = CommonStyleSchema4.extend({
   fit: external_exports.enum(["cover", "contain", "fill"]).optional(),
@@ -8994,6 +9371,41 @@ var ButtonLayoutBreakpointsSchema4 = external_exports.object({
   xl: ButtonLayoutBreakpointPatchSchema4.optional(),
   "2xl": ButtonLayoutBreakpointPatchSchema4.optional()
 }).partial().optional();
+var AuthLayoutBreakpointPatchSchema4 = external_exports.object({
+  gap: NonNegativePxSchema4.optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional()
+}).partial();
+var AuthLayoutBreakpointsSchema4 = external_exports.object({
+  sm: AuthLayoutBreakpointPatchSchema4.optional(),
+  md: AuthLayoutBreakpointPatchSchema4.optional(),
+  lg: AuthLayoutBreakpointPatchSchema4.optional(),
+  xl: AuthLayoutBreakpointPatchSchema4.optional(),
+  "2xl": AuthLayoutBreakpointPatchSchema4.optional()
+}).partial().optional();
+var ChoiceLayoutBreakpointPatchSchema4 = external_exports.object({
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: NonNegativePxSchema4.optional(),
+  columns: external_exports.number().int().min(1).max(6).optional()
+}).partial();
+var ChoiceLayoutBreakpointsSchema4 = external_exports.object({
+  sm: ChoiceLayoutBreakpointPatchSchema4.optional(),
+  md: ChoiceLayoutBreakpointPatchSchema4.optional(),
+  lg: ChoiceLayoutBreakpointPatchSchema4.optional(),
+  xl: ChoiceLayoutBreakpointPatchSchema4.optional(),
+  "2xl": ChoiceLayoutBreakpointPatchSchema4.optional()
+}).partial().optional();
+var CarouselLayoutBreakpointPatchSchema4 = external_exports.object({
+  pageAlignment: external_exports.enum(["top", "center", "bottom"]).optional(),
+  pageSpacing: NonNegativePxSchema4.optional(),
+  pagePeek: NonNegativePxSchema4.optional()
+}).partial();
+var CarouselLayoutBreakpointsSchema4 = external_exports.object({
+  sm: CarouselLayoutBreakpointPatchSchema4.optional(),
+  md: CarouselLayoutBreakpointPatchSchema4.optional(),
+  lg: CarouselLayoutBreakpointPatchSchema4.optional(),
+  xl: CarouselLayoutBreakpointPatchSchema4.optional(),
+  "2xl": CarouselLayoutBreakpointPatchSchema4.optional()
+}).partial().optional();
 var DecisionNodeJumpIdSchema4 = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i);
 var ExternalSurfaceJumpIdSchema4 = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i);
 var FlowGraphNodeJumpTargetSchema4 = ScreenIdSchema4.or(DecisionNodeJumpIdSchema4).or(
@@ -9059,7 +9471,7 @@ var ButtonActionSchema4 = external_exports.discriminatedUnion("kind", [
   }),
   external_exports.object({ kind: external_exports.literal("request_app_review") })
 ]);
-var TEXT_INPUT_TYPES4 = ["plain", "email", "phone", "url", "multiline"];
+var TEXT_INPUT_TYPES4 = ["plain", "email", "phone", "url", "number", "multiline"];
 var TextInputTypeSchema4 = external_exports.enum(TEXT_INPUT_TYPES4);
 var COUNTER_DISPLAY_KINDS4 = ["number", "time"];
 var COUNTER_TIME_FORMATS4 = ["mm_ss", "hh_mm_ss", "dd_hh_mm_ss"];
@@ -9124,7 +9536,8 @@ var ProgressLayerSchema4 = external_exports.object({
   kind: external_exports.literal("progress"),
   trackColor: ThemedColorSchema4.optional(),
   fillColor: ThemedColorSchema4.optional(),
-  style: CommonStyleSchema4.optional()
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
 });
 var LoaderOnCompleteSchema4 = external_exports.discriminatedUnion("mode", [
   external_exports.object({ mode: external_exports.literal("none") }),
@@ -9144,7 +9557,8 @@ var LoaderLayerSchema4 = external_exports.object({
   fillColor: ThemedColorSchema4.optional(),
   /** Horizontal alignment of the bar or ring within the layer box (default start). */
   align: external_exports.enum(["start", "center", "end"]).optional(),
-  style: CommonStyleSchema4.optional()
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
 }).superRefine((data, ctx) => {
   if (data.variant !== "circular") return;
   const w = data.style?.width;
@@ -9181,27 +9595,39 @@ var CheckboxLayerSchema4 = external_exports.object({
   styleBreakpoints: CommonStyleBreakpointsSchema4
 });
 var lazyLayer24 = () => layerSchemaStore4.schema;
-var StackLayerSchema4 = external_exports.object({
-  ...baseLayerShape4,
-  kind: external_exports.literal("stack"),
-  style: CommonStyleSchema4.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema4,
-  stackLayoutBreakpoints: StackLayoutBreakpointsSchema4,
-  selectedStyle: CommonStyleSchema4.optional(),
-  direction: external_exports.enum(["vertical", "horizontal"]),
-  gap: external_exports.number().int().min(0).optional(),
-  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
-  justify: external_exports.enum(["start", "center", "end"]).optional(),
-  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
-  wrap: external_exports.boolean().optional(),
-  children: external_exports.lazy(() => external_exports.array(lazyLayer24()))
-});
+var migrateStackJustifyForParse4 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = { ...raw };
+  if (o.justify != null && o.distribution == null) o.distribution = o.justify;
+  delete o.justify;
+  return o;
+};
+var StackLayerSchema4 = external_exports.preprocess(
+  migrateStackJustifyForParse4,
+  external_exports.object({
+    ...baseLayerShape4,
+    kind: external_exports.literal("stack"),
+    style: CommonStyleSchema4.optional(),
+    styleBreakpoints: CommonStyleBreakpointsSchema4,
+    stackLayoutBreakpoints: StackLayoutBreakpointsSchema4,
+    selectedStyle: CommonStyleSchema4.optional(),
+    selectedStyleBreakpoints: CommonStyleBreakpointsSchema4,
+    direction: external_exports.enum(["vertical", "horizontal"]),
+    gap: external_exports.number().int().min(0).optional(),
+    align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+    distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+    wrap: external_exports.boolean().optional(),
+    children: external_exports.lazy(() => external_exports.array(lazyLayer24()))
+  })
+);
 var TextLayerSchema4 = external_exports.object({
   ...baseLayerShape4,
   kind: external_exports.literal("text"),
   text: LocalizedTextSchema5,
   style: TextStyleSchema4.optional(),
-  styleBreakpoints: TextStyleBreakpointsSchema4
+  styleBreakpoints: TextStyleBreakpointsSchema4,
+  /** Merged on top of resolved `style` when this layer is inside a selected choice option. */
+  selectedStyle: TextStyleSchema4.optional()
 });
 var migrateLegacyHyperlinkForParse4 = (raw) => {
   if (!raw || typeof raw !== "object") return raw;
@@ -9240,7 +9666,8 @@ var HyperlinkLayerSchemaInner4 = external_exports.object({
   distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
   wrap: external_exports.boolean().optional(),
   style: CommonStyleSchema4.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema4
+  styleBreakpoints: CommonStyleBreakpointsSchema4,
+  hyperlinkLayoutBreakpoints: StackLayoutBreakpointsSchema4
 }).superRefine((data, ctx) => {
   const p = parseHyperlinkHref4(data.href.trim());
   if (!p.ok) {
@@ -9261,7 +9688,8 @@ var ImageLayerSchema4 = external_exports.object({
   media: MediaReferenceSchema4.optional(),
   alt: external_exports.string().max(280).optional(),
   style: ImageStyleSchema4.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema4
+  styleBreakpoints: ImageStyleBreakpointsSchema4,
+  selectedStyle: ImageStyleSchema4.optional()
 });
 var LottieLayerSchema4 = external_exports.object({
   ...baseLayerShape4,
@@ -9272,7 +9700,8 @@ var LottieLayerSchema4 = external_exports.object({
   triggerLayerId: external_exports.string().min(1).optional(),
   onComplete: LoaderOnCompleteSchema4.optional(),
   style: ImageStyleSchema4.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema4
+  styleBreakpoints: ImageStyleBreakpointsSchema4,
+  selectedStyle: ImageStyleSchema4.optional()
 });
 var VideoLayerSchema4 = external_exports.object({
   ...baseLayerShape4,
@@ -9284,7 +9713,8 @@ var VideoLayerSchema4 = external_exports.object({
   onComplete: LoaderOnCompleteSchema4.optional(),
   audioEnabled: external_exports.boolean().optional(),
   style: ImageStyleSchema4.optional(),
-  styleBreakpoints: ImageStyleBreakpointsSchema4
+  styleBreakpoints: ImageStyleBreakpointsSchema4,
+  selectedStyle: ImageStyleSchema4.optional()
 });
 var IconLayerSchema4 = external_exports.object({
   ...baseLayerShape4,
@@ -9292,7 +9722,8 @@ var IconLayerSchema4 = external_exports.object({
   family: external_exports.enum(ICON_FAMILIES4),
   iconName: external_exports.string().min(1).max(128),
   style: IconStyleSchema4.optional(),
-  styleBreakpoints: IconStyleBreakpointsSchema4
+  styleBreakpoints: IconStyleBreakpointsSchema4,
+  selectedStyle: IconStyleSchema4.optional()
 });
 var lazyLayer34 = () => layerSchemaStore4.schema;
 var OAuthProviderPresetLayerSchema4 = external_exports.object({
@@ -9446,6 +9877,7 @@ var OAuthLoginLayerSchemaValidated4 = external_exports.object({
   ),
   gap: external_exports.number().int().min(0).optional(),
   align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  authLayoutBreakpoints: AuthLayoutBreakpointsSchema4,
   style: CommonStyleSchema4.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema4
 });
@@ -9597,6 +10029,7 @@ var EmailPasswordAuthLayerSchemaValidated4 = external_exports.object({
   ),
   gap: external_exports.number().int().min(0).optional(),
   align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  authLayoutBreakpoints: AuthLayoutBreakpointsSchema4,
   style: CommonStyleSchema4.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema4
 }).superRefine(refineEmailPasswordAuthChildren4);
@@ -9630,7 +10063,8 @@ var SingleChoiceLayerSchema4 = external_exports.object({
   gap: external_exports.number().int().min(0).optional(),
   columns: external_exports.number().int().min(1).max(12).optional(),
   style: CommonStyleSchema4.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema4
+  styleBreakpoints: CommonStyleBreakpointsSchema4,
+  choiceLayoutBreakpoints: ChoiceLayoutBreakpointsSchema4
 });
 var MultipleChoiceLayerSchema4 = external_exports.object({
   ...baseLayerShape4,
@@ -9647,8 +10081,19 @@ var MultipleChoiceLayerSchema4 = external_exports.object({
   gap: external_exports.number().int().min(0).optional(),
   columns: external_exports.number().int().min(1).max(12).optional(),
   style: CommonStyleSchema4.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema4
+  styleBreakpoints: CommonStyleBreakpointsSchema4,
+  choiceLayoutBreakpoints: ChoiceLayoutBreakpointsSchema4
 });
+var TextInputFieldStyleSchema4 = external_exports.object({
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema4.optional(),
+  align: external_exports.enum(["left", "center", "right"]).optional(),
+  lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
 var TextInputLayerSchema4 = external_exports.object({
   ...baseLayerShape4,
   kind: external_exports.literal("text_input"),
@@ -9660,7 +10105,10 @@ var TextInputLayerSchema4 = external_exports.object({
   maxLength: external_exports.number().int().positive().max(2e3).optional(),
   classification: FieldClassificationSchema5,
   children: external_exports.lazy(() => external_exports.array(lazyLayer54())).optional(),
-  style: CommonStyleSchema4.optional()
+  /** Typography for the native input's typed text. */
+  fieldStyle: TextInputFieldStyleSchema4.optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
 });
 var ScaleInputLabelStyleSchema4 = external_exports.object({
   fontFamily: external_exports.string().min(1).max(128).optional(),
@@ -9669,6 +10117,7 @@ var ScaleInputLabelStyleSchema4 = external_exports.object({
   color: ThemedColorSchema4.optional(),
   align: external_exports.enum(["left", "center", "right"]).optional(),
   lineHeight: external_exports.number().min(0.8).max(3).optional(),
+  letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
   opacity: external_exports.number().min(0).max(1).optional()
 }).partial();
 var ScaleInputLayerSchema4 = external_exports.object({
@@ -9691,7 +10140,40 @@ var ScaleInputLayerSchema4 = external_exports.object({
   thumbSize: external_exports.number().int().min(8).max(48).optional(),
   thumbColor: ThemedColorSchema4.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer54())).optional(),
-  style: CommonStyleSchema4.optional()
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+});
+var WheelPickerOptionSchema4 = external_exports.object({
+  optionId: external_exports.string().min(1).max(64),
+  label: LocalizedTextSchema5
+});
+var WheelPickerItemStyleSchema4 = external_exports.object({
+  fontFamily: external_exports.string().min(1).max(128).optional(),
+  fontSize: external_exports.number().int().min(8).max(96).optional(),
+  fontWeight: external_exports.number().int().min(100).max(900).optional(),
+  color: ThemedColorSchema4.optional(),
+  opacity: external_exports.number().min(0).max(1).optional()
+}).partial();
+var WheelPickerLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("wheel_picker"),
+  fieldKey: FieldKeySchema5,
+  mode: external_exports.enum(["options", "date"]).optional(),
+  options: external_exports.array(WheelPickerOptionSchema4).min(2).optional(),
+  defaultOptionId: external_exports.string().optional(),
+  datePart: external_exports.enum(["year", "month", "day"]).optional(),
+  minYear: external_exports.number().int().min(1e3).max(9999).optional(),
+  maxYear: external_exports.number().int().min(1e3).max(9999).optional(),
+  defaultValue: external_exports.string().optional(),
+  placeholder: LocalizedTextSchema5.optional(),
+  itemHeight: external_exports.number().int().min(28).max(72).optional(),
+  visibleItemCount: external_exports.number().int().min(3).max(9).optional(),
+  selectionBackgroundColor: ThemedColorSchema4.optional(),
+  itemStyle: WheelPickerItemStyleSchema4.optional(),
+  selectedItemStyle: WheelPickerItemStyleSchema4.optional(),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer54())).optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
 });
 var CarouselIndicatorsStyleSchema4 = external_exports.object({
   width: external_exports.number().int().min(1).max(64).optional(),
@@ -9727,7 +10209,8 @@ var CarouselLayerSchema4 = external_exports.object({
   autoAdvanceMs: external_exports.number().int().min(500).max(6e4).optional(),
   pageControl: CarouselPageControlSchema4.optional(),
   style: CommonStyleSchema4.optional(),
-  styleBreakpoints: CommonStyleBreakpointsSchema4
+  styleBreakpoints: CommonStyleBreakpointsSchema4,
+  carouselLayoutBreakpoints: CarouselLayoutBreakpointsSchema4
 });
 layerSchemaStore4.schema = external_exports.lazy(
   () => external_exports.union([
@@ -9748,6 +10231,7 @@ layerSchemaStore4.schema = external_exports.lazy(
     MultipleChoiceLayerSchema4,
     TextInputLayerSchema4,
     ScaleInputLayerSchema4,
+    WheelPickerLayerSchema4,
     OAuthLoginLayerSchema4,
     OAuthProviderPresetLayerSchema4,
     OAuthProviderCustomLayerSchema4,
@@ -10047,7 +10531,7 @@ var walkLayers = (root, fn) => {
     else if (l.kind === "hyperlink") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "single_choice" || l.kind === "multiple_choice") {
       l.children.forEach((c) => visit(c, depth + 1));
-    } else if (l.kind === "text_input" || l.kind === "scale_input") {
+    } else if (l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker") {
       l.children?.forEach((c) => visit(c, depth + 1));
     } else if (l.kind === "oauth_login") {
       l.children.forEach((c) => visit(c, depth + 1));
@@ -10381,7 +10865,7 @@ var collectFlowBuilderIssues = (manifest) => {
       }
       if (isInputLayer(l)) {
         inputCount += 1;
-        if (l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input") {
+        if (l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker") {
           needsManualSubmit = true;
         }
         const key = l.fieldKey;
@@ -10571,7 +11055,7 @@ var collectFlowBuilderIssues = (manifest) => {
     }
     if (needsManualSubmit && !hasContinueButton) {
       issues.push(
-        `Screen "${screen.name || screen.id}" has a multiple_choice, text_input, or scale_input but no Button with action "continue". Add a Continue button so users can submit.`
+        `Screen "${screen.name || screen.id}" has a multiple_choice, text_input, scale_input, or wheel_picker but no Button with action "continue". Add a Continue button so users can submit.`
       );
     }
   }
@@ -10793,6 +11277,28 @@ var scanLayer = (issues, screen, layer, branding) => {
       checkThemed(issues, stepId, id, "trackColor", layer.trackColor, false, branding);
       checkThemed(issues, stepId, id, "fillColor", layer.fillColor, false, branding);
       checkThemed(issues, stepId, id, "thumbColor", layer.thumbColor, false, branding);
+      return;
+    case "wheel_picker":
+      walkCommonBreakpoints(issues, stepId, id, layer.style, void 0, branding);
+      checkThemed(
+        issues,
+        stepId,
+        id,
+        "selectionBackgroundColor",
+        layer.selectionBackgroundColor,
+        false,
+        branding
+      );
+      checkThemed(issues, stepId, id, "itemStyle.color", layer.itemStyle?.color, false, branding);
+      checkThemed(
+        issues,
+        stepId,
+        id,
+        "selectedItemStyle.color",
+        layer.selectedItemStyle?.color,
+        false,
+        branding
+      );
       return;
     case "oauth_login":
       walkCommonBreakpoints(issues, stepId, id, layer.style, layer.styleBreakpoints, branding);
@@ -11202,7 +11708,7 @@ var defaultLayoutStyleForKind = (kind) => {
     case "video":
       return LAYOUT_FULL_FIXED_H160;
     case "icon":
-      return LAYOUT_HUG_HUG;
+      return { width: 24, height: 24 };
     case "button":
     case "back_button":
     case "oauth_provider":
@@ -11210,6 +11716,7 @@ var defaultLayoutStyleForKind = (kind) => {
       return LAYOUT_FULL_HUG;
     case "text_input":
     case "scale_input":
+    case "wheel_picker":
     case "email_password_auth":
     case "email_password_field":
     case "oauth_login":
@@ -11424,7 +11931,7 @@ var walkLayers2 = (root, fn) => {
     else if (l.kind === "hyperlink") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "single_choice" || l.kind === "multiple_choice") {
       l.children.forEach((c) => visit(c, depth + 1));
-    } else if (l.kind === "text_input" || l.kind === "scale_input") {
+    } else if (l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker") {
       l.children?.forEach((c) => visit(c, depth + 1));
     } else if (l.kind === "oauth_login") {
       l.children.forEach((c) => visit(c, depth + 1));
@@ -13375,7 +13882,7 @@ var analyzeLayout = (files) => {
         confidence: "high",
         file: file.path,
         evidence: aligns.join("; "),
-        recommendation: 'Map RN/Tailwind centering to parent `stack.align: "center"` and `stack.justify: "center"`. Center hero images inside vertical body stacks. Use `style.align: "center"` on text layers.'
+        recommendation: 'Map RN/Tailwind centering to parent `stack.align: "center"` and `stack.distribution: "center"`. Center hero images inside vertical body stacks. Use `style.align: "center"` on text layers.'
       });
     }
     if (CENTER_CLASS_RE.test(file.content) && /kind:\s*['"]image['"]|Image\b/.test(file.content)) {
@@ -14032,7 +14539,7 @@ var LayerIntentSchema = external_exports.lazy(
       kind: external_exports.literal("text_input"),
       fieldKey: external_exports.string().min(1),
       placeholder: LocalizedOrStringSchema.optional(),
-      inputType: external_exports.enum(["plain", "email", "phone", "url", "multiline"]).optional(),
+      inputType: external_exports.enum(["plain", "email", "phone", "url", "number", "multiline"]).optional(),
       required: external_exports.boolean().optional(),
       minLength: external_exports.number().int().min(0).max(2e3).optional(),
       maxLength: external_exports.number().int().positive().max(2e3).optional(),
@@ -14444,8 +14951,8 @@ var buildStack = (intent, ctx) => {
   };
   if (intent.gap !== void 0) out.gap = intent.gap;
   if (intent.align) out.align = intent.align;
-  if (intent.justify) out.justify = intent.justify;
-  if (intent.distribution) out.distribution = intent.distribution;
+  const distribution = intent.distribution ?? intent.justify;
+  if (distribution) out.distribution = distribution;
   if (intent.wrap !== void 0) out.wrap = intent.wrap;
   if (intent.selectedStyle && Object.keys(intent.selectedStyle).length > 0) {
     out.selectedStyle = intent.selectedStyle;
@@ -14516,7 +15023,8 @@ var buildCarousel = (intent, ctx) => {
     };
     if (slide.gap !== void 0) out2.gap = slide.gap;
     if (slide.align) out2.align = slide.align;
-    if (slide.justify) out2.justify = slide.justify;
+    const distribution = slide.distribution ?? slide.justify;
+    if (distribution) out2.distribution = distribution;
     return withStyle(out2, slide.style);
   });
   const out = { id, kind: "carousel", slides };

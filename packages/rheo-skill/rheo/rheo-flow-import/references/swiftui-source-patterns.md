@@ -36,7 +36,7 @@ Ask the user to confirm the entry view/coordinator if it is not obvious.
 | `VideoPlayer` / `AVPlayer` | `video` |
 | `Button { … } label: { … }` acting as CTA | `button` (label = nested `text` child) |
 | Toolbar back/close (`.toolbar { ToolbarItem(placement: .navigationBarLeading) }`, a chevron `Button`) | `back_button` in `regions.header`, `icon.family: "ionicons"`, no `action` |
-| `VStack`/`HStack`/`ZStack` with `spacing`, `alignment` | `stack` (`direction`, `align`, `justify`, `gap`) |
+| `VStack`/`HStack`/`ZStack` with `spacing`, `alignment` | `stack` (`direction`, `align`, `distribution`, `gap`) |
 | SF Symbol `Image(systemName:)` | `icon` — **remap to a valid `ionicons` name** (SF Symbols are not allowed on `icon`) |
 | `Link(destination:)` / `openURL` | `hyperlink` |
 | `ProgressView(value:)` / step dots | `progress` (header) |
@@ -53,6 +53,7 @@ real asset — follow the struct to its `Image("…")` to find the asset name.
 - `TextField`/`SecureField` → `text_input` with a snake_case `fieldKey`
   (`SecureField` / email / PII → `classification: "sensitive"`).
 - `Slider` / star rating → `scale_input`. `Toggle` consent → `checkbox`.
+- `Picker` / `WheelPicker` / date-part wheels → `wheel_picker` (not `single_choice`).
 - Manual-submit input screens need a `continue` button.
 
 ## Theme, colors, gradients, fonts

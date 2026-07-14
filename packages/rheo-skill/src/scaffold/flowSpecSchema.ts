@@ -172,7 +172,7 @@ export const LayerIntentSchema: z.ZodType<LayerIntent> = z.lazy(() =>
       kind: z.literal('text_input'),
       fieldKey: z.string().min(1),
       placeholder: LocalizedOrStringSchema.optional(),
-      inputType: z.enum(['plain', 'email', 'phone', 'url', 'multiline']).optional(),
+      inputType: z.enum(['plain', 'email', 'phone', 'url', 'number', 'multiline']).optional(),
       required: z.boolean().optional(),
       minLength: z.number().int().min(0).max(2000).optional(),
       maxLength: z.number().int().positive().max(2000).optional(),

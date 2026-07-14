@@ -43,7 +43,7 @@ Before zipping, read [layer-schema-pitfalls.md](layer-schema-pitfalls.md) and ru
 
 ## Layer Kinds
 
-Use only: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_button`, `progress`, `loader`, `counter`, `single_choice`, `multiple_choice`, `text_input`, `scale_input`, `oauth_provider`, `oauth_login`, `email_password_auth`, `email_password_field`, `email_password_submit`, `carousel`, `hyperlink`, `checkbox`.
+Use only: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_button`, `progress`, `loader`, `counter`, `single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`, `oauth_provider`, `oauth_login`, `email_password_auth`, `email_password_field`, `email_password_submit`, `carousel`, `hyperlink`, `checkbox`.
 
 ## Rules
 
@@ -58,10 +58,14 @@ Use only: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_b
 - In-screen pagers → `kind: "carousel"` with one slide per page; swipe-only; bundle every slide asset. See carousel-import.md in references.
 - Center images with parent stack `align: "center"`; map card borders/shadows to wrapping stacks.
 - Custom fonts: bundle files in `rheo-import.fonts.json` only (never `rheo-import.assets.json`), `manifest.theme.fontFamily`. See `font-import.md`.
-- Choice options: each option stack uses `style` (default) and `selectedStyle` (selected).
+- Choice options: each option stack bakes default chrome into `style` and selected overrides into `selectedStyle` (optional `selectedStyleBreakpoints`).
+- Stack packing: `distribution` — never `justify`. Width fill parent is `"full"` — never width `"fill"`.
+- `text_input.fieldStyle` is typography only; chrome on outer `style`.
+- `wheel_picker`: scroll wheel / date parts; `itemStyle` / `selectedItemStyle` typography only; branch later via `dec_*` with string predicates.
+- Icons default to 24×24 unless source specifies another size.
 - Publish gates: explicit `style.color` on all text (including button labels), Continue on manual-submit screens, valid entry/completion path. Run `scripts/audit-publish-manifest.mjs` before finishing.
 - Black-and-white fallback is acceptable only when the audit finds no style/token evidence and the user confirms no theme source.
-- Use at most one input layer kind per screen.
+- Use at most one input layer kind per screen (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`).
 - Non-reserved `sdk.*` decision keys must be listed in `sdkAttributeKeys`.
 - RevenueCat paywalls are external surface nodes and always need `fallback`.
 - Emit complete graph edges for imported flows.

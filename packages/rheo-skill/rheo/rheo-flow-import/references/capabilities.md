@@ -26,6 +26,7 @@ Every layer `kind` accepted by the manifest:
 - `multiple_choice`
 - `text_input`
 - `scale_input`
+- `wheel_picker`
 - `oauth_provider`
 - `oauth_login`
 - `email_password_auth`
@@ -95,7 +96,7 @@ Valid `permissionKey` values for `request_os_permission`:
 
 ## Inputs and auth
 
-- `text_input` types: `plain`, `email`, `phone`, `url`, `multiline`.
+- `text_input` types: `plain`, `email`, `phone`, `url`, `number`, `multiline`.
 - `text_input` classification: `safe`, `sensitive`.
 - `oauth_login` preset providers: `github`, `google`, `apple`.
 - `email_password_auth` modes: `sign_in`, `sign_up` (sign_up requires email + password + confirm fields).

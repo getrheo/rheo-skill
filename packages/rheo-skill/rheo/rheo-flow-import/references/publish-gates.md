@@ -26,7 +26,7 @@ These mirror `apps/web/src/features/builder/validateFlow.ts` and API `preflightP
 | **Choice input shape** | `single_choice` / `multiple_choice` missing `optionBindings` or `branching`, using `"options"` instead of `children`, or `fieldKey` not snake_case. |
 | **Container `children`** | `back_button`, `button`, or `hyperlink` emitted without a `children` array (or with label text on the parent instead of nested `text` children). Crashes import on Indie plans during motion strip; fails Zod validation. |
 | **Text/icon `style.color`** | Body text or **button label** (nested text child) left without `style.color` — native does not inherit CSS colors. |
-| **Continue button** | `text_input`, `multiple_choice`, or `scale_input` without a `button` with `action.kind: "continue"`. |
+| **Continue button** | `text_input`, `multiple_choice`, `scale_input`, or `wheel_picker` without a `button` with `action.kind: "continue"`. |
 | **One input per screen** | Multiple inputs, or OAuth/email-password combined with inputs. |
 | **fieldKey** | Missing or non–snake_case on input layers. |
 | **Graph targets** | `go_to_step`, choice `goTo`, loader/lottie/video `onComplete` (screen mode), permission outcomes, and fallbacks point at missing `scr_*` / `dec_*` / `surf_*` ids. |

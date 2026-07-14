@@ -5,7 +5,7 @@ summary: Current manifest-generation guidance for agent skills and local import 
 tags: [agents, manifest, import]
 audience: [developer]
 related: [developer-guide/agent-import, developer-guide/sdk, user-guide/flow-builder]
-last_reviewed: "2026-07-06"
+last_reviewed: "2026-07-14"
 ---
 
 # Rheo Manifest Agent Profile
@@ -95,7 +95,7 @@ Prefer readable ids such as `scr_welcome`, `lyr_welcome_title`, `dec_platform`, 
 Use only these layer kinds:
 
 ```text
-stack, text, image, lottie, video, icon, button, back_button, progress, loader, counter, single_choice, multiple_choice, text_input, scale_input, oauth_provider, oauth_login, email_password_auth, email_password_field, email_password_submit, carousel, hyperlink, checkbox
+stack, text, image, lottie, video, icon, button, back_button, progress, loader, counter, single_choice, multiple_choice, text_input, scale_input, wheel_picker, oauth_provider, oauth_login, email_password_auth, email_password_field, email_password_submit, carousel, hyperlink, checkbox
 ```
 
 ## Screen Pattern
@@ -138,12 +138,21 @@ Set explicit `style.width` and `style.height` on every layer:
 
 | Axis | Values |
 |------|--------|
-| Width | `"full"` (fill), `"auto"` (hug), fractions (`"1/2"`, `"1/3"`, `"2/3"`, `"1/4"`, `"3/4"`), or px |
+| Width | `"full"` (fill parent — **never** `"fill"` on width), `"auto"` (hug), fractions (`"1/2"`, `"1/3"`, `"2/3"`, `"1/4"`, `"3/4"`), or px |
 | Height | `"fill"` (or legacy `"full"`), `"auto"` (hug), the same fractions, or px |
+| Optional clamps | `minWidth` / `maxWidth` / `minHeight` / `maxHeight` (px) |
 
 **Fill chains:** When a region must expand (split tap zones, scroll areas, carousel slide bodies), set `height: "fill"` on every stack ancestor up to the body root. The body region root stack fills its slot by default.
 
 **Hug:** Cards and buttons that should size to content use `height: "auto"`. Hug is never upgraded to fill because a parent uses stretch alignment.
+
+**Stack packing:** Use `distribution` (`start` \| `center` \| `end` \| `between` \| `around`). Do **not** emit legacy `justify` (schema preprocess migrates it away; new manifests must write `distribution`).
+
+**Icons:** Default glyph box is `style.width` / `style.height` **24** unless the design specifies another size.
+
+**Images:** Only set `style.radius` when the source has a corner radius — do not invent a default radius.
+
+**Responsive maps:** Prefer `styleBreakpoints` (`sm`–`2xl`). Choice option stacks may use `selectedStyleBreakpoints`. Kind-prefixed layout maps when needed: `stackLayoutBreakpoints`, `buttonLayoutBreakpoints`, `hyperlinkLayoutBreakpoints`, `authLayoutBreakpoints`, `choiceLayoutBreakpoints`, `carouselLayoutBreakpoints`.
 
 ## Text
 
@@ -182,14 +191,16 @@ Set explicit `style.width` and `style.height` on every layer:
 
 ## Inputs
 
-- Use at most one input layer kind per screen.
+- Use at most one input layer kind per screen (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`).
 - Use stable snake_case `fieldKey` values.
 - `text_input` needs `classification` set to `safe` or `sensitive`.
+- `text_input.fieldStyle` is **typography only** (`fontFamily`, `fontSize`, `fontWeight`, `color`, `align`, `lineHeight`, `letterSpacing`, `opacity`). Padding, radius, background, and border belong on the outer `style` / `styleBreakpoints`.
+- `wheel_picker` captures a string value (`mode: "options"` or `"date"` with `datePart`). Row typography uses `itemStyle` / `selectedItemStyle`; chrome stays on outer `style` / `styleBreakpoints`. No layer `.branching` — route later via `dec_*` with predicate `type: "string"`. Needs a Continue button.
 - When source uses in-screen pagers (`infoSteps`, horizontal `translateX`, `pagingEnabled` lists), emit `kind: "carousel"` with one vertical `stack` slide per page. Do not collapse multi-slide routes to a single static screen.
 
 ### Choice option styling (`single_choice` / `multiple_choice`)
 
-Each selectable option is a child `stack` on the input layer. Map unselected UI to `style` and selected UI to `selectedStyle` on the **same** stack (border, background, padding, radius). The renderer merges `selectedStyle` over `style` when the option is active.
+Each selectable option is a child `stack` on the input layer. **Bake default chrome into `style`** (padding, radius, background, border) and map selected UI to `selectedStyle` on the **same** stack. Optional `selectedStyleBreakpoints` when selected chrome changes by viewport. The renderer merges `selectedStyle` over `style` when the option is active — do not rely on runtime injection of missing chrome.
 
 When source uses `selected === value ? '…selected classes…' : '…default classes…'`, do not import only the default branch.
 
@@ -431,7 +442,7 @@ The dashboard **Publish** button runs the same checks as the agent skill's publi
 - The entry target must exist (`entryScreenId`).
 - A completion path from entry (`end_flow`, terminal screen `next`, or external surface end).
 - **Every text and icon layer** has explicit `style.color` (including nested **button label** text — native does not inherit colors).
-- Screens with `text_input`, `multiple_choice`, or `scale_input` include a `button` with `action.kind: "continue"`.
+- Screens with `text_input`, `multiple_choice`, `scale_input`, or `wheel_picker` include a `button` with `action.kind: "continue"`.
 - At most one input layer per screen; do not combine OAuth or email/password login with other inputs on the same screen.
 - Valid `fieldKey` (snake_case) on inputs; choice `goTo`, `go_to_step`, loader `onComplete`, and permission outcomes must reference existing `scr_*`, `dec_*`, or `surf_*` ids (or permission sentinels `continue` / `end`).
 - External surfaces: real `config.provider`, connected `fallback`, RevenueCat enabled when used.
