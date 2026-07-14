@@ -38,7 +38,7 @@ Ask the user to confirm the entry file if it is not obvious; do not guess.
 | `react-native-video` / `expo-video` | `video` |
 | `<Pressable>`/`<TouchableOpacity>` acting as CTA | `button` (label = nested `text` child) |
 | Header back chevron / close (`<HeaderBackButton>`, a back `Pressable` in a top bar) | `back_button` in `regions.header`, `icon.family: "ionicons"`, no `action` |
-| `<View style={{ flexDirection, alignItems, gap }}>` | `stack` (`direction`, `align`, `justify`, `gap`) |
+| `<View style={{ flexDirection, alignItems, gap }}>` | `stack` (`direction`, `align`, `distribution`, `gap`) |
 | Vector icons (`react-native-vector-icons`, `@expo/vector-icons` Ionicons) | `icon` (`family: "ionicons"`) |
 | External `Linking.openURL(...)` / `<A href>` | `hyperlink` |
 | Progress bar / step dots tied to step index | `progress` (header) |
@@ -55,6 +55,7 @@ Hero images that render through wrapper components (`<Illustration>`, `<Logo>`,
 - `<TextInput>` collecting a value → `text_input` with a snake_case `fieldKey`;
   mark password/email/PII as `classification: "sensitive"`.
 - Sliders / rating rows → `scale_input`. Consent toggles → `checkbox`.
+- Native scroll wheels / `Picker` / year-month-day selectors → `wheel_picker` (not `single_choice`).
 - Screens with a manual-submit input need a `continue` button.
 
 ## Theme, colors, gradients, fonts

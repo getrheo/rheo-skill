@@ -23,7 +23,7 @@ See [layer-schema-pitfalls.md](layer-schema-pitfalls.md) for common id mistakes 
 
 ## Layer Kinds
 
-Allowed kinds: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_button`, `progress`, `loader`, `counter`, `single_choice`, `multiple_choice`, `text_input`, `scale_input`, `oauth_provider`, `oauth_login`, `email_password_auth`, `email_password_field`, `email_password_submit`, `carousel`, `hyperlink`, `checkbox`.
+Allowed kinds: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_button`, `progress`, `loader`, `counter`, `single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`, `oauth_provider`, `oauth_login`, `email_password_auth`, `email_password_field`, `email_password_submit`, `carousel`, `hyperlink`, `checkbox`.
 
 ## Regions
 
@@ -62,21 +62,29 @@ Map clear brand values into `manifest.theme` and layer styles. Set `style.color`
 ## Layout
 
 - Center images: parent stack `align: "center"`.
+- Main-axis packing: stack / button `distribution` (not `justify`).
 - Card chrome: wrapping stacks with `border`, `shadow`, `background`, `radius`, `padding`.
+- Do not invent image `radius` unless the source has rounded corners.
 
 ## Explicit Sizing
 
-Set `style.width` and `style.height` on every layer — do not omit them. `width` accepts `"full"`, `"auto"`, a fraction (`"1/2"`, `"1/3"`, `"2/3"`, `"1/4"`, `"3/4"`), or a pixel number; `height` accepts `"fill"`, `"auto"`, or a pixel number. Use these per-kind defaults unless the design requires otherwise:
+Set `style.width` and `style.height` on every layer — do not omit them. `width` accepts `"full"` (**never** `"fill"` on width), `"auto"`, a fraction (`"1/2"`, `"1/3"`, `"2/3"`, `"1/4"`, `"3/4"`), or a pixel number; `height` accepts `"fill"`, `"auto"`, or a pixel number. Optional clamps: `minWidth` / `maxWidth` / `minHeight` / `maxHeight`. Use these per-kind defaults unless the design requires otherwise:
 
 | Layer kinds | `width` | `height` |
 |-------------|---------|----------|
-| `stack`, `text_input`, `scale_input`, `oauth_login`, `email_password_auth`, `email_password_field`, `progress`, `loader` | `"full"` | `"fill"` |
+| `stack`, `text_input`, `scale_input`, `wheel_picker`, `oauth_login`, `email_password_auth`, `email_password_field`, `progress`, `loader` | `"full"` | `"fill"` |
 | `button`, `back_button`, `oauth_provider`, `email_password_submit`, `checkbox`, `single_choice`, `multiple_choice` | `"full"` | `"auto"` |
-| `text`, `counter`, `icon`, `hyperlink` | `"auto"` | `"auto"` |
+| `text`, `counter`, `hyperlink` | `"auto"` | `"auto"` |
+| `icon` | `24` | `24` |
 | `image`, `lottie`, `video` | `"full"` | number (e.g. `160`) |
 | `carousel` | — (no outer `style` sizing) | — |
 
-Dashboard import backfills these defaults automatically, but emitting them explicitly produces higher-fidelity first drafts.
+Stack packing uses **`distribution`** (`start` \| `center` \| `end` \| `between` \| `around`). Never emit legacy `justify`.
+
+`text_input.fieldStyle` is typography only; outer chrome stays on `style` / `styleBreakpoints`.
+`wheel_picker.itemStyle` / `selectedItemStyle` are row typography only; outer chrome stays on `style` / `styleBreakpoints`.
+
+Dashboard import backfills sizing defaults automatically, but emitting them explicitly produces higher-fidelity first drafts.
 
 ## Container Layers (Required `children`)
 
@@ -159,9 +167,10 @@ Full template: [layer-schema-pitfalls.md](layer-schema-pitfalls.md#single_choice
 
 ## Inputs
 
-- Use at most one input layer kind per screen.
+- Use at most one input layer kind per screen (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`).
 - Use stable snake_case `fieldKey` values.
 - Mark text input classification as `safe` or `sensitive`.
+- `wheel_picker` captures a string (options or date part); no layer branching — use `dec_*` with string predicates.
 
 ## Decisions
 
@@ -194,4 +203,4 @@ When source screens use i18n ([localization-import.md](localization-import.md)):
 - Avoid orphaned screens unless intentionally parked for later editing.
 - Run `scripts/audit-publish-manifest.mjs` before finishing — it enforces dashboard **Publish** rules (see [publish-gates.md](publish-gates.md)).
 - Every `text` and `icon` layer needs explicit `style.color` (including nested button label text).
-- Screens with `text_input`, `multiple_choice`, or `scale_input` need a `continue` button.
+- Screens with `text_input`, `multiple_choice`, `scale_input`, or `wheel_picker` need a `continue` button.

@@ -144,7 +144,7 @@ export type TextInputIntent = CommonIntent & {
   kind: 'text_input';
   fieldKey: string;
   placeholder?: LocalizedOrString;
-  inputType?: 'plain' | 'email' | 'phone' | 'url' | 'multiline';
+  inputType?: 'plain' | 'email' | 'phone' | 'url' | 'number' | 'multiline';
   required?: boolean;
   minLength?: number;
   maxLength?: number;
@@ -205,7 +205,9 @@ export type CarouselSlide = {
   direction?: 'vertical' | 'horizontal';
   gap?: number;
   align?: 'start' | 'center' | 'end' | 'stretch';
+  /** @deprecated Prefer `distribution`. */
   justify?: 'start' | 'center' | 'end';
+  distribution?: 'start' | 'center' | 'end' | 'between' | 'around';
   style?: StyleRecord;
   children: LayerIntent[];
 };

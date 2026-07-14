@@ -328,8 +328,8 @@ const buildStack = (intent: StackIntent, ctx: BuildCtx): Json => {
   };
   if (intent.gap !== undefined) out.gap = intent.gap;
   if (intent.align) out.align = intent.align;
-  if (intent.justify) out.justify = intent.justify;
-  if (intent.distribution) out.distribution = intent.distribution;
+  const distribution = intent.distribution ?? intent.justify;
+  if (distribution) out.distribution = distribution;
   if (intent.wrap !== undefined) out.wrap = intent.wrap;
   if (intent.selectedStyle && Object.keys(intent.selectedStyle).length > 0) {
     out.selectedStyle = intent.selectedStyle;
@@ -406,7 +406,8 @@ const buildCarousel = (intent: CarouselIntent, ctx: BuildCtx): Json => {
     };
     if (slide.gap !== undefined) out.gap = slide.gap;
     if (slide.align) out.align = slide.align;
-    if (slide.justify) out.justify = slide.justify;
+    const distribution = slide.distribution ?? slide.justify;
+    if (distribution) out.distribution = distribution;
     return withStyle(out, slide.style);
   });
   const out: Json = { id, kind: 'carousel', slides };

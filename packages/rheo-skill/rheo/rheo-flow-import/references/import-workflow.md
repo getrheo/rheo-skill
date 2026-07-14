@@ -68,7 +68,7 @@ If the user has not named an entry point, stop after question 1 and wait for an 
    - Bundle every slide image; every asset referenced in the carousel must appear in `rheo-import.assets.json`.
    - Do not collapse multi-slide routes into one static screen with a single image.
 11. Map layout, alignment, borders, and shadows:
-   - Parent vertical stacks that center content need `align: "center"` (and `justify: "center"` when appropriate).
+   - Parent vertical stacks that center content need `align: "center"` (and `distribution: "center"` when appropriate).
    - Hero images belong inside centered stacks, not as lone siblings in an unaligned vertical stack.
    - Card rows (rating, testimonials, why-it-works cards) use wrapping stacks with `style.background`, `style.radius`, `style.padding`, `style.border`, and `style.shadow` from source.
 12. Map custom fonts from audit findings ([font-import.md](font-import.md)):

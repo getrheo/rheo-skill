@@ -45,7 +45,7 @@ export const analyzeLayout = (files: AuditFile[]): AuditFinding[] => {
         file: file.path,
         evidence: aligns.join('; '),
         recommendation:
-          'Map RN/Tailwind centering to parent `stack.align: "center"` and `stack.justify: "center"`. Center hero images inside vertical body stacks. Use `style.align: "center"` on text layers.',
+          'Map RN/Tailwind centering to parent `stack.align: "center"` and `stack.distribution: "center"`. Center hero images inside vertical body stacks. Use `style.align: "center"` on text layers.',
       });
     }
 

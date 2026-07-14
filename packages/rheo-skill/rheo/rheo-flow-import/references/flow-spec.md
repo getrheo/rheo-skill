@@ -62,7 +62,7 @@ the scaffold expands into a real layer. `id` is always optional. `style` and
 { "kind": "text", "text": "Welcome to Rheo", "style": { "color": "#FFFFFF" } }
 { "kind": "text", "text": { "default": "Hi", "translations": { "es": "Hola" } } }
 { "kind": "image", "mediaAssetId": "00000000-0000-0000-0000-000000000101", "alt": "Hero" }
-{ "kind": "icon", "iconName": "sparkles-outline" }            // family defaults to ionicons
+{ "kind": "icon", "iconName": "sparkles-outline" }            // family defaults to ionicons; size defaults to 24×24
 { "kind": "lottie", "mediaAssetId": "…", "loop": true, "autoPlay": true }
 { "kind": "video", "mediaAssetId": "…", "autoPlay": false }    // needs a play_media button
 ```
@@ -96,10 +96,12 @@ Action shorthands: `"none"`, `"continue"`, `"skip"`, `"end_flow"`,
 ### Stacks (layout)
 
 ```jsonc
-{ "kind": "stack", "direction": "vertical", "align": "center", "gap": 12,
+{ "kind": "stack", "direction": "vertical", "align": "center", "distribution": "center", "gap": 12,
   "style": { "padding": { "t": 24, "r": 16, "b": 24, "l": 16 } },
   "children": [ { "kind": "text", "text": "Centered hero copy" } ] }
 ```
+
+Use `distribution` for main-axis packing (`start` \| `center` \| `end` \| `between` \| `around`). Legacy flow-spec `justify` is accepted by the scaffold and rewritten to `distribution`, but prefer writing `distribution` directly.
 
 Card chrome (border/shadow/background/radius) goes on a wrapping stack's `style`.
 
@@ -107,7 +109,8 @@ Card chrome (border/shadow/background/radius) goes on a wrapping stack's `style`
 
 You provide `options`; the scaffold builds the option `stack` children,
 `optionBindings`, and `branching`. `optionId` defaults to a slug of the label.
-Map unselected chrome to `style` and selected chrome to `selectedStyle` per option.
+Map unselected chrome to `style` and selected chrome to `selectedStyle` per option
+(bake padding/radius/background/border into `style` — do not omit default chrome).
 
 ```jsonc
 {
@@ -136,11 +139,13 @@ option, set `branching: { "enabled": true, "conditions": [{ "choiceId": "male", 
   "inputType": "plain", "required": true, "classification": "safe" }
 { "kind": "scale_input", "fieldKey": "fitness_level", "min": 1, "max": 5, "step": 1,
   "minLabel": "Beginner", "maxLabel": "Pro" }
+{ "kind": "wheel_picker", "fieldKey": "birth_year", "mode": "date", "datePart": "year",
+  "minYear": 1950, "maxYear": 2010, "defaultValue": "1990" }
 { "kind": "checkbox", "fieldKey": "accept_terms", "blocking": true }
 ```
 
 Use **at most one** input layer per screen, and add a `continue` button on
-screens with `text_input`, `multiple_choice`, or `scale_input`.
+screens with `text_input`, `multiple_choice`, `scale_input`, or `wheel_picker`.
 
 ### Auth
 
