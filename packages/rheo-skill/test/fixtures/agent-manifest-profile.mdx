@@ -95,7 +95,7 @@ Prefer readable ids such as `scr_welcome`, `lyr_welcome_title`, `dec_platform`, 
 Use only these layer kinds:
 
 ```text
-stack, text, image, lottie, video, icon, button, back_button, progress, loader, counter, single_choice, multiple_choice, text_input, scale_input, wheel_picker, oauth_provider, oauth_login, email_password_auth, email_password_field, email_password_submit, carousel, hyperlink, checkbox
+stack, text, image, lottie, video, icon, button, back_button, progress, loader, counter, single_choice, multiple_choice, text_input, scale_input, wheel_picker, oauth_provider, oauth_login, email_password_auth, email_password_field, email_password_submit, carousel, hyperlink, checkbox, conditional
 ```
 
 ## Screen Pattern
@@ -191,7 +191,7 @@ Set explicit `style.width` and `style.height` on every layer:
 
 ## Inputs
 
-- Use at most one input layer kind per screen (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`).
+- Use at most one input layer kind per **active path** (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`). Without a `conditional` layer that means one per screen; sibling `conditional` branches may each own their own input because only one branch ever renders.
 - Use stable snake_case `fieldKey` values.
 - `text_input` needs `classification` set to `safe` or `sensitive`.
 - `text_input.fieldStyle` is **typography only** (`fontFamily`, `fontSize`, `fontWeight`, `color`, `align`, `lineHeight`, `letterSpacing`, `opacity`). Padding, radius, background, and border belong on the outer `style` / `styleBreakpoints`.
@@ -291,12 +291,14 @@ When audit or source shows `infoSteps`, `currentInfoStep`, horizontal pagers, or
 
 Bundle every slide asset.
 
-**Swipe-only paging**
+**Paging**
 
-- Carousels are **swipe-only** (horizontal snap scroll). Optional `pageControl` adds dots. There is no Next/Continue button on the carousel layer.
-- Do **not** add `regions.footer` or body `button` layers that only advance pager index when the source footer increments `currentInfoStep`.
-- Use `regions.footer` for a sticky CTA that advances the **whole flow** (next screen/route), or rely on swipe-to-last-slide completion when `loop` is false and there are 2+ slides.
-- `screen.next.default` is the edge to the **next screen** after carousel completion (swipe to last slide, or a screen-level Continue on single-slide carousels).
+- Carousels page by **swipe** (horizontal snap scroll) by default. Optional `pageControl` adds dots. The carousel layer itself has no built-in Next/Continue chrome.
+- To add an explicit Next control, use a `button` layer with `action: { "kind": "advance_carousel", "targetLayerId": "<carousel layer id>", "onLast": "noop" | "complete" }`. The target must be a `carousel` on the **same screen**; `onLast` defaults to `"noop"`.
+- Do **not** add `regions.footer` or body `button` layers that only bump the pager index without `advance_carousel`.
+- Use `regions.footer` for a sticky CTA that advances the **whole flow** (next screen/route), or rely on landing on the last slide when `loop` is false and there are 2+ slides.
+- `screen.next.default` is the edge to the **next screen** after carousel completion (landing on the last slide via swipe or `advance_carousel`, or a screen-level Continue on single-slide carousels).
+- Looping carousels never complete through paging, and single-slide carousels ignore `advance_carousel` — use a `continue` button to leave the screen.
 
 ## Layout, alignment, borders, shadows
 
@@ -435,6 +437,45 @@ Use decision nodes for source-code branches. Non-reserved `sdk.*` keys reference
 }
 ```
 
+## Conditional Layers
+
+Use `conditional` when one screen shows different layers to different people. Decision nodes pick the next screen; a conditional picks what a screen shows.
+
+Every branch is a direct child `stack`. Cases are checked in order and the first match wins; `elseRootLayerId` renders when none match. Case expressions use the same `DecisionExpr` shape as decision nodes.
+
+```json
+{
+  "id": "lyr_experience",
+  "kind": "conditional",
+  "cases": [
+    {
+      "id": "dc_beginner",
+      "name": "Beginners",
+      "expression": {
+        "kind": "predicate",
+        "variable": { "kind": "field", "fieldKey": "experience" },
+        "predicate": { "type": "string", "pred": { "op": "eq", "value": "option_1" } }
+      },
+      "rootLayerId": "lyr_beginner_stack"
+    }
+  ],
+  "elseRootLayerId": "lyr_default_stack",
+  "children": [
+    { "id": "lyr_beginner_stack", "kind": "stack", "direction": "vertical", "children": [] },
+    { "id": "lyr_default_stack", "kind": "stack", "direction": "vertical", "children": [] }
+  ]
+}
+```
+
+Rules:
+
+- 1–16 cases, plus a required `elseRootLayerId`. Every `rootLayerId` must name a distinct direct child stack.
+- Cases may only read fields answered **above** them: fields from upstream screens, or same-screen fields whose input layer precedes the conditional in tree order. A case cannot read a field captured inside its own branches.
+- One input, one `oauth_login`, and one `email_password_auth` per active path — sibling branches each get their own budget.
+- `fieldKey` values stay unique across the whole screen, including across sibling branches.
+- Every case needs at least one rule before publishing; drafts may leave a case empty.
+- A conditional owns no style or layout. The winning branch lays out exactly where the conditional sits.
+
 ## Publish Readiness
 
 The dashboard **Publish** button runs the same checks as the agent skill's publish-gate audit. Agents must pass these before calling an import complete:
@@ -443,7 +484,8 @@ The dashboard **Publish** button runs the same checks as the agent skill's publi
 - A completion path from entry (`end_flow`, terminal screen `next`, or external surface end).
 - **Every text and icon layer** has explicit `style.color` (including nested **button label** text — native does not inherit colors).
 - Screens with `text_input`, `multiple_choice`, `scale_input`, or `wheel_picker` include a `button` with `action.kind: "continue"`.
-- At most one input layer per screen; do not combine OAuth or email/password login with other inputs on the same screen.
+- At most one input layer per active path; do not combine OAuth or email/password login with other inputs on the same path.
+- Every `conditional` case has at least one rule and reads only fields answered above it.
 - Valid `fieldKey` (snake_case) on inputs; choice `goTo`, `go_to_step`, loader `onComplete`, and permission outcomes must reference existing `scr_*`, `dec_*`, or `surf_*` ids (or permission sentinels `continue` / `end`).
 - External surfaces: real `config.provider`, connected `fallback`, RevenueCat enabled when used.
 - Run the skill's **audit-publish** command on `rheo-import.manifest.json` and fix all blocking issues in the publish-gates report.

@@ -43,7 +43,7 @@ Before zipping, read [layer-schema-pitfalls.md](layer-schema-pitfalls.md) and ru
 
 ## Layer Kinds
 
-Use only: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_button`, `progress`, `loader`, `counter`, `single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`, `oauth_provider`, `oauth_login`, `email_password_auth`, `email_password_field`, `email_password_submit`, `carousel`, `hyperlink`, `checkbox`.
+Use only: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_button`, `progress`, `loader`, `counter`, `single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`, `oauth_provider`, `oauth_login`, `email_password_auth`, `email_password_field`, `email_password_submit`, `carousel`, `hyperlink`, `checkbox`, `conditional`.
 
 ## Rules
 
@@ -55,7 +55,7 @@ Use only: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_b
 - Inspect theme/style/token files, StyleSheet, and Tailwind classes before using black-and-white defaults.
 - Set `style.color` on text for dark/saturated screen backgrounds.
 - Gradients: `screen.containerStyle.backgroundFill.color` as `linear-gradient(...)` CSS when `kind` is `color`.
-- In-screen pagers → `kind: "carousel"` with one slide per page; swipe-only; bundle every slide asset. See carousel-import.md in references.
+- In-screen pagers → `kind: "carousel"` with one slide per page; swipe by default, or an `advance_carousel` button when the source has an explicit Next control; bundle every slide asset. See carousel-import.md in references.
 - Center images with parent stack `align: "center"`; map card borders/shadows to wrapping stacks.
 - Custom fonts: bundle files in `rheo-import.fonts.json` only (never `rheo-import.assets.json`), `manifest.theme.fontFamily`. See `font-import.md`.
 - Choice options: each option stack bakes default chrome into `style` and selected overrides into `selectedStyle` (optional `selectedStyleBreakpoints`).
@@ -65,7 +65,7 @@ Use only: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_b
 - Icons default to 24×24 unless source specifies another size.
 - Publish gates: explicit `style.color` on all text (including button labels), Continue on manual-submit screens, valid entry/completion path. Run `scripts/audit-publish-manifest.mjs` before finishing.
 - Black-and-white fallback is acceptable only when the audit finds no style/token evidence and the user confirms no theme source.
-- Use at most one input layer kind per screen (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`).
+- Use at most one input layer kind per **active path** (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`) — one per screen unless sibling `conditional` branches split the path.
 - Non-reserved `sdk.*` decision keys must be listed in `sdkAttributeKeys`.
 - RevenueCat paywalls are external surface nodes and always need `fallback`.
 - Emit complete graph edges for imported flows.

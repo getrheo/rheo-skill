@@ -44,7 +44,7 @@ export const analyzeRegions = (files: AuditFile[]): AuditFinding[] => {
         file: file.path,
         evidence: `Footer/sticky CTA marker: ${footer}`,
         recommendation: carouselPager
-          ? 'If this footer only advances in-screen pager pages (infoSteps/currentInfoStep), do not map it to regions.footer — use a swipe-only carousel layer. Use regions.footer only for CTAs that advance the next screen in the flow.'
+          ? 'If this footer only advances in-screen pager pages (infoSteps/currentInfoStep), either drop it (swipe already pages the carousel) or keep it as a button with action.kind "advance_carousel" targeting that carousel. Use regions.footer for CTAs that advance the next screen in the flow.'
           : 'Use regions.footer for sticky bottom CTAs instead of placing them at the end of body.',
       });
     }

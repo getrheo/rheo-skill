@@ -96,7 +96,7 @@ export const renderAuditMarkdown = (report: AuditReport): string => {
       ? '- Apply gradient evidence to `screen.containerStyle.backgroundFill.color` using `linear-gradient(...)` CSS strings.'
       : '- Map screen-level background findings before adding generic body layers.',
     hasCarousel
-      ? '- **Carousel required:** emit `kind: "carousel"` with one slide stack per pager page. Swipe-only — no in-pager buttons. Bundle every slide asset.'
+      ? '- **Carousel required:** emit `kind: "carousel"` with one slide stack per pager page. Swipe by default — only add a paging button when the source has an explicit Next control, using `action.kind: "advance_carousel"`. Bundle every slide asset.'
       : '- No carousel markers detected — still verify multi-slide routes manually.',
     hasFonts
       ? '- **Fonts required:** copy `.ttf`/`.otf`/`.woff`/`.woff2` under `assets/fonts/`, add `rheo-import.fonts.json`, set `manifest.theme.fontFamily`. **Never** put font files in `rheo-import.assets.json` (see `references/font-import.md`).'

@@ -63,8 +63,8 @@ If the user has not named an entry point, stop after question 1 and wait for an 
    - When source uses `infoSteps`, `currentInfoStep`, horizontal `translateX` pagers, or `pagingEnabled` lists, emit `kind: "carousel"`.
    - Each slide is a vertical `stack` with image, title, and body text from that slide.
    - Add `pageControl: { "position": "bottom" }` when dot indicators exist (dots only).
-   - Carousels are **swipe-only** — no Next/Continue button on the carousel layer. Do not add footer/body buttons for in-pager paging.
-   - Use `regions.footer` only when the source CTA advances the **next screen in the flow**, or for single-slide carousels that need an explicit Continue.
+   - Carousels page by swipe. When the source has an explicit Next control, keep it as a `button` with `action.kind: "advance_carousel"` targeting that carousel; never add a plain footer/body button that only bumps the pager index.
+   - Use `regions.footer` when the source CTA advances the **next screen in the flow**, or for single-slide carousels that need an explicit Continue.
    - Bundle every slide image; every asset referenced in the carousel must appear in `rheo-import.assets.json`.
    - Do not collapse multi-slide routes into one static screen with a single image.
 11. Map layout, alignment, borders, and shadows:

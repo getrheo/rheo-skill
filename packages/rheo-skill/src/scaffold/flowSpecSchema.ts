@@ -30,6 +30,11 @@ const ActionObjectSchema = z.discriminatedUnion('kind', [
     }),
   }),
   z.object({ kind: z.literal('play_media'), targetLayerIds: z.array(z.string().min(1)).min(1) }),
+  z.object({
+    kind: z.literal('advance_carousel'),
+    targetLayerId: z.string().min(1),
+    onLast: z.enum(['noop', 'complete']).optional(),
+  }),
 ]);
 
 const ButtonActionSpecSchema = z.union([

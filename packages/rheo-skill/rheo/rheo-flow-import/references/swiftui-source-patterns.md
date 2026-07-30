@@ -74,7 +74,8 @@ real asset — follow the struct to its `Image("…")` to find the asset name.
 
 A paging `TabView { … }.tabViewStyle(.page)`, a horizontal `ScrollView` with snap
 paging, or an `infoSteps`/`currentStep` index → `kind: "carousel"`, one slide per
-page, swipe-only (no in-pager button) ([carousel-import.md](carousel-import.md)).
+page. Paging is swipe by default; an explicit Next button becomes a `button` with
+`action.kind: "advance_carousel"` ([carousel-import.md](carousel-import.md)).
 
 ## Integrations and native steps
 

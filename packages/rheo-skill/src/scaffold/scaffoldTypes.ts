@@ -25,7 +25,8 @@ export type ButtonActionSpec =
       permissionKey: OsPermissionKey;
       outcomes: { granted: string; denied: string; blocked: string };
     }
-  | { kind: 'play_media'; targetLayerIds: string[] };
+  | { kind: 'play_media'; targetLayerIds: string[] }
+  | { kind: 'advance_carousel'; targetLayerId: string; onLast?: 'noop' | 'complete' };
 
 export type BranchingSpec = {
   enabled: boolean;

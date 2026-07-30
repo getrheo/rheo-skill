@@ -23,7 +23,7 @@ See [layer-schema-pitfalls.md](layer-schema-pitfalls.md) for common id mistakes 
 
 ## Layer Kinds
 
-Allowed kinds: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_button`, `progress`, `loader`, `counter`, `single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`, `oauth_provider`, `oauth_login`, `email_password_auth`, `email_password_field`, `email_password_submit`, `carousel`, `hyperlink`, `checkbox`.
+Allowed kinds: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_button`, `progress`, `loader`, `counter`, `single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`, `oauth_provider`, `oauth_login`, `email_password_auth`, `email_password_field`, `email_password_submit`, `carousel`, `hyperlink`, `checkbox`, `conditional`.
 
 ## Regions
 
@@ -56,8 +56,9 @@ Map clear brand values into `manifest.theme` and layer styles. Set `style.color`
 
 - In-screen pagers (`infoSteps`, horizontal pager, dot indicators) → `kind: "carousel"` with one slide stack per page.
 - Do not collapse multi-slide routes to one static screen.
-- `pageControl` is optional dot chrome only. Carousels are swipe-only (no pager buttons).
-- Do not duplicate paging with `regions.footer` Continue when the source footer only increments pager index. See [carousel-import.md](carousel-import.md).
+- `pageControl` is optional dot chrome only; the carousel layer has no built-in paging buttons.
+- An explicit source Next control becomes a `button` with `action: { "kind": "advance_carousel", "targetLayerId": "<carousel id>" }` on the same screen.
+- Do not duplicate paging with a `regions.footer` Continue when the source footer only increments pager index. See [carousel-import.md](carousel-import.md).
 
 ## Layout
 
@@ -143,6 +144,7 @@ When source uses a chevron-only back control, still nest an `icon` child (and op
 - **`back_button`** has no `action` field; navigation is built-in. Use in `regions.header` for back/close chrome.
 - Prefer `continue`, `skip`, and `end_flow` actions for imported first drafts (on `button` only).
 - **`request_app_review`** is allowed for human/explicit requests only (not default imports): empty action object, requires `screen.next.default`, single CTA after a positive moment.
+- **`advance_carousel`** is for a source pager's own Next control: `targetLayerId` must be a `carousel` on the same screen, and optional `onLast` is `noop` (default) or `complete`.
 
 ## Custom Fonts
 
@@ -167,7 +169,7 @@ Full template: [layer-schema-pitfalls.md](layer-schema-pitfalls.md#single_choice
 
 ## Inputs
 
-- Use at most one input layer kind per screen (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`).
+- Use at most one input layer kind per **active path** (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`) — one per screen unless sibling `conditional` branches split the path.
 - Use stable snake_case `fieldKey` values.
 - Mark text input classification as `safe` or `sensitive`.
 - `wheel_picker` captures a string (options or date part); no layer branching — use `dec_*` with string predicates.
@@ -177,6 +179,19 @@ Full template: [layer-schema-pitfalls.md](layer-schema-pitfalls.md#single_choice
 - Use decisions for real source-code branches.
 - Non-reserved `sdk.*` keys used in decisions must be listed in `sdkAttributeKeys`.
 - Prefer source semantics over visual guessing.
+
+## Conditionals (same-screen variants)
+
+Use `conditional` when the source renders different content on **one** screen based on locale, platform, an SDK attribute, or an answer already captured. Use `dec_*` when the source picks a different **screen**.
+
+- Ordered `cases[]` (1–16), each with a `DecisionExpr` `expression` and a `rootLayerId`; first match wins.
+- Required `elseRootLayerId` for the fallback. Every bound id is a distinct direct child `stack`.
+- Cases read only fields answered **above** the conditional — upstream screens, or same-screen inputs earlier in tree order. Never a field captured inside its own branches.
+- One input / `oauth_login` / `email_password_auth` per active path; sibling branches each get their own.
+- `fieldKey` values stay unique across the whole screen, including across branches.
+- Every case needs at least one rule before publish.
+- No `style` or layout of its own; the winning branch renders in place.
+- Do not use a conditional to reproduce a source screen that was genuinely a separate route.
 
 ## External Surfaces
 

@@ -23,7 +23,7 @@ describe('auditImport', () => {
     expect(markdown).toContain('linear-gradient');
     expect(markdown).toContain('Carousel');
     expect(markdown).toContain('infoSteps');
-    expect(markdown).toContain('swipe-only');
+    expect(markdown).toContain('advance_carousel');
     expect(markdown).toContain('align');
     expect(markdown).toContain('shadow');
     expect(markdown).toContain('Mandatory Intake Questionnaire');
