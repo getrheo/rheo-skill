@@ -4421,6 +4421,8 @@ var OsPermissionOutcomesSchema = external_exports.object({
 }).strict();
 var APP_REVIEW_OUTCOMES = ["not_shown", "dismissed"];
 var AppReviewOutcomeSchema = external_exports.enum(APP_REVIEW_OUTCOMES);
+var CAROUSEL_ADVANCE_ON_LAST = ["noop", "complete"];
+var CarouselAdvanceOnLastSchema = external_exports.enum(CAROUSEL_ADVANCE_ON_LAST);
 var ButtonActionSchema = external_exports.discriminatedUnion("kind", [
   external_exports.object({ kind: external_exports.literal("none") }),
   external_exports.object({ kind: external_exports.literal("continue") }),
@@ -4440,7 +4442,12 @@ var ButtonActionSchema = external_exports.discriminatedUnion("kind", [
     kind: external_exports.literal("play_media"),
     targetLayerIds: external_exports.array(external_exports.string().min(1)).min(1)
   }),
-  external_exports.object({ kind: external_exports.literal("request_app_review") })
+  external_exports.object({ kind: external_exports.literal("request_app_review") }),
+  external_exports.object({
+    kind: external_exports.literal("advance_carousel"),
+    targetLayerId: external_exports.string().min(1),
+    onLast: CarouselAdvanceOnLastSchema.optional()
+  })
 ]);
 var TEXT_INPUT_TYPES = ["plain", "email", "phone", "url", "number", "multiline"];
 var TextInputTypeSchema = external_exports.enum(TEXT_INPUT_TYPES);
@@ -5183,6 +5190,83 @@ var CarouselLayerSchema = external_exports.object({
   styleBreakpoints: CommonStyleBreakpointsSchema,
   carouselLayoutBreakpoints: CarouselLayoutBreakpointsSchema
 });
+var DecisionBuiltinNameSchema = external_exports.enum(["locale", "platform"]);
+var DecisionVariableRefSchema = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema }),
+  external_exports.object({ kind: external_exports.literal("sdk"), key: external_exports.string().min(1).max(128) }),
+  external_exports.object({ kind: external_exports.literal("field"), fieldKey: external_exports.string().min(1).max(128) })
+]);
+var DecisionStringPredicateSchema = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("contains"), value: external_exports.string() })
+]);
+var DecisionNumberPredicateSchema = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lte"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gte"), value: external_exports.number() })
+]);
+var DecisionChoicePredicateSchema = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), optionId: external_exports.string().min(1) }),
+  external_exports.object({ op: external_exports.literal("one_of"), optionIds: external_exports.array(external_exports.string().min(1)).min(1) })
+]);
+var DecisionMultiPredicateSchema = external_exports.discriminatedUnion("op", [
+  external_exports.object({
+    op: external_exports.literal("intersects"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("contains_all"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("subset_of"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  })
+]);
+var DecisionBooleanPredicateSchema = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.boolean() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.boolean() })
+]);
+var DecisionPredicatePayloadSchema = external_exports.discriminatedUnion("type", [
+  external_exports.object({ type: external_exports.literal("string"), pred: DecisionStringPredicateSchema }),
+  external_exports.object({ type: external_exports.literal("number"), pred: DecisionNumberPredicateSchema }),
+  external_exports.object({ type: external_exports.literal("boolean"), pred: DecisionBooleanPredicateSchema }),
+  external_exports.object({ type: external_exports.literal("choice"), pred: DecisionChoicePredicateSchema }),
+  external_exports.object({ type: external_exports.literal("multi"), pred: DecisionMultiPredicateSchema })
+]);
+var DecisionExprSchema = external_exports.lazy(
+  () => external_exports.discriminatedUnion("kind", [
+    external_exports.object({ kind: external_exports.literal("empty") }),
+    external_exports.object({
+      kind: external_exports.literal("group"),
+      op: external_exports.enum(["and", "or"]),
+      children: external_exports.array(DecisionExprSchema).min(1)
+    }),
+    external_exports.object({
+      kind: external_exports.literal("predicate"),
+      variable: DecisionVariableRefSchema,
+      predicate: DecisionPredicatePayloadSchema
+    })
+  ])
+);
+var CONDITIONAL_MAX_CASES = 16;
+var ConditionalCaseSchema = external_exports.object({
+  id: external_exports.string().min(1).max(80),
+  name: external_exports.string().min(1).max(80).optional(),
+  expression: DecisionExprSchema,
+  rootLayerId: LayerIdSchema
+});
+var ConditionalLayerSchema = external_exports.object({
+  ...baseLayerShape,
+  kind: external_exports.literal("conditional"),
+  cases: external_exports.array(ConditionalCaseSchema).min(1).max(CONDITIONAL_MAX_CASES),
+  elseRootLayerId: LayerIdSchema,
+  children: external_exports.lazy(() => external_exports.array(StackLayerSchema).min(2))
+});
 layerSchemaStore.schema = external_exports.lazy(
   () => external_exports.union([
     StackLayerSchema,
@@ -5209,7 +5293,8 @@ layerSchemaStore.schema = external_exports.lazy(
     EmailPasswordAuthLayerSchema,
     EmailPasswordFieldLayerSchema,
     EmailPasswordSubmitLayerSchema,
-    CarouselLayerSchema
+    CarouselLayerSchema,
+    ConditionalLayerSchema
   ])
 );
 var LayerSchema = layerSchemaStore.schema;
@@ -5589,6 +5674,8 @@ var OsPermissionOutcomesSchema2 = external_exports.object({
 }).strict();
 var APP_REVIEW_OUTCOMES2 = ["not_shown", "dismissed"];
 external_exports.enum(APP_REVIEW_OUTCOMES2);
+var CAROUSEL_ADVANCE_ON_LAST2 = ["noop", "complete"];
+var CarouselAdvanceOnLastSchema2 = external_exports.enum(CAROUSEL_ADVANCE_ON_LAST2);
 var ButtonActionSchema2 = external_exports.discriminatedUnion("kind", [
   external_exports.object({ kind: external_exports.literal("none") }),
   external_exports.object({ kind: external_exports.literal("continue") }),
@@ -5608,7 +5695,12 @@ var ButtonActionSchema2 = external_exports.discriminatedUnion("kind", [
     kind: external_exports.literal("play_media"),
     targetLayerIds: external_exports.array(external_exports.string().min(1)).min(1)
   }),
-  external_exports.object({ kind: external_exports.literal("request_app_review") })
+  external_exports.object({ kind: external_exports.literal("request_app_review") }),
+  external_exports.object({
+    kind: external_exports.literal("advance_carousel"),
+    targetLayerId: external_exports.string().min(1),
+    onLast: CarouselAdvanceOnLastSchema2.optional()
+  })
 ]);
 var TEXT_INPUT_TYPES2 = ["plain", "email", "phone", "url", "number", "multiline"];
 var TextInputTypeSchema2 = external_exports.enum(TEXT_INPUT_TYPES2);
@@ -6351,6 +6443,101 @@ var CarouselLayerSchema2 = external_exports.object({
   styleBreakpoints: CommonStyleBreakpointsSchema2,
   carouselLayoutBreakpoints: CarouselLayoutBreakpointsSchema2
 });
+var DecisionBuiltinNameSchema2 = external_exports.enum(["locale", "platform"]);
+var DecisionVariableRefSchema2 = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema2 }),
+  external_exports.object({ kind: external_exports.literal("sdk"), key: external_exports.string().min(1).max(128) }),
+  external_exports.object({ kind: external_exports.literal("field"), fieldKey: external_exports.string().min(1).max(128) })
+]);
+var DecisionStringPredicateSchema2 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("contains"), value: external_exports.string() })
+]);
+var DecisionNumberPredicateSchema2 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lte"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gte"), value: external_exports.number() })
+]);
+var DecisionChoicePredicateSchema2 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), optionId: external_exports.string().min(1) }),
+  external_exports.object({ op: external_exports.literal("one_of"), optionIds: external_exports.array(external_exports.string().min(1)).min(1) })
+]);
+var DecisionMultiPredicateSchema2 = external_exports.discriminatedUnion("op", [
+  external_exports.object({
+    op: external_exports.literal("intersects"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("contains_all"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("subset_of"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  })
+]);
+var DecisionBooleanPredicateSchema2 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.boolean() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.boolean() })
+]);
+var DecisionPredicatePayloadSchema2 = external_exports.discriminatedUnion("type", [
+  external_exports.object({ type: external_exports.literal("string"), pred: DecisionStringPredicateSchema2 }),
+  external_exports.object({ type: external_exports.literal("number"), pred: DecisionNumberPredicateSchema2 }),
+  external_exports.object({ type: external_exports.literal("boolean"), pred: DecisionBooleanPredicateSchema2 }),
+  external_exports.object({ type: external_exports.literal("choice"), pred: DecisionChoicePredicateSchema2 }),
+  external_exports.object({ type: external_exports.literal("multi"), pred: DecisionMultiPredicateSchema2 })
+]);
+var DecisionExprSchema2 = external_exports.lazy(
+  () => external_exports.discriminatedUnion("kind", [
+    external_exports.object({ kind: external_exports.literal("empty") }),
+    external_exports.object({
+      kind: external_exports.literal("group"),
+      op: external_exports.enum(["and", "or"]),
+      children: external_exports.array(DecisionExprSchema2).min(1)
+    }),
+    external_exports.object({
+      kind: external_exports.literal("predicate"),
+      variable: DecisionVariableRefSchema2,
+      predicate: DecisionPredicatePayloadSchema2
+    })
+  ])
+);
+var collectDecisionFieldKeys = (expr) => {
+  const out = [];
+  const walk = (e) => {
+    if (e.kind === "empty") return;
+    if (e.kind === "predicate") {
+      if (e.variable.kind === "field") out.push(e.variable.fieldKey);
+      return;
+    }
+    for (const c of e.children) walk(c);
+  };
+  walk(expr);
+  return out;
+};
+var decisionExprHasPredicate = (expr) => {
+  if (expr.kind === "empty") return false;
+  if (expr.kind === "predicate") return true;
+  return expr.children.some(decisionExprHasPredicate);
+};
+var CONDITIONAL_MAX_CASES2 = 16;
+var ConditionalCaseSchema2 = external_exports.object({
+  id: external_exports.string().min(1).max(80),
+  name: external_exports.string().min(1).max(80).optional(),
+  expression: DecisionExprSchema2,
+  rootLayerId: LayerIdSchema2
+});
+var ConditionalLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("conditional"),
+  cases: external_exports.array(ConditionalCaseSchema2).min(1).max(CONDITIONAL_MAX_CASES2),
+  elseRootLayerId: LayerIdSchema2,
+  children: external_exports.lazy(() => external_exports.array(StackLayerSchema2).min(2))
+});
 layerSchemaStore2.schema = external_exports.lazy(
   () => external_exports.union([
     StackLayerSchema2,
@@ -6377,7 +6564,8 @@ layerSchemaStore2.schema = external_exports.lazy(
     EmailPasswordAuthLayerSchema2,
     EmailPasswordFieldLayerSchema2,
     EmailPasswordSubmitLayerSchema2,
-    CarouselLayerSchema2
+    CarouselLayerSchema2,
+    ConditionalLayerSchema2
   ])
 );
 var DecisionNodeIdSchema = external_exports.string().min(1).max(64).regex(/^dec_[a-z0-9_]+$/i, "decision node id must look like dec_<id>");
@@ -6385,74 +6573,11 @@ var ExternalSurfaceJumpIdSchema22 = external_exports.string().min(1).max(64).reg
 var EXTERNAL_SURFACE_NO_NEXT = "__onb_surface_no_next__";
 var ExternalSurfaceTerminalTargetSchema = external_exports.literal(EXTERNAL_SURFACE_NO_NEXT);
 var FlowJumpTargetSchema = ScreenIdSchema2.or(DecisionNodeIdSchema).or(ExternalSurfaceJumpIdSchema22).or(ExternalSurfaceTerminalTargetSchema).nullable();
-var DecisionBuiltinNameSchema = external_exports.enum(["locale", "platform"]);
-var DecisionVariableRefSchema = external_exports.discriminatedUnion("kind", [
-  external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema }),
-  external_exports.object({ kind: external_exports.literal("sdk"), key: external_exports.string().min(1).max(128) }),
-  external_exports.object({ kind: external_exports.literal("field"), fieldKey: external_exports.string().min(1).max(128) })
-]);
-var DecisionStringPredicateSchema = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.string() }),
-  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.string() }),
-  external_exports.object({ op: external_exports.literal("contains"), value: external_exports.string() })
-]);
-var DecisionNumberPredicateSchema = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("lt"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("lte"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("gt"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("gte"), value: external_exports.number() })
-]);
-var DecisionChoicePredicateSchema = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), optionId: external_exports.string().min(1) }),
-  external_exports.object({ op: external_exports.literal("one_of"), optionIds: external_exports.array(external_exports.string().min(1)).min(1) })
-]);
-var DecisionMultiPredicateSchema = external_exports.discriminatedUnion("op", [
-  external_exports.object({
-    op: external_exports.literal("intersects"),
-    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
-  }),
-  external_exports.object({
-    op: external_exports.literal("contains_all"),
-    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
-  }),
-  external_exports.object({
-    op: external_exports.literal("subset_of"),
-    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
-  })
-]);
-var DecisionBooleanPredicateSchema = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.boolean() }),
-  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.boolean() })
-]);
-var DecisionPredicatePayloadSchema = external_exports.discriminatedUnion("type", [
-  external_exports.object({ type: external_exports.literal("string"), pred: DecisionStringPredicateSchema }),
-  external_exports.object({ type: external_exports.literal("number"), pred: DecisionNumberPredicateSchema }),
-  external_exports.object({ type: external_exports.literal("boolean"), pred: DecisionBooleanPredicateSchema }),
-  external_exports.object({ type: external_exports.literal("choice"), pred: DecisionChoicePredicateSchema }),
-  external_exports.object({ type: external_exports.literal("multi"), pred: DecisionMultiPredicateSchema })
-]);
-var DecisionExprSchema = external_exports.lazy(
-  () => external_exports.discriminatedUnion("kind", [
-    external_exports.object({ kind: external_exports.literal("empty") }),
-    external_exports.object({
-      kind: external_exports.literal("group"),
-      op: external_exports.enum(["and", "or"]),
-      children: external_exports.array(DecisionExprSchema).min(1)
-    }),
-    external_exports.object({
-      kind: external_exports.literal("predicate"),
-      variable: DecisionVariableRefSchema,
-      predicate: DecisionPredicatePayloadSchema
-    })
-  ])
-);
 var DecisionCaseSchema = external_exports.object({
   id: external_exports.string().min(1).max(80),
   /** Display label in the editor (e.g. “Engaged users”). */
   name: external_exports.string().min(1).max(80).optional(),
-  expression: DecisionExprSchema,
+  expression: DecisionExprSchema2,
   next: FlowJumpTargetSchema
 });
 var DecisionNodeSchema = external_exports.object({
@@ -6461,19 +6586,6 @@ var DecisionNodeSchema = external_exports.object({
   cases: external_exports.array(DecisionCaseSchema).min(1).max(16),
   elseNext: FlowJumpTargetSchema
 });
-var collectDecisionFieldKeys = (expr) => {
-  const out = [];
-  const walk = (e) => {
-    if (e.kind === "empty") return;
-    if (e.kind === "predicate") {
-      if (e.variable.kind === "field") out.push(e.variable.fieldKey);
-      return;
-    }
-    for (const c of e.children) walk(c);
-  };
-  walk(expr);
-  return out;
-};
 var collectDecisionFieldKeysFromNode = (node) => {
   const seen = /* @__PURE__ */ new Set();
   for (const c of node.cases) {
@@ -6878,6 +6990,8 @@ var OsPermissionOutcomesSchema3 = external_exports.object({
 }).strict();
 var APP_REVIEW_OUTCOMES3 = ["not_shown", "dismissed"];
 var AppReviewOutcomeSchema2 = external_exports.enum(APP_REVIEW_OUTCOMES3);
+var CAROUSEL_ADVANCE_ON_LAST3 = ["noop", "complete"];
+var CarouselAdvanceOnLastSchema3 = external_exports.enum(CAROUSEL_ADVANCE_ON_LAST3);
 var ButtonActionSchema3 = external_exports.discriminatedUnion("kind", [
   external_exports.object({ kind: external_exports.literal("none") }),
   external_exports.object({ kind: external_exports.literal("continue") }),
@@ -6897,7 +7011,12 @@ var ButtonActionSchema3 = external_exports.discriminatedUnion("kind", [
     kind: external_exports.literal("play_media"),
     targetLayerIds: external_exports.array(external_exports.string().min(1)).min(1)
   }),
-  external_exports.object({ kind: external_exports.literal("request_app_review") })
+  external_exports.object({ kind: external_exports.literal("request_app_review") }),
+  external_exports.object({
+    kind: external_exports.literal("advance_carousel"),
+    targetLayerId: external_exports.string().min(1),
+    onLast: CarouselAdvanceOnLastSchema3.optional()
+  })
 ]);
 var TEXT_INPUT_TYPES3 = ["plain", "email", "phone", "url", "number", "multiline"];
 var TextInputTypeSchema3 = external_exports.enum(TEXT_INPUT_TYPES3);
@@ -7685,6 +7804,154 @@ var CarouselLayerSchema3 = external_exports.object({
   styleBreakpoints: CommonStyleBreakpointsSchema3,
   carouselLayoutBreakpoints: CarouselLayoutBreakpointsSchema3
 });
+var DecisionBuiltinNameSchema3 = external_exports.enum(["locale", "platform"]);
+var DecisionVariableRefSchema3 = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema3 }),
+  external_exports.object({ kind: external_exports.literal("sdk"), key: external_exports.string().min(1).max(128) }),
+  external_exports.object({ kind: external_exports.literal("field"), fieldKey: external_exports.string().min(1).max(128) })
+]);
+var DecisionStringPredicateSchema3 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("contains"), value: external_exports.string() })
+]);
+var DecisionNumberPredicateSchema3 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lte"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gte"), value: external_exports.number() })
+]);
+var DecisionChoicePredicateSchema3 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), optionId: external_exports.string().min(1) }),
+  external_exports.object({ op: external_exports.literal("one_of"), optionIds: external_exports.array(external_exports.string().min(1)).min(1) })
+]);
+var DecisionMultiPredicateSchema3 = external_exports.discriminatedUnion("op", [
+  external_exports.object({
+    op: external_exports.literal("intersects"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("contains_all"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("subset_of"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  })
+]);
+var DecisionBooleanPredicateSchema3 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.boolean() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.boolean() })
+]);
+var DecisionPredicatePayloadSchema3 = external_exports.discriminatedUnion("type", [
+  external_exports.object({ type: external_exports.literal("string"), pred: DecisionStringPredicateSchema3 }),
+  external_exports.object({ type: external_exports.literal("number"), pred: DecisionNumberPredicateSchema3 }),
+  external_exports.object({ type: external_exports.literal("boolean"), pred: DecisionBooleanPredicateSchema3 }),
+  external_exports.object({ type: external_exports.literal("choice"), pred: DecisionChoicePredicateSchema3 }),
+  external_exports.object({ type: external_exports.literal("multi"), pred: DecisionMultiPredicateSchema3 })
+]);
+var DecisionExprSchema3 = external_exports.lazy(
+  () => external_exports.discriminatedUnion("kind", [
+    external_exports.object({ kind: external_exports.literal("empty") }),
+    external_exports.object({
+      kind: external_exports.literal("group"),
+      op: external_exports.enum(["and", "or"]),
+      children: external_exports.array(DecisionExprSchema3).min(1)
+    }),
+    external_exports.object({
+      kind: external_exports.literal("predicate"),
+      variable: DecisionVariableRefSchema3,
+      predicate: DecisionPredicatePayloadSchema3
+    })
+  ])
+);
+var collectDecisionSdkKeys = (expr) => {
+  const out = [];
+  const walk = (e) => {
+    if (e.kind === "empty") return;
+    if (e.kind === "predicate") {
+      if (e.variable.kind === "sdk") out.push(e.variable.key);
+      return;
+    }
+    for (const c of e.children) walk(c);
+  };
+  walk(expr);
+  return out;
+};
+var collectDecisionFieldKeys2 = (expr) => {
+  const out = [];
+  const walk = (e) => {
+    if (e.kind === "empty") return;
+    if (e.kind === "predicate") {
+      if (e.variable.kind === "field") out.push(e.variable.fieldKey);
+      return;
+    }
+    for (const c of e.children) walk(c);
+  };
+  walk(expr);
+  return out;
+};
+var CONDITIONAL_MAX_CASES3 = 16;
+var ConditionalCaseSchema3 = external_exports.object({
+  id: external_exports.string().min(1).max(80),
+  name: external_exports.string().min(1).max(80).optional(),
+  expression: DecisionExprSchema3,
+  rootLayerId: LayerIdSchema3
+});
+var ConditionalLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("conditional"),
+  cases: external_exports.array(ConditionalCaseSchema3).min(1).max(CONDITIONAL_MAX_CASES3),
+  elseRootLayerId: LayerIdSchema3,
+  children: external_exports.lazy(() => external_exports.array(StackLayerSchema3).min(2))
+});
+var validateConditionalCasesAndBindings = (data, ctx) => {
+  const childIds = new Set(data.children.map((c) => c.id));
+  const boundRootIds = /* @__PURE__ */ new Set();
+  const caseIds = /* @__PURE__ */ new Set();
+  const claimRoot = (rootLayerId, path) => {
+    if (!childIds.has(rootLayerId)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `conditional rootLayerId "${rootLayerId}" does not match any direct child stack`,
+        path
+      });
+      return;
+    }
+    if (boundRootIds.has(rootLayerId)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `conditional child stack "${rootLayerId}" is bound to more than one branch`,
+        path
+      });
+      return;
+    }
+    boundRootIds.add(rootLayerId);
+  };
+  data.cases.forEach((c, idx) => {
+    if (caseIds.has(c.id)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate conditional case id "${c.id}"`,
+        path: ["cases", idx, "id"]
+      });
+    }
+    caseIds.add(c.id);
+    claimRoot(c.rootLayerId, ["cases", idx, "rootLayerId"]);
+  });
+  claimRoot(data.elseRootLayerId, ["elseRootLayerId"]);
+  for (const child of data.children) {
+    if (!boundRootIds.has(child.id)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `conditional child stack "${child.id}" is not bound to a case or the else branch`,
+        path: ["children"]
+      });
+    }
+  }
+};
 layerSchemaStore3.schema = external_exports.lazy(
   () => external_exports.union([
     StackLayerSchema3,
@@ -7711,11 +7978,38 @@ layerSchemaStore3.schema = external_exports.lazy(
     EmailPasswordAuthLayerSchema3,
     EmailPasswordFieldLayerSchema3,
     EmailPasswordSubmitLayerSchema3,
-    CarouselLayerSchema3
+    CarouselLayerSchema3,
+    ConditionalLayerSchema3
   ])
 );
 var LayerSchema2 = layerSchemaStore3.schema;
 var STYLE_BREAKPOINT_KEYS = ["sm", "md", "lg", "xl", "2xl"];
+var layerChildren = (layer) => {
+  switch (layer.kind) {
+    case "stack":
+    case "conditional":
+    case "button":
+    case "back_button":
+    case "hyperlink":
+    case "single_choice":
+    case "multiple_choice":
+    case "oauth_login":
+    case "email_password_auth":
+    case "email_password_submit":
+      return layer.children;
+    case "carousel":
+      return layer.slides;
+    case "text_input":
+    case "scale_input":
+    case "wheel_picker":
+    case "email_password_field":
+      return layer.children ?? [];
+    case "oauth_provider":
+      return layer.variant === "custom" ? layer.children : [];
+    default:
+      return [];
+  }
+};
 var commonStyleHasAbsolutePosition = (style, breakpoints) => {
   if (style?.position === "absolute") return true;
   if (!breakpoints) return false;
@@ -7931,74 +8225,11 @@ var ExternalSurfaceJumpIdSchema23 = external_exports.string().min(1).max(64).reg
 var EXTERNAL_SURFACE_NO_NEXT2 = "__onb_surface_no_next__";
 var ExternalSurfaceTerminalTargetSchema2 = external_exports.literal(EXTERNAL_SURFACE_NO_NEXT2);
 var FlowJumpTargetSchema2 = ScreenIdSchema3.or(DecisionNodeIdSchema2).or(ExternalSurfaceJumpIdSchema23).or(ExternalSurfaceTerminalTargetSchema2).nullable();
-var DecisionBuiltinNameSchema2 = external_exports.enum(["locale", "platform"]);
-var DecisionVariableRefSchema2 = external_exports.discriminatedUnion("kind", [
-  external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema2 }),
-  external_exports.object({ kind: external_exports.literal("sdk"), key: external_exports.string().min(1).max(128) }),
-  external_exports.object({ kind: external_exports.literal("field"), fieldKey: external_exports.string().min(1).max(128) })
-]);
-var DecisionStringPredicateSchema2 = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.string() }),
-  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.string() }),
-  external_exports.object({ op: external_exports.literal("contains"), value: external_exports.string() })
-]);
-var DecisionNumberPredicateSchema2 = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("lt"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("lte"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("gt"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("gte"), value: external_exports.number() })
-]);
-var DecisionChoicePredicateSchema2 = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), optionId: external_exports.string().min(1) }),
-  external_exports.object({ op: external_exports.literal("one_of"), optionIds: external_exports.array(external_exports.string().min(1)).min(1) })
-]);
-var DecisionMultiPredicateSchema2 = external_exports.discriminatedUnion("op", [
-  external_exports.object({
-    op: external_exports.literal("intersects"),
-    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
-  }),
-  external_exports.object({
-    op: external_exports.literal("contains_all"),
-    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
-  }),
-  external_exports.object({
-    op: external_exports.literal("subset_of"),
-    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
-  })
-]);
-var DecisionBooleanPredicateSchema2 = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.boolean() }),
-  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.boolean() })
-]);
-var DecisionPredicatePayloadSchema2 = external_exports.discriminatedUnion("type", [
-  external_exports.object({ type: external_exports.literal("string"), pred: DecisionStringPredicateSchema2 }),
-  external_exports.object({ type: external_exports.literal("number"), pred: DecisionNumberPredicateSchema2 }),
-  external_exports.object({ type: external_exports.literal("boolean"), pred: DecisionBooleanPredicateSchema2 }),
-  external_exports.object({ type: external_exports.literal("choice"), pred: DecisionChoicePredicateSchema2 }),
-  external_exports.object({ type: external_exports.literal("multi"), pred: DecisionMultiPredicateSchema2 })
-]);
-var DecisionExprSchema2 = external_exports.lazy(
-  () => external_exports.discriminatedUnion("kind", [
-    external_exports.object({ kind: external_exports.literal("empty") }),
-    external_exports.object({
-      kind: external_exports.literal("group"),
-      op: external_exports.enum(["and", "or"]),
-      children: external_exports.array(DecisionExprSchema2).min(1)
-    }),
-    external_exports.object({
-      kind: external_exports.literal("predicate"),
-      variable: DecisionVariableRefSchema2,
-      predicate: DecisionPredicatePayloadSchema2
-    })
-  ])
-);
 var DecisionCaseSchema2 = external_exports.object({
   id: external_exports.string().min(1).max(80),
   /** Display label in the editor (e.g. “Engaged users”). */
   name: external_exports.string().min(1).max(80).optional(),
-  expression: DecisionExprSchema2,
+  expression: DecisionExprSchema3,
   next: FlowJumpTargetSchema2
 });
 var DecisionNodeSchema2 = external_exports.object({
@@ -8027,32 +8258,6 @@ var migrateLegacyDecisionNodeInPlace = (node) => {
     }
   ];
   node.elseNext = onFalse;
-};
-var collectDecisionSdkKeys = (expr) => {
-  const out = [];
-  const walk = (e) => {
-    if (e.kind === "empty") return;
-    if (e.kind === "predicate") {
-      if (e.variable.kind === "sdk") out.push(e.variable.key);
-      return;
-    }
-    for (const c of e.children) walk(c);
-  };
-  walk(expr);
-  return out;
-};
-var collectDecisionFieldKeys2 = (expr) => {
-  const out = [];
-  const walk = (e) => {
-    if (e.kind === "empty") return;
-    if (e.kind === "predicate") {
-      if (e.variable.kind === "field") out.push(e.variable.fieldKey);
-      return;
-    }
-    for (const c of e.children) walk(c);
-  };
-  walk(expr);
-  return out;
 };
 var collectDecisionFieldKeysFromNode2 = (node) => {
   const seen = /* @__PURE__ */ new Set();
@@ -8102,6 +8307,8 @@ var walkScreenLayersWithLayoutContext = (screen, fn) => {
       for (const c of l.children) visit(c, childCtx());
     } else if (l.kind === "carousel") {
       for (const s of l.slides) visit(s, childCtx());
+    } else if (l.kind === "conditional") {
+      for (const c of l.children) visit(c, childCtx());
     } else if (l.kind === "button" || l.kind === "back_button") {
       for (const c of l.children) visit(c, childCtx());
     } else if (l.kind === "hyperlink") {
@@ -8139,6 +8346,7 @@ var walkScreenLayers = (screen, fn) => {
     fn(l);
     if (l.kind === "stack") l.children.forEach(visit);
     else if (l.kind === "carousel") l.slides.forEach(visit);
+    else if (l.kind === "conditional") l.children.forEach(visit);
     else if (l.kind === "button") l.children.forEach(visit);
     else if (l.kind === "back_button") l.children.forEach(visit);
     else if (l.kind === "hyperlink") l.children.forEach(visit);
@@ -8161,6 +8369,57 @@ var walkScreenLayers = (screen, fn) => {
   if (screen.regions.header) visit(screen.regions.header);
   visit(screen.regions.body);
   if (screen.regions.footer) visit(screen.regions.footer);
+};
+var maxMatchesOnActivePath = (root, match) => {
+  const self = match(root) ? 1 : 0;
+  if (root.kind === "conditional") {
+    let widest = 0;
+    for (const branch of root.children) {
+      widest = Math.max(widest, maxMatchesOnActivePath(branch, match));
+    }
+    return self + widest;
+  }
+  let total = 0;
+  for (const child of layerChildren(root)) {
+    total += maxMatchesOnActivePath(child, match);
+  }
+  return self + total;
+};
+var maxMatchesOnScreenActivePath = (screen, match) => {
+  const { header, body, footer } = screen.regions;
+  return (header ? maxMatchesOnActivePath(header, match) : 0) + maxMatchesOnActivePath(body, match) + (footer ? maxMatchesOnActivePath(footer, match) : 0);
+};
+var answerFieldKeyOf = (l) => {
+  if (isInputLayer2(l)) return l.fieldKey;
+  if (l.kind === "checkbox") return l.fieldKey;
+  if (l.kind === "email_password_auth") return l.fieldKey;
+  return null;
+};
+var conditionalFieldScopeViolations = (screen) => {
+  const fieldOrderOnScreen = /* @__PURE__ */ new Map();
+  const conditionals = [];
+  let order = 0;
+  walkScreenLayers(screen, (l) => {
+    const fieldKey = answerFieldKeyOf(l);
+    if (fieldKey != null && !fieldOrderOnScreen.has(fieldKey)) {
+      fieldOrderOnScreen.set(fieldKey, order);
+    }
+    if (l.kind === "conditional") conditionals.push({ layer: l, order });
+    order += 1;
+  });
+  const violations = [];
+  for (const { layer, order: conditionalOrder } of conditionals) {
+    layer.cases.forEach((c, caseIndex) => {
+      for (const fieldKey of collectDecisionFieldKeys2(c.expression)) {
+        const declaredAt = fieldOrderOnScreen.get(fieldKey);
+        if (declaredAt === void 0) continue;
+        if (declaredAt >= conditionalOrder) {
+          violations.push({ conditionalId: layer.id, caseId: c.id, caseIndex, fieldKey });
+        }
+      }
+    });
+  }
+  return violations;
 };
 var ExternalSurfaceNodeIdSchema = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
 var NORMALIZED_SURFACE_OUTCOMES = [
@@ -8292,6 +8551,8 @@ var migrateLayerInPlace = (layer) => {
     for (const c of l.children) migrateLayerInPlace(c);
   } else if (l.kind === "carousel" && Array.isArray(l.slides)) {
     for (const s of l.slides) migrateLayerInPlace(s);
+  } else if (l.kind === "conditional" && Array.isArray(l.children)) {
+    for (const c of l.children) migrateLayerInPlace(c);
   } else if (l.kind === "button" && Array.isArray(l.children)) {
     for (const c of l.children) migrateLayerInPlace(c);
   } else if (l.kind === "back_button" && Array.isArray(l.children)) {
@@ -8493,8 +8754,8 @@ var refineManifestGraph = (manifest, ctx, jumpTargets) => {
 };
 var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys) => {
   const layerIds = /* @__PURE__ */ new Set();
+  const sdkAllow = new Set(manifest.sdkAttributeKeys);
   manifest.screens.forEach((screen, screenIdx) => {
-    let inputCount = 0;
     const layerIdsForScreen = /* @__PURE__ */ new Set();
     walkScreenLayers(screen, (l) => {
       layerIdsForScreen.add(l.id);
@@ -8509,7 +8770,6 @@ var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys
       }
       layerIds.add(l.id);
       if (isInputLayer2(l)) {
-        inputCount += 1;
         if (allFieldKeys.has(l.fieldKey)) {
           ctx.addIssue({
             code: external_exports.ZodIssueCode.custom,
@@ -8534,10 +8794,18 @@ var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys
         if (!allFieldKeys.has(fk)) allFieldKeys.set(fk, screen.id);
       }
     });
-    if (inputCount > 1) {
+    const inputsOnPath = maxMatchesOnScreenActivePath(screen, isInputLayer2);
+    if (inputsOnPath > 1) {
       ctx.addIssue({
         code: external_exports.ZodIssueCode.custom,
-        message: `screen "${screen.id}" has ${inputCount} input layers (max 1 allowed)`,
+        message: `screen "${screen.id}" can show ${inputsOnPath} input layers at once (max 1 allowed)`,
+        path: ["screens", screenIdx, "regions"]
+      });
+    }
+    for (const v of conditionalFieldScopeViolations(screen)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `conditional "${v.conditionalId}" case "${v.caseId}" reads fieldKey "${v.fieldKey}" that is answered at or after it on the same screen`,
         path: ["screens", screenIdx, "regions"]
       });
     }
@@ -8603,6 +8871,21 @@ var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys
               message: `screen "${screen.id}" branch condition references unknown choice "${cond.choiceId}"`,
               path: ["screens", screenIdx]
             });
+          }
+        }
+      }
+      if (l.kind === "conditional") {
+        validateConditionalCasesAndBindings(l, ctx);
+        for (const c of l.cases) {
+          for (const sk of collectDecisionSdkKeys(c.expression)) {
+            if (isReservedSdkKey(sk)) continue;
+            if (!sdkAllow.has(sk)) {
+              ctx.addIssue({
+                code: external_exports.ZodIssueCode.custom,
+                message: `conditional "${l.id}" case "${c.id}" references sdk key "${sk}" not in sdkAttributeKeys`,
+                path: ["screens", screenIdx]
+              });
+            }
           }
         }
       }
@@ -8757,6 +9040,22 @@ var refineFlowManifest = (manifest, ctx) => {
       }
     }
   });
+  manifest.screens.forEach((screen, screenIdx) => {
+    walkScreenLayers(screen, (l) => {
+      if (l.kind !== "conditional") return;
+      for (const c of l.cases) {
+        for (const fk of collectDecisionFieldKeys2(c.expression)) {
+          if (!allFieldKeys.has(fk)) {
+            ctx.addIssue({
+              code: external_exports.ZodIssueCode.custom,
+              message: `conditional "${l.id}" case "${c.id}" references unknown fieldKey "${fk}"`,
+              path: ["screens", screenIdx, "regions"]
+            });
+          }
+        }
+      }
+    });
+  });
   if (manifest.locales.length > 0 && !manifest.locales.includes(manifest.defaultLocale)) {
     ctx.addIssue({
       code: external_exports.ZodIssueCode.custom,
@@ -8839,7 +9138,10 @@ var FontStyleSchema = external_exports.object({
   label: external_exports.string().max(40).optional(),
   /** MediaAsset id of the uploaded font file. */
   mediaAssetId: external_exports.string().uuid().optional(),
-  /** Public URL of the uploaded font file (denormalized for SDK consumption). */
+  /**
+   * Access URL for the uploaded font file (denormalized for SDK consumption).
+   * Freshly signed on SDK resolve and dashboard app reads; do not persist as long-lived.
+   */
   url: external_exports.string().url().optional(),
   /** Original filename — useful for display. */
   filename: external_exports.string().max(200).optional()
@@ -9450,6 +9752,8 @@ var OsPermissionOutcomesSchema4 = external_exports.object({
 }).strict();
 var APP_REVIEW_OUTCOMES4 = ["not_shown", "dismissed"];
 external_exports.enum(APP_REVIEW_OUTCOMES4);
+var CAROUSEL_ADVANCE_ON_LAST4 = ["noop", "complete"];
+var CarouselAdvanceOnLastSchema4 = external_exports.enum(CAROUSEL_ADVANCE_ON_LAST4);
 var ButtonActionSchema4 = external_exports.discriminatedUnion("kind", [
   external_exports.object({ kind: external_exports.literal("none") }),
   external_exports.object({ kind: external_exports.literal("continue") }),
@@ -9469,7 +9773,12 @@ var ButtonActionSchema4 = external_exports.discriminatedUnion("kind", [
     kind: external_exports.literal("play_media"),
     targetLayerIds: external_exports.array(external_exports.string().min(1)).min(1)
   }),
-  external_exports.object({ kind: external_exports.literal("request_app_review") })
+  external_exports.object({ kind: external_exports.literal("request_app_review") }),
+  external_exports.object({
+    kind: external_exports.literal("advance_carousel"),
+    targetLayerId: external_exports.string().min(1),
+    onLast: CarouselAdvanceOnLastSchema4.optional()
+  })
 ]);
 var TEXT_INPUT_TYPES4 = ["plain", "email", "phone", "url", "number", "multiline"];
 var TextInputTypeSchema4 = external_exports.enum(TEXT_INPUT_TYPES4);
@@ -10212,6 +10521,83 @@ var CarouselLayerSchema4 = external_exports.object({
   styleBreakpoints: CommonStyleBreakpointsSchema4,
   carouselLayoutBreakpoints: CarouselLayoutBreakpointsSchema4
 });
+var DecisionBuiltinNameSchema4 = external_exports.enum(["locale", "platform"]);
+var DecisionVariableRefSchema4 = external_exports.discriminatedUnion("kind", [
+  external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema4 }),
+  external_exports.object({ kind: external_exports.literal("sdk"), key: external_exports.string().min(1).max(128) }),
+  external_exports.object({ kind: external_exports.literal("field"), fieldKey: external_exports.string().min(1).max(128) })
+]);
+var DecisionStringPredicateSchema4 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.string() }),
+  external_exports.object({ op: external_exports.literal("contains"), value: external_exports.string() })
+]);
+var DecisionNumberPredicateSchema4 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("lte"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gt"), value: external_exports.number() }),
+  external_exports.object({ op: external_exports.literal("gte"), value: external_exports.number() })
+]);
+var DecisionChoicePredicateSchema4 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), optionId: external_exports.string().min(1) }),
+  external_exports.object({ op: external_exports.literal("one_of"), optionIds: external_exports.array(external_exports.string().min(1)).min(1) })
+]);
+var DecisionMultiPredicateSchema4 = external_exports.discriminatedUnion("op", [
+  external_exports.object({
+    op: external_exports.literal("intersects"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("contains_all"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  }),
+  external_exports.object({
+    op: external_exports.literal("subset_of"),
+    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
+  })
+]);
+var DecisionBooleanPredicateSchema4 = external_exports.discriminatedUnion("op", [
+  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.boolean() }),
+  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.boolean() })
+]);
+var DecisionPredicatePayloadSchema4 = external_exports.discriminatedUnion("type", [
+  external_exports.object({ type: external_exports.literal("string"), pred: DecisionStringPredicateSchema4 }),
+  external_exports.object({ type: external_exports.literal("number"), pred: DecisionNumberPredicateSchema4 }),
+  external_exports.object({ type: external_exports.literal("boolean"), pred: DecisionBooleanPredicateSchema4 }),
+  external_exports.object({ type: external_exports.literal("choice"), pred: DecisionChoicePredicateSchema4 }),
+  external_exports.object({ type: external_exports.literal("multi"), pred: DecisionMultiPredicateSchema4 })
+]);
+var DecisionExprSchema4 = external_exports.lazy(
+  () => external_exports.discriminatedUnion("kind", [
+    external_exports.object({ kind: external_exports.literal("empty") }),
+    external_exports.object({
+      kind: external_exports.literal("group"),
+      op: external_exports.enum(["and", "or"]),
+      children: external_exports.array(DecisionExprSchema4).min(1)
+    }),
+    external_exports.object({
+      kind: external_exports.literal("predicate"),
+      variable: DecisionVariableRefSchema4,
+      predicate: DecisionPredicatePayloadSchema4
+    })
+  ])
+);
+var CONDITIONAL_MAX_CASES4 = 16;
+var ConditionalCaseSchema4 = external_exports.object({
+  id: external_exports.string().min(1).max(80),
+  name: external_exports.string().min(1).max(80).optional(),
+  expression: DecisionExprSchema4,
+  rootLayerId: LayerIdSchema4
+});
+var ConditionalLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("conditional"),
+  cases: external_exports.array(ConditionalCaseSchema4).min(1).max(CONDITIONAL_MAX_CASES4),
+  elseRootLayerId: LayerIdSchema4,
+  children: external_exports.lazy(() => external_exports.array(StackLayerSchema4).min(2))
+});
 layerSchemaStore4.schema = external_exports.lazy(
   () => external_exports.union([
     StackLayerSchema4,
@@ -10238,7 +10624,8 @@ layerSchemaStore4.schema = external_exports.lazy(
     EmailPasswordAuthLayerSchema4,
     EmailPasswordFieldLayerSchema4,
     EmailPasswordSubmitLayerSchema4,
-    CarouselLayerSchema4
+    CarouselLayerSchema4,
+    ConditionalLayerSchema4
   ])
 );
 var ScreenBackgroundFitSchema2 = external_exports.enum(["cover", "contain", "fill"]);
@@ -10304,74 +10691,11 @@ var ExternalSurfaceJumpIdSchema24 = external_exports.string().min(1).max(64).reg
 var EXTERNAL_SURFACE_NO_NEXT3 = "__onb_surface_no_next__";
 var ExternalSurfaceTerminalTargetSchema3 = external_exports.literal(EXTERNAL_SURFACE_NO_NEXT3);
 var FlowJumpTargetSchema3 = ScreenIdSchema4.or(DecisionNodeIdSchema3).or(ExternalSurfaceJumpIdSchema24).or(ExternalSurfaceTerminalTargetSchema3).nullable();
-var DecisionBuiltinNameSchema3 = external_exports.enum(["locale", "platform"]);
-var DecisionVariableRefSchema3 = external_exports.discriminatedUnion("kind", [
-  external_exports.object({ kind: external_exports.literal("builtin"), name: DecisionBuiltinNameSchema3 }),
-  external_exports.object({ kind: external_exports.literal("sdk"), key: external_exports.string().min(1).max(128) }),
-  external_exports.object({ kind: external_exports.literal("field"), fieldKey: external_exports.string().min(1).max(128) })
-]);
-var DecisionStringPredicateSchema3 = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.string() }),
-  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.string() }),
-  external_exports.object({ op: external_exports.literal("contains"), value: external_exports.string() })
-]);
-var DecisionNumberPredicateSchema3 = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("lt"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("lte"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("gt"), value: external_exports.number() }),
-  external_exports.object({ op: external_exports.literal("gte"), value: external_exports.number() })
-]);
-var DecisionChoicePredicateSchema3 = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), optionId: external_exports.string().min(1) }),
-  external_exports.object({ op: external_exports.literal("one_of"), optionIds: external_exports.array(external_exports.string().min(1)).min(1) })
-]);
-var DecisionMultiPredicateSchema3 = external_exports.discriminatedUnion("op", [
-  external_exports.object({
-    op: external_exports.literal("intersects"),
-    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
-  }),
-  external_exports.object({
-    op: external_exports.literal("contains_all"),
-    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
-  }),
-  external_exports.object({
-    op: external_exports.literal("subset_of"),
-    optionIds: external_exports.array(external_exports.string().min(1)).min(1)
-  })
-]);
-var DecisionBooleanPredicateSchema3 = external_exports.discriminatedUnion("op", [
-  external_exports.object({ op: external_exports.literal("eq"), value: external_exports.boolean() }),
-  external_exports.object({ op: external_exports.literal("neq"), value: external_exports.boolean() })
-]);
-var DecisionPredicatePayloadSchema3 = external_exports.discriminatedUnion("type", [
-  external_exports.object({ type: external_exports.literal("string"), pred: DecisionStringPredicateSchema3 }),
-  external_exports.object({ type: external_exports.literal("number"), pred: DecisionNumberPredicateSchema3 }),
-  external_exports.object({ type: external_exports.literal("boolean"), pred: DecisionBooleanPredicateSchema3 }),
-  external_exports.object({ type: external_exports.literal("choice"), pred: DecisionChoicePredicateSchema3 }),
-  external_exports.object({ type: external_exports.literal("multi"), pred: DecisionMultiPredicateSchema3 })
-]);
-var DecisionExprSchema3 = external_exports.lazy(
-  () => external_exports.discriminatedUnion("kind", [
-    external_exports.object({ kind: external_exports.literal("empty") }),
-    external_exports.object({
-      kind: external_exports.literal("group"),
-      op: external_exports.enum(["and", "or"]),
-      children: external_exports.array(DecisionExprSchema3).min(1)
-    }),
-    external_exports.object({
-      kind: external_exports.literal("predicate"),
-      variable: DecisionVariableRefSchema3,
-      predicate: DecisionPredicatePayloadSchema3
-    })
-  ])
-);
 var DecisionCaseSchema3 = external_exports.object({
   id: external_exports.string().min(1).max(80),
   /** Display label in the editor (e.g. “Engaged users”). */
   name: external_exports.string().min(1).max(80).optional(),
-  expression: DecisionExprSchema3,
+  expression: DecisionExprSchema4,
   next: FlowJumpTargetSchema3
 });
 external_exports.object({
@@ -10526,6 +10850,7 @@ var walkLayers = (root, fn) => {
     fn(l, depth);
     if (l.kind === "stack") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "carousel") l.slides.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "conditional") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "button") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "back_button") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "hyperlink") l.children.forEach((c) => visit(c, depth + 1));
@@ -10721,6 +11046,18 @@ var validatePublishable = (manifest) => {
         code: "screen.unreachable"
       });
     }
+    walkScreen(screen, (l) => {
+      if (l.kind !== "conditional") return;
+      for (const c of l.cases) {
+        if (decisionExprHasPredicate(c.expression)) continue;
+        issues.push({
+          stepId: screen.id,
+          path: ["screens", screen.id, "layers", l.id, "cases", c.id],
+          message: `conditional "${l.name ?? l.id}" branch "${c.name ?? c.id}" needs at least one rule before publishing`,
+          code: "conditional.incomplete_cases"
+        });
+      }
+    });
   }
   for (const sn of manifest.externalSurfaceNodes ?? []) {
     if (manifest.entryScreenId != null && !reachable.has(sn.id)) {
@@ -10803,11 +11140,13 @@ var collectFlowBuilderIssues = (manifest) => {
     const screenLabel = screen.name || screen.id;
     const mediaLayerIds = /* @__PURE__ */ new Set();
     const buttonLayerIds = /* @__PURE__ */ new Set();
+    const carouselLayerIds = /* @__PURE__ */ new Set();
     const shellPlaybackId = screenBackgroundPlaybackId(screen.id);
     const shellFill = screen.containerStyle?.backgroundFill;
     const shellVideoFill = shellFill?.kind === "video" ? shellFill : void 0;
     walkScreen(screen, (l) => {
       if (l.kind === "button") buttonLayerIds.add(l.id);
+      if (l.kind === "carousel") carouselLayerIds.add(l.id);
     });
     if (shellFill?.kind === "image" || shellFill?.kind === "video") {
       if (!shellFill.media?.mediaAssetId) {
@@ -11020,6 +11359,13 @@ var collectFlowBuilderIssues = (manifest) => {
               `Button "${l.name || l.id}" on screen "${screenLabel}" play-media target "${targetId}" must be a Lottie or video layer on this screen, or screen background video.`
             );
           }
+        }
+      }
+      if (l.kind === "button" && l.action.kind === "advance_carousel") {
+        if (!carouselLayerIds.has(l.action.targetLayerId)) {
+          issues.push(
+            `Button "${l.name || l.id}" on screen "${screenLabel}" advance-carousel target "${l.action.targetLayerId}" must be a carousel layer on this screen.`
+          );
         }
       }
     });
@@ -11926,6 +12272,7 @@ var walkLayers2 = (root, fn) => {
     fn(l, depth);
     if (l.kind === "stack") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "carousel") l.slides.forEach((c) => visit(c, depth + 1));
+    else if (l.kind === "conditional") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "button") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "back_button") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "hyperlink") l.children.forEach((c) => visit(c, depth + 1));
@@ -12855,7 +13202,7 @@ var analyzeBackgrounds = (files) => {
 };
 
 // src/audit/analyzers/carouselAnalyzer.ts
-var CAROUSEL_NO_DUPLICATE_FOOTER = "Carousels are swipe-only (optional pageControl dots). Do not add regions.footer or body buttons for in-pager paging. Use regions.footer only for CTAs that advance the next screen in the flow, or single-slide carousels.";
+var CAROUSEL_NO_DUPLICATE_FOOTER = 'Carousels swipe by default (optional pageControl dots). Do not add buttons that only mimic paging; when the source has an explicit Next control, give it action.kind "advance_carousel" targeting that carousel. Use regions.footer for CTAs that advance the next screen in the flow, or single-slide carousels.';
 var CAROUSEL_PATTERNS = [
   [
     /\binfoSteps\b/,
@@ -13949,7 +14296,7 @@ var analyzeRegions = (files) => {
         confidence: "high",
         file: file.path,
         evidence: `Footer/sticky CTA marker: ${footer}`,
-        recommendation: carouselPager ? "If this footer only advances in-screen pager pages (infoSteps/currentInfoStep), do not map it to regions.footer \u2014 use a swipe-only carousel layer. Use regions.footer only for CTAs that advance the next screen in the flow." : "Use regions.footer for sticky bottom CTAs instead of placing them at the end of body."
+        recommendation: carouselPager ? 'If this footer only advances in-screen pager pages (infoSteps/currentInfoStep), either drop it (swipe already pages the carousel) or keep it as a button with action.kind "advance_carousel" targeting that carousel. Use regions.footer for CTAs that advance the next screen in the flow.' : "Use regions.footer for sticky bottom CTAs instead of placing them at the end of body."
       });
     }
     const body = hasAny(file.content, bodyPatterns);
@@ -14218,7 +14565,7 @@ var renderAuditMarkdown = (report) => {
     "- Use high-confidence region findings when choosing `regions.header`, `regions.body`, and `regions.footer`.",
     hasStyle ? "- Populate `manifest.theme` and per-layer `style` from style-token evidence. Set `style.color` on text for colored screens." : "- No style-token evidence found \u2014 ask the user for theme sources before using black-and-white defaults.",
     hasGradient ? "- Apply gradient evidence to `screen.containerStyle.backgroundFill.color` using `linear-gradient(...)` CSS strings." : "- Map screen-level background findings before adding generic body layers.",
-    hasCarousel ? '- **Carousel required:** emit `kind: "carousel"` with one slide stack per pager page. Swipe-only \u2014 no in-pager buttons. Bundle every slide asset.' : "- No carousel markers detected \u2014 still verify multi-slide routes manually.",
+    hasCarousel ? '- **Carousel required:** emit `kind: "carousel"` with one slide stack per pager page. Swipe by default \u2014 only add a paging button when the source has an explicit Next control, using `action.kind: "advance_carousel"`. Bundle every slide asset.' : "- No carousel markers detected \u2014 still verify multi-slide routes manually.",
     hasFonts ? "- **Fonts required:** copy `.ttf`/`.otf`/`.woff`/`.woff2` under `assets/fonts/`, add `rheo-import.fonts.json`, set `manifest.theme.fontFamily`. **Never** put font files in `rheo-import.assets.json` (see `references/font-import.md`)." : "- If custom fonts appear later in review, bundle them in `rheo-import.fonts.json` only \u2014 never in `rheo-import.assets.json`.",
     hasChoiceStates ? "- **Choice selected state:** each option stack needs `style` (default) and `selectedStyle` (selected), including border/background/text colors." : "- Verify single_choice / multiple_choice option stacks for `selectedStyle` when source uses selected ternaries.",
     hasAnimation ? "- **Motion (intake Q6=yes + Grow+ plan):** apply `screen.animations`, `screen.stagger`, and conservative `restingMotion` from animation audit findings. Use `--suggest-animations` JSON for clip shapes. Omit unmapped springs/gestures." : "- **Motion:** if intake Q6=yes, re-scan entry scope; if Q6=no or plan lacks animations, omit all `animations`, `stagger`, and `restingMotion` fields.",
@@ -14403,7 +14750,12 @@ var ActionObjectSchema = external_exports.discriminatedUnion("kind", [
       blocked: external_exports.string().min(1)
     })
   }),
-  external_exports.object({ kind: external_exports.literal("play_media"), targetLayerIds: external_exports.array(external_exports.string().min(1)).min(1) })
+  external_exports.object({ kind: external_exports.literal("play_media"), targetLayerIds: external_exports.array(external_exports.string().min(1)).min(1) }),
+  external_exports.object({
+    kind: external_exports.literal("advance_carousel"),
+    targetLayerId: external_exports.string().min(1),
+    onLast: external_exports.enum(["noop", "complete"]).optional()
+  })
 ]);
 var ButtonActionSpecSchema = external_exports.union([
   external_exports.enum(["none", "continue", "skip", "end_flow", "go_back_one_screen", "request_app_review"]),

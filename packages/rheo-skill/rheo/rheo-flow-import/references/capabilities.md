@@ -35,10 +35,17 @@ Every layer `kind` accepted by the manifest:
 - `carousel`
 - `hyperlink`
 - `checkbox`
+- `conditional`
 
 Container layers that **must** include a `children` array (or `slides` for carousel): `stack`, `carousel`,
 `button`, `back_button`, `hyperlink`, `single_choice`, `multiple_choice`, `oauth_login`,
-`oauth_provider` (custom variant), `email_password_auth`, `email_password_field`, `email_password_submit`.
+`oauth_provider` (custom variant), `email_password_auth`, `email_password_field`, `email_password_submit`,
+`conditional`.
+
+`conditional` picks which of its child stacks renders: ordered `cases[]` (each with a `DecisionExpr`
+and a `rootLayerId`) plus a required `elseRootLayerId`. Every bound id must be a distinct direct child
+`stack`. Cases may only read fields answered above the conditional, every case needs at least one rule
+before publish, and the one-input limit applies per active path so sibling branches may each own an input.
 
 ## Button / back_button variants
 
@@ -60,11 +67,13 @@ Valid `action.kind` values on `button` layers:
 - `request_os_permission`
 - `play_media`
 - `request_app_review`
+- `advance_carousel`
 
 - `FlowGraphNodeJumpTarget` (`scr_*` | `dec_*` | `surf_*`): `go_to_step.screenId`, choice `branching.conditions[].goTo`, loader/lottie/video `onComplete` when mode is `screen`, and `request_os_permission` outcomes (except `continue`/`end`).
 - `go_back_one_screen` and `back_button` accept optional `fallbackScreenId` (`scr_*` only).
 - `request_os_permission` requires `permissionKey` and `outcomes` (`granted`/`denied`/`blocked`).
 - `play_media` requires `targetLayerIds` (≥1) pointing at Lottie/video layers on the same screen.
+- `advance_carousel` requires `targetLayerId` (exactly one `carousel` layer on the same screen) and takes optional `onLast` (`noop` default, or `complete` to finish the carousel when already on the last slide).
 - `back_button` takes **no** `action` (back navigation is built in).
 
 ## OS permission keys

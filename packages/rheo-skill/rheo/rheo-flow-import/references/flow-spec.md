@@ -91,7 +91,10 @@ Action shorthands: `"none"`, `"continue"`, `"skip"`, `"end_flow"`,
 `"go_back_one_screen"`, `"request_app_review"`. Object forms:
 `{ "kind": "go_to_step", "screenId": "scr_x" }` (or `dec_*` / `surf_*`),
 `{ "kind": "request_os_permission", "permissionKey": "…", "outcomes": { "granted": "scr_a", "denied": "dec_b", "blocked": "surf_c" } }` (targets may be `scr_*`, `dec_*`, `surf_*`, `"continue"`, or `"end"`),
-`{ "kind": "play_media", "targetLayerIds": ["lyr_video"] }`.
+`{ "kind": "play_media", "targetLayerIds": ["lyr_video"] }`,
+`{ "kind": "advance_carousel", "targetLayerId": "lyr_carousel", "onLast": "noop" }`
+(`onLast` is optional and defaults to `"noop"`; use `"complete"` to finish the carousel when the
+button is tapped on the last slide).
 
 ### Stacks (layout)
 
@@ -161,7 +164,7 @@ screens with `text_input`, `multiple_choice`, `scale_input`, or `wheel_picker`.
 
 Keep OAuth, email/password, and questionnaire inputs on **separate screens**.
 
-### Carousel (swipe-only onboarding pager)
+### Carousel (onboarding pager)
 
 ```jsonc
 {
@@ -180,7 +183,9 @@ Keep OAuth, email/password, and questionnaire inputs on **separate screens**.
 }
 ```
 
-No buttons inside a carousel — paging is swipe-only ([carousel-import.md](carousel-import.md)).
+Paging is swipe by default. When the source screen has an explicit Next control, add a
+`button` with `action: { "kind": "advance_carousel", "targetLayerId": "<carousel id>" }`
+instead of a plain footer CTA ([carousel-import.md](carousel-import.md)).
 
 ### Counter / progress / loader
 

@@ -76,8 +76,9 @@ Hero images that render through wrapper components (`<Illustration>`, `<Logo>`,
 `react-native-pager-view`, a `FlatList horizontal pagingEnabled`, a
 `ScrollView horizontal` snap pager, `Animated` `translateX` paging, or an
 `infoSteps`/`currentStep` index → `kind: "carousel"` with one slide per page.
-Carousels are swipe-only; do not turn the pager's own next button into a footer
-button ([carousel-import.md](carousel-import.md)).
+Paging is swipe by default; map the pager's own next button to a `button` with
+`action.kind: "advance_carousel"` rather than a footer CTA
+([carousel-import.md](carousel-import.md)).
 
 ## Integrations and native steps
 

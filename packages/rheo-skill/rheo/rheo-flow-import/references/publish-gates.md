@@ -27,10 +27,12 @@ These mirror `apps/web/src/features/builder/validateFlow.ts` and API `preflightP
 | **Container `children`** | `back_button`, `button`, or `hyperlink` emitted without a `children` array (or with label text on the parent instead of nested `text` children). Crashes import on Indie plans during motion strip; fails Zod validation. |
 | **Text/icon `style.color`** | Body text or **button label** (nested text child) left without `style.color` — native does not inherit CSS colors. |
 | **Continue button** | `text_input`, `multiple_choice`, `scale_input`, or `wheel_picker` without a `button` with `action.kind: "continue"`. |
-| **One input per screen** | Multiple inputs, or OAuth/email-password combined with inputs. |
+| **One input per active path** | Multiple inputs on the same path, or OAuth/email-password combined with inputs. Sibling `conditional` branches each get their own budget. |
+| **Conditional bindings** | `cases[].rootLayerId` / `elseRootLayerId` not pointing at distinct direct child stacks, or a case reading a field captured inside its own branch. |
 | **fieldKey** | Missing or non–snake_case on input layers. |
 | **Graph targets** | `go_to_step`, choice `goTo`, loader/lottie/video `onComplete` (screen mode), permission outcomes, and fallbacks point at missing `scr_*` / `dec_*` / `surf_*` ids. |
 | **Media triggers** | Lottie/video with `autoPlay: false` needs a `play_media` button targeting that layer. |
+| **Carousel targets** | `advance_carousel` must point `targetLayerId` at a `carousel` layer on the same screen. |
 | **Screen backgrounds** | Image/video fills need `mediaAssetId`; manual background video needs trigger wiring. |
 
 ### Publishable graph (`validatePublishable`)
@@ -39,6 +41,7 @@ These mirror `apps/web/src/features/builder/validateFlow.ts` and API `preflightP
 - `entryScreenId` set and valid.
 - A **completion path** from entry (`end_flow`, terminal `next`, or external surface end).
 - Decision nodes: every case and `elseNext` connected.
+- `conditional` layers: every case has at least one rule (`conditional.incomplete_cases`).
 
 ### Integrations (default: enabled)
 

@@ -1,7 +1,7 @@
 import type { AuditFile, AuditFinding } from '../auditTypes.js';
 
 const CAROUSEL_NO_DUPLICATE_FOOTER =
-  'Carousels are swipe-only (optional pageControl dots). Do not add regions.footer or body buttons for in-pager paging. Use regions.footer only for CTAs that advance the next screen in the flow, or single-slide carousels.';
+  'Carousels swipe by default (optional pageControl dots). Do not add buttons that only mimic paging; when the source has an explicit Next control, give it action.kind "advance_carousel" targeting that carousel. Use regions.footer for CTAs that advance the next screen in the flow, or single-slide carousels.';
 
 const CAROUSEL_PATTERNS: Array<[RegExp, string, string]> = [
   [
