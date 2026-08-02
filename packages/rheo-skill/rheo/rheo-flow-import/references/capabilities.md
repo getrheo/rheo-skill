@@ -111,7 +111,10 @@ Valid `permissionKey` values for `request_os_permission`:
 - `email_password_auth` modes: `sign_in`, `sign_up` (sign_up requires email + password + confirm fields).
 - `icon` families: `ionicons`.
 
-## External surface outcomes (RevenueCat)
+## External surface outcomes
 
-Normalized outcome keys for `externalSurfaceNodes[].outcomes`: `purchase_completed`, `purchase_cancelled`, `dismissed`, `failed`, `restore_completed`.
-Every external surface also needs a `fallback` jump target.
+Builder add-menu kinds share `externalSurfaceNodes`: **Integration Node** (partner providers such as RevenueCat) and **External Surface Node** (`provider: "headless"`). Every node needs a `fallback` jump target.
+
+**Integration Node / RevenueCat** (`provider: "revenuecat"`): `purchase_completed`, `purchase_cancelled`, `dismissed`, `failed`, `restore_completed`.
+
+**External Surface Node / Headless** (`provider: "headless"`): `completed`, `back`, `dismissed`, `failed`. Host apps register UI via `externalSurfaces[hostKey]` (`config.hostKey` or node id) with `onComplete` / `onBack` / `onDismiss`.

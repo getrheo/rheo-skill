@@ -2,7 +2,7 @@
 import { writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BUTTON_LAYER_VARIANTS, ButtonActionSchema, EMAIL_PASSWORD_AUTH_MODES, FIELD_CLASSIFICATIONS, ICON_FAMILIES, LAYER_KINDS, MANIFEST_SCHEMA_VERSION, NORMALIZED_SURFACE_OUTCOMES, OAUTH_LOGIN_PRESETS, OS_PERMISSION_KEYS, TEXT_INPUT_TYPES } from '@getrheo/contracts';
+import { BUTTON_LAYER_VARIANTS, ButtonActionSchema, EMAIL_PASSWORD_AUTH_MODES, FIELD_CLASSIFICATIONS, ICON_FAMILIES, LAYER_KINDS, MANIFEST_SCHEMA_VERSION, OAUTH_LOGIN_PRESETS, OS_PERMISSION_KEYS, TEXT_INPUT_TYPES } from '@getrheo/contracts';
 
 /** Button/back-button action `kind` literals, read straight from the contract schema. */
 export const BUTTON_ACTION_KINDS: string[] = ButtonActionSchema.options.map(
@@ -80,10 +80,13 @@ export const generateCapabilitiesMarkdown = (): string =>
     `- \`email_password_auth\` modes: ${list(EMAIL_PASSWORD_AUTH_MODES)} (sign_up requires email + password + confirm fields).`,
     `- \`icon\` families: ${list(ICON_FAMILIES)}.`,
     '',
-    '## External surface outcomes (RevenueCat)',
+    '## External surface outcomes',
     '',
-    `Normalized outcome keys for \`externalSurfaceNodes[].outcomes\`: ${list(NORMALIZED_SURFACE_OUTCOMES)}.`,
-    'Every external surface also needs a `fallback` jump target.',
+    'Builder add-menu kinds share `externalSurfaceNodes`: **Integration Node** (partner providers such as RevenueCat) and **External Surface Node** (`provider: "headless"`). Every node needs a `fallback` jump target.',
+    '',
+    `**Integration Node / RevenueCat** (\`provider: "revenuecat"\`): ${list(['purchase_completed', 'purchase_cancelled', 'dismissed', 'failed', 'restore_completed'])}.`,
+    '',
+    `**External Surface Node / Headless** (\`provider: "headless"\`): ${list(['completed', 'back', 'dismissed', 'failed'])}. Host apps register UI via \`externalSurfaces[hostKey]\` (\`config.hostKey\` or node id) with \`onComplete\` / \`onBack\` / \`onDismiss\`.`,
     '',
   ].join('\n');
 

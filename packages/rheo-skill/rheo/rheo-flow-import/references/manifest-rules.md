@@ -195,9 +195,13 @@ Use `conditional` when the source renders different content on **one** screen ba
 
 ## External Surfaces
 
-- RevenueCat paywalls become `externalSurfaceNodes` with provider `revenuecat`.
-- Every external surface needs a `fallback`.
-- Map known paywall outcomes to `purchase_completed`, `restore_completed`, `dismissed`, and `failed`.
+In the builder UI these are two add-menu kinds sharing `externalSurfaceNodes`:
+
+- **Integration Node** — RevenueCat paywalls become nodes with provider `revenuecat`.
+- **External Surface Node** — Host-owned custom screens become nodes with provider `headless` (stable `surf_*` id; optional `config.hostKey` for the host `externalSurfaces` registry).
+- Every node needs a `fallback`.
+- Map paywall outcomes to `purchase_completed`, `restore_completed`, `dismissed`, and `failed`.
+- Map headless outcomes to `completed`, `back`, `dismissed`, and `failed`.
 
 ## Assets
 

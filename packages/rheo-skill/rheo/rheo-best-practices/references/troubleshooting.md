@@ -38,7 +38,7 @@ Fix workflow:
 
 ## Missing Fallback Edge
 
-Every external surface needs `fallback`. RevenueCat outcomes that are not explicitly mapped fall through to this target.
+Every Integration / External Surface Node needs `fallback`. Outcomes that are not explicitly mapped (RevenueCat purchase outcomes or headless `completed` / `back` / `dismissed`) fall through to this target.
 
 ## Integration Disabled
 

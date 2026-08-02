@@ -299,10 +299,16 @@ const ScreenSpecSchema = z.object({
 const ExternalSurfaceSpecSchema = z.object({
   id: z.string().min(1).max(64),
   name: z.string().min(1).max(80).optional(),
-  provider: z.enum(['revenuecat', 'unspecified']),
+  provider: z.enum(['revenuecat', 'headless', 'unspecified']),
   offeringId: z.string().min(1).max(128).optional(),
   placementId: z.string().min(1).max(128).optional(),
   presentation: z.enum(['paywall', 'paywall_if_needed']).optional(),
+  hostKey: z
+    .string()
+    .min(1)
+    .max(64)
+    .regex(/^[a-zA-Z][a-zA-Z0-9_]*$/)
+    .optional(),
   outcomes: z
     .object({
       purchase_completed: z.string().min(1).nullable().optional(),
@@ -310,6 +316,8 @@ const ExternalSurfaceSpecSchema = z.object({
       dismissed: z.string().min(1).nullable().optional(),
       failed: z.string().min(1).nullable().optional(),
       restore_completed: z.string().min(1).nullable().optional(),
+      completed: z.string().min(1).nullable().optional(),
+      back: z.string().min(1).nullable().optional(),
     })
     .optional(),
   fallback: z.string().min(1).nullable(),

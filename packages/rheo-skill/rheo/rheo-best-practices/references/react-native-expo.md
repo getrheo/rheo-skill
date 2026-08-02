@@ -15,7 +15,7 @@ pnpm add @getrheo/react-native-expo \
   react-native-safe-area-context expo-store-review expo-video
 ```
 
-**Integrations (host only, not SDK peers):** `react-native-appsflyer`, `react-native-purchases`, `react-native-purchases-ui` when the flow uses attribution or RevenueCat paywalls.
+**Integrations (host only, not SDK peers):** `react-native-appsflyer`, `react-native-purchases`, `react-native-purchases-ui` when the flow uses attribution or RevenueCat Integration Nodes. External Surface Nodes use `Flow` / `useFlow` `externalSurfaces` (no extra native peer).
 
 ## Minimal Runtime
 

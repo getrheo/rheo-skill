@@ -46,7 +46,8 @@ struct OnboardingHost: View {
 
 ## Notes
 
-- Use `RheoSwiftUIRevenueCat` for RevenueCat external surface presenter helpers.
+- Use `RheoSwiftUIRevenueCat` for RevenueCat Integration Node presenter helpers.
+- External Surface Nodes: pass `externalSurfaces: [surfId: { ctx in AnyView(...) }]` on `FlowView` (`ctx.onComplete` / `onBack` / `onDismiss`).
 - Use `RheoSwiftUIAppsFlyer` for AppsFlyer attribution providers.
 - Host apps must include Info.plist usage strings for authored permission prompts.
 - Host apps must register branding fonts if relying on downloaded font families.
