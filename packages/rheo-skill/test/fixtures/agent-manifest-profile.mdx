@@ -390,12 +390,17 @@ Before finalizing an import, verify:
 
 ## External Surfaces
 
-RevenueCat paywalls map to external surface nodes:
+`externalSurfaceNodes` are graph nodes (`surf_*`), not layers. Every node needs `fallback`. In the flow builder they appear as two add-menu kinds that share this schema:
+
+- **Integration Node** — partner providers such as `revenuecat` (requires App settings toggle).
+- **External Surface Node** — `provider: "headless"` (host UI registry; no App settings toggle).
+
+### RevenueCat (Integration Node)
 
 ```json
 {
   "id": "surf_paywall",
-  "name": "RevenueCat paywall",
+  "name": "Integration",
   "config": {
     "provider": "revenuecat",
     "offeringId": "default",
@@ -411,7 +416,26 @@ RevenueCat paywalls map to external surface nodes:
 }
 ```
 
-Every external surface needs `fallback`. The target app must have the matching integration enabled in Rheo.
+The target app must have RevenueCat enabled in Rheo App settings.
+
+### Headless (External Surface Node)
+
+```json
+{
+  "id": "surf_custom_step",
+  "name": "External Surface",
+  "config": { "provider": "headless", "hostKey": "onboardingQuiz" },
+  "outcomes": {
+    "completed": "scr_next",
+    "back": "scr_welcome",
+    "dismissed": "scr_skip",
+    "failed": "scr_skip"
+  },
+  "fallback": "scr_skip"
+}
+```
+
+No App settings toggle. Optional `config.hostKey` is the `externalSurfaces` registry key (defaults to the node id). See [Headless external surfaces](/docs/developer-guide/headless-external-surfaces).
 
 ## Decision Nodes
 
@@ -487,7 +511,7 @@ The dashboard **Publish** button runs the same checks as the agent skill's publi
 - At most one input layer per active path; do not combine OAuth or email/password login with other inputs on the same path.
 - Every `conditional` case has at least one rule and reads only fields answered above it.
 - Valid `fieldKey` (snake_case) on inputs; choice `goTo`, `go_to_step`, loader `onComplete`, and permission outcomes must reference existing `scr_*`, `dec_*`, or `surf_*` ids (or permission sentinels `continue` / `end`).
-- External surfaces: real `config.provider`, connected `fallback`, RevenueCat enabled when used.
+- External surfaces: real `config.provider` (`revenuecat` for Integration Nodes or `headless` for External Surface Nodes), connected `fallback`, RevenueCat enabled when that provider is used.
 - Run the skill's **audit-publish** command on `rheo-import.manifest.json` and fix all blocking issues in the publish-gates report.
 
 ## Common Invalid Outputs

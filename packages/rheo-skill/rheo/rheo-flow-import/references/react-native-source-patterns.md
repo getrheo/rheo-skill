@@ -83,15 +83,16 @@ Paging is swipe by default; map the pager's own next button to a `button` with
 ## Integrations and native steps
 
 - `react-native-purchases` / `react-native-purchases-ui` / `Purchases.configure`
-  / a `<Paywall>` → a RevenueCat **external surface** (`provider: "revenuecat"`,
-  required `fallback`). See [integrations](../../rheo-best-practices/references/integrations.md).
+  / a `<Paywall>` → a RevenueCat **Integration Node** (`provider: "revenuecat"`,
+  required `fallback`). Host-owned custom screens → an **External Surface Node**
+  (`provider: "headless"`). See [integrations](../../rheo-best-practices/references/integrations.md).
 - `react-native-appsflyer` → represent stable attribution branches via decision
   nodes; add keys to `sdkAttributeKeys`. Never include AppsFlyer/RevenueCat secrets.
 - OAuth / email-password screens → `oauth_login` / `email_password_auth` (host
   owns the actual auth logic).
 - `react-native-permissions` prompts → a `request_os_permission` button action.
 - Signature pads, camera capture, custom WebViews → confirm with the user whether
-  to keep native (host-owned) or approximate; flag unmappable behavior in chat.
+  to keep native (External Surface Node / host-owned) or approximate; flag unmappable behavior in chat.
 
 ## i18n
 

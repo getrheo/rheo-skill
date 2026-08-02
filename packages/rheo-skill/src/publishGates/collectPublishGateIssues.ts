@@ -143,7 +143,7 @@ export const fixForBuilderMessage = (message: string): string => {
     return 'Set externalSurfaceNodes[].config.provider to a real provider (e.g. revenuecat), not unspecified.';
   }
   if (message.includes('Fallback edge')) {
-    return 'Connect every external surface fallback to the next screen/decision/surface when the paywall dismisses or fails.';
+    return 'Connect every external surface fallback to the next screen/decision/surface when no specific outcome is mapped.';
   }
   return `Resolve builder publish rule: ${message}`;
 };
@@ -161,7 +161,7 @@ const collectIntegrationIssues = (
     }
     if (node.fallback == null) {
       issues.push(
-        `External surface "${node.name ?? node.id}" needs a connected Fallback edge — every paywall must route somewhere when no specific outcome is mapped.`,
+        `External surface "${node.name ?? node.id}" needs a connected Fallback edge — every external surface must route somewhere when no specific outcome is mapped.`,
       );
     }
     if (node.config.provider === 'revenuecat' && !integrations.revenuecat.enabled) {

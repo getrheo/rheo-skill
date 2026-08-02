@@ -15,7 +15,7 @@ pnpm add @getrheo/react-native-bare \
   react-native-safe-area-context react-native-in-app-review react-native-video
 ```
 
-**Integrations (host only):** `react-native-appsflyer`, `react-native-purchases`, `react-native-purchases-ui` when needed.
+**Integrations (host only):** `react-native-appsflyer`, `react-native-purchases`, `react-native-purchases-ui` when needed. External Surface Nodes use `Flow` `externalSurfaces` (no extra native peer).
 
 ## Minimal Runtime
 
@@ -24,7 +24,13 @@ import { Flow, RheoProvider } from '@getrheo/react-native-bare';
 
 export const OnboardingHost = () => (
   <RheoProvider config={{ publishableKey: '…', userId: '…' }}>
-    <Flow channelId="ch_…" onFlowCompleted={() => {}} />
+    <Flow
+      channelId="ch_…"
+      onFlowCompleted={() => {}}
+      externalSurfaces={{
+        // surf_*: ({ onComplete, onBack, onDismiss }) => host UI
+      }}
+    />
   </RheoProvider>
 );
 ```

@@ -80,8 +80,9 @@ page. Paging is swipe by default; an explicit Next button becomes a `button` wit
 ## Integrations and native steps
 
 - RevenueCat (`Purchases.configure`, `RevenueCatUI` `PaywallView`, `.presentPaywall`)
-  → a RevenueCat **external surface** (`provider: "revenuecat"`, required
-  `fallback`). See [integrations](../../rheo-best-practices/references/integrations.md).
+  → a RevenueCat **Integration Node** (`provider: "revenuecat"`, required
+  `fallback`). Host-owned custom screens → an **External Surface Node**
+  (`provider: "headless"`). See [integrations](../../rheo-best-practices/references/integrations.md).
 - AppsFlyer (`AppsFlyerLib`) → represent stable attribution branches via decision
   nodes; add keys to `sdkAttributeKeys`. Never include secrets.
 - "Sign in with Apple" (`SignInWithAppleButton`) / OAuth / email-password →
@@ -90,7 +91,7 @@ page. Paging is swipe by default; an explicit Next button becomes a `button` wit
   `UNUserNotificationCenter`) → a `request_os_permission` button action; the host
   must declare the matching `Info.plist` usage strings.
 - `PencilKit` signature, camera capture, custom `WKWebView` → confirm whether to
-  keep native (host-owned) or approximate; flag unmappable behavior in chat.
+  keep native (External Surface Node / host-owned) or approximate; flag unmappable behavior in chat.
 
 ## Localization
 

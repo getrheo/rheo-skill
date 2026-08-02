@@ -566,7 +566,12 @@ const buildExternalSurface = (surface: ExternalSurfaceSpec): Json => {
           ...(surface.placementId ? { placementId: surface.placementId } : {}),
           ...(surface.presentation ? { presentation: surface.presentation } : {}),
         }
-      : { provider: 'unspecified' };
+      : surface.provider === 'headless'
+        ? {
+            provider: 'headless',
+            ...(surface.hostKey ? { hostKey: surface.hostKey } : {}),
+          }
+        : { provider: 'unspecified' };
   const outcomes: Json = {};
   for (const [key, value] of Object.entries(surface.outcomes ?? {})) {
     if (value !== undefined) outcomes[key] = value;

@@ -8422,15 +8422,20 @@ var conditionalFieldScopeViolations = (screen) => {
   return violations;
 };
 var ExternalSurfaceNodeIdSchema = external_exports.string().min(1).max(64).regex(/^surf_[a-z0-9_]+$/i, "external surface node id must look like surf_<id>");
-var NORMALIZED_SURFACE_OUTCOMES = [
+var IAP_SURFACE_OUTCOMES = [
   "purchase_completed",
   "purchase_cancelled",
   "dismissed",
   "failed",
   "restore_completed"
 ];
+var NORMALIZED_SURFACE_OUTCOMES = [
+  ...IAP_SURFACE_OUTCOMES,
+  "completed",
+  "back"
+];
 var NormalizedSurfaceOutcomeSchema = external_exports.enum(NORMALIZED_SURFACE_OUTCOMES);
-var SurfaceProviderSchema = external_exports.enum(["unspecified", "revenuecat"]);
+var SurfaceProviderSchema = external_exports.enum(["unspecified", "revenuecat", "headless"]);
 var UnspecifiedExternalSurfaceConfigSchema = external_exports.object({
   provider: external_exports.literal("unspecified")
 });
@@ -8441,16 +8446,28 @@ var RevenueCatSurfaceConfigSchema = external_exports.object({
   placementId: external_exports.string().min(1).max(128).optional(),
   presentation: RevenueCatSurfacePresentationSchema.optional()
 });
+var ExternalSurfaceHostKeySchema = external_exports.string().min(1).max(64).regex(
+  /^[a-zA-Z][a-zA-Z0-9_]*$/,
+  "host key must start with a letter and contain only letters, digits, or underscores"
+);
+var HeadlessExternalSurfaceConfigSchema = external_exports.object({
+  provider: external_exports.literal("headless"),
+  /** Registry key for `Flow` / `FlowView` `externalSurfaces`. Defaults to the node id. */
+  hostKey: ExternalSurfaceHostKeySchema.optional()
+});
 var ExternalSurfaceConfigSchema = external_exports.discriminatedUnion("provider", [
   UnspecifiedExternalSurfaceConfigSchema,
-  RevenueCatSurfaceConfigSchema
+  RevenueCatSurfaceConfigSchema,
+  HeadlessExternalSurfaceConfigSchema
 ]);
 var ExternalSurfaceOutcomesMapSchema = external_exports.object({
   purchase_completed: FlowJumpTargetSchema2.optional(),
   purchase_cancelled: FlowJumpTargetSchema2.optional(),
   dismissed: FlowJumpTargetSchema2.optional(),
   failed: FlowJumpTargetSchema2.optional(),
-  restore_completed: FlowJumpTargetSchema2.optional()
+  restore_completed: FlowJumpTargetSchema2.optional(),
+  completed: FlowJumpTargetSchema2.optional(),
+  back: FlowJumpTargetSchema2.optional()
 }).strict();
 var ExternalSurfaceNodeSchema = external_exports.object({
   id: ExternalSurfaceNodeIdSchema,
@@ -8461,6 +8478,12 @@ var ExternalSurfaceNodeSchema = external_exports.object({
   /** Required: used for any outcome not in `outcomes` (e.g. provider quirks, unmapped events). */
   fallback: FlowJumpTargetSchema2
 });
+var resolveExternalSurfaceHostKey = (node) => {
+  if (node.config.provider === "headless" && node.config.hostKey) {
+    return node.config.hostKey;
+  }
+  return node.id;
+};
 var RESERVED_RC_SDK_KEYS = [
   /** Last RC event observed by the SDK (e.g. `purchase_completed`, `purchase_cancelled`). */
   "onb_rc_last_event",
@@ -8710,6 +8733,7 @@ var refineManifestGraph = (manifest, ctx, jumpTargets) => {
     }
   });
   const seenSurfaceId = /* @__PURE__ */ new Set();
+  const seenHostKey = /* @__PURE__ */ new Set();
   manifest.externalSurfaceNodes.forEach((sn, si) => {
     if (seenSurfaceId.has(sn.id)) {
       ctx.addIssue({
@@ -8732,6 +8756,17 @@ var refineManifestGraph = (manifest, ctx, jumpTargets) => {
         message: `external surface id "${sn.id}" collides with a decision node id`,
         path: ["externalSurfaceNodes", si]
       });
+    }
+    if (sn.config.provider === "headless") {
+      const hostKey = resolveExternalSurfaceHostKey(sn);
+      if (seenHostKey.has(hostKey)) {
+        ctx.addIssue({
+          code: external_exports.ZodIssueCode.custom,
+          message: `duplicate external surface host key "${hostKey}"`,
+          path: ["externalSurfaceNodes", si, "config", "hostKey"]
+        });
+      }
+      seenHostKey.add(hostKey);
     }
     for (const [outcome, target] of Object.entries(sn.outcomes)) {
       if (target != null && !jumpTargets.has(target)) {
@@ -12435,7 +12470,7 @@ var fixForBuilderMessage = (message) => {
     return "Set externalSurfaceNodes[].config.provider to a real provider (e.g. revenuecat), not unspecified.";
   }
   if (message.includes("Fallback edge")) {
-    return "Connect every external surface fallback to the next screen/decision/surface when the paywall dismisses or fails.";
+    return "Connect every external surface fallback to the next screen/decision/surface when no specific outcome is mapped.";
   }
   return `Resolve builder publish rule: ${message}`;
 };
@@ -12449,7 +12484,7 @@ var collectIntegrationIssues = (manifest, integrations) => {
     }
     if (node.fallback == null) {
       issues.push(
-        `External surface "${node.name ?? node.id}" needs a connected Fallback edge \u2014 every paywall must route somewhere when no specific outcome is mapped.`
+        `External surface "${node.name ?? node.id}" needs a connected Fallback edge \u2014 every external surface must route somewhere when no specific outcome is mapped.`
       );
     }
     if (node.config.provider === "revenuecat" && !integrations.revenuecat.enabled) {
@@ -15004,16 +15039,19 @@ var ScreenSpecSchema = external_exports.object({
 var ExternalSurfaceSpecSchema = external_exports.object({
   id: external_exports.string().min(1).max(64),
   name: external_exports.string().min(1).max(80).optional(),
-  provider: external_exports.enum(["revenuecat", "unspecified"]),
+  provider: external_exports.enum(["revenuecat", "headless", "unspecified"]),
   offeringId: external_exports.string().min(1).max(128).optional(),
   placementId: external_exports.string().min(1).max(128).optional(),
   presentation: external_exports.enum(["paywall", "paywall_if_needed"]).optional(),
+  hostKey: external_exports.string().min(1).max(64).regex(/^[a-zA-Z][a-zA-Z0-9_]*$/).optional(),
   outcomes: external_exports.object({
     purchase_completed: external_exports.string().min(1).nullable().optional(),
     purchase_cancelled: external_exports.string().min(1).nullable().optional(),
     dismissed: external_exports.string().min(1).nullable().optional(),
     failed: external_exports.string().min(1).nullable().optional(),
-    restore_completed: external_exports.string().min(1).nullable().optional()
+    restore_completed: external_exports.string().min(1).nullable().optional(),
+    completed: external_exports.string().min(1).nullable().optional(),
+    back: external_exports.string().min(1).nullable().optional()
   }).optional(),
   fallback: external_exports.string().min(1).nullable()
 });
@@ -15518,6 +15556,9 @@ var buildExternalSurface = (surface) => {
     ...surface.offeringId ? { offeringId: surface.offeringId } : {},
     ...surface.placementId ? { placementId: surface.placementId } : {},
     ...surface.presentation ? { presentation: surface.presentation } : {}
+  } : surface.provider === "headless" ? {
+    provider: "headless",
+    ...surface.hostKey ? { hostKey: surface.hostKey } : {}
   } : { provider: "unspecified" };
   const outcomes = {};
   for (const [key, value] of Object.entries(surface.outcomes ?? {})) {

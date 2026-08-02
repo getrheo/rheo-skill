@@ -1,6 +1,6 @@
 # @getrheo/rheo-skill
 
-Current release: **`2.3.0`** on npm (`PLATFORM_SDK_VERSION` in `scripts/publish-package-registry.mjs`). Public source: [getrheo/rheo-skill](https://github.com/getrheo/rheo-skill) (mirrored from this private monorepo via `pnpm extract:oss-repos`).
+Current release: **`2.5.0`** on npm (`PLATFORM_SDK_VERSION` in `scripts/publish-package-registry.mjs`). Public source: [getrheo/rheo-skill](https://github.com/getrheo/rheo-skill) (mirrored from this private monorepo via `pnpm extract:oss-repos`).
 
 Source and build tooling for the **`rheo`** agent skill — a single, self-contained
 skill with two sub-skills:

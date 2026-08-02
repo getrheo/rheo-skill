@@ -293,16 +293,20 @@ export type ScreenSpec = {
 export type ExternalSurfaceSpec = {
   id: string;
   name?: string;
-  provider: 'revenuecat' | 'unspecified';
+  provider: 'revenuecat' | 'headless' | 'unspecified';
   offeringId?: string;
   placementId?: string;
   presentation?: 'paywall' | 'paywall_if_needed';
+  /** Registry key for headless `externalSurfaces` (defaults to `id`). */
+  hostKey?: string;
   outcomes?: {
     purchase_completed?: string | null;
     purchase_cancelled?: string | null;
     dismissed?: string | null;
     failed?: string | null;
     restore_completed?: string | null;
+    completed?: string | null;
+    back?: string | null;
   };
   /** Required: where the surface routes for any unmapped outcome. */
   fallback: string | null;
