@@ -95,7 +95,7 @@ Prefer readable ids such as `scr_welcome`, `lyr_welcome_title`, `dec_platform`, 
 Use only these layer kinds:
 
 ```text
-stack, text, image, lottie, video, icon, button, back_button, progress, loader, counter, single_choice, multiple_choice, text_input, scale_input, wheel_picker, oauth_provider, oauth_login, email_password_auth, email_password_field, email_password_submit, carousel, hyperlink, checkbox, conditional
+stack, text, image, lottie, video, icon, button, back_button, progress, loader, counter, single_choice, multiple_choice, text_input, scale_input, wheel_picker, date_time_input, number_stepper, number_stepper_button, number_stepper_value, phone_input, address_input, oauth_provider, oauth_login, email_password_auth, email_password_field, email_password_submit, carousel, hyperlink, checkbox, conditional
 ```
 
 ## Screen Pattern
@@ -191,11 +191,15 @@ Set explicit `style.width` and `style.height` on every layer:
 
 ## Inputs
 
-- Use at most one input layer kind per **active path** (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`). Without a `conditional` layer that means one per screen; sibling `conditional` branches may each own their own input because only one branch ever renders.
+- Use at most one input layer kind per **active path** (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`, `date_time_input`, `number_stepper`, `phone_input`, `address_input`). Without a `conditional` layer that means one per screen; sibling `conditional` branches may each own their own input because only one branch ever renders.
 - Use stable snake_case `fieldKey` values.
 - `text_input` needs `classification` set to `safe` or `sensitive`.
 - `text_input.fieldStyle` is **typography only** (`fontFamily`, `fontSize`, `fontWeight`, `color`, `align`, `lineHeight`, `letterSpacing`, `opacity`). Padding, radius, background, and border belong on the outer `style` / `styleBreakpoints`.
 - `wheel_picker` captures a string value (`mode: "options"` or `"date"` with `datePart`). Row typography uses `itemStyle` / `selectedItemStyle`; chrome stays on outer `style` / `styleBreakpoints`. No layer `.branching` — route later via `dec_*` with predicate `type: "string"`. Needs a Continue button.
+- `date_time_input` collects a date, time, or datetime string. Set `mode` to `"date"`, `"time"`, or `"datetime"`. Use `min`/`max` for bounds and `defaultValue` for prefill. Needs `classification` (`safe`/`sensitive`). Needs a Continue button.
+- `number_stepper` collects a numeric value via increment/decrement controls. Set `min`, `max`, `step`, and optionally `defaultValue` and `unitLabel`. Structural children are `number_stepper_button` (roles `decrement` / `increment`) and `number_stepper_value`. Enclosing layout matches a stack (`direction`, `align`, `distribution`, `gap`, outer `style`). Needs a Continue button.
+- `phone_input` collects a phone number split into country code and national number. Set `defaultCountryCode` (ISO 3166-1 alpha-2, e.g. `"US"`). Needs `classification` (`safe`/`sensitive`). Needs a Continue button.
+- `address_input` collects a postal address. Configure `showLine2`, `showRegion`, `requiredFields`, and `defaultCountryCode`. Needs a Continue button.
 - When source uses in-screen pagers (`infoSteps`, horizontal `translateX`, `pagingEnabled` lists), emit `kind: "carousel"` with one vertical `stack` slide per page. Do not collapse multi-slide routes to a single static screen.
 
 ### Choice option styling (`single_choice` / `multiple_choice`)
@@ -392,7 +396,7 @@ Before finalizing an import, verify:
 
 `externalSurfaceNodes` are graph nodes (`surf_*`), not layers. Every node needs `fallback`. In the flow builder they appear as two add-menu kinds that share this schema:
 
-- **Integration Node** — partner providers such as `revenuecat` (requires App settings toggle).
+- **Integration Node** — partner providers such as `revenuecat` or `superwall` (requires App settings toggle).
 - **External Surface Node** — `provider: "headless"` (host UI registry; no App settings toggle).
 
 ### RevenueCat (Integration Node)
@@ -417,6 +421,28 @@ Before finalizing an import, verify:
 ```
 
 The target app must have RevenueCat enabled in Rheo App settings.
+
+### Superwall (Integration Node)
+
+```json
+{
+  "id": "surf_sw_paywall",
+  "name": "Integration",
+  "config": {
+    "provider": "superwall",
+    "placementId": "campaign_trigger"
+  },
+  "outcomes": {
+    "purchase_completed": "scr_premium",
+    "restore_completed": "scr_premium",
+    "dismissed": "scr_free",
+    "failed": "scr_free"
+  },
+  "fallback": "scr_free"
+}
+```
+
+The target app must have Superwall enabled in Rheo App settings.
 
 ### Headless (External Surface Node)
 
@@ -507,11 +533,11 @@ The dashboard **Publish** button runs the same checks as the agent skill's publi
 - The entry target must exist (`entryScreenId`).
 - A completion path from entry (`end_flow`, terminal screen `next`, or external surface end).
 - **Every text and icon layer** has explicit `style.color` (including nested **button label** text — native does not inherit colors).
-- Screens with `text_input`, `multiple_choice`, `scale_input`, or `wheel_picker` include a `button` with `action.kind: "continue"`.
+- Screens with `text_input`, `multiple_choice`, `scale_input`, `wheel_picker`, `date_time_input`, `number_stepper`, `phone_input`, or `address_input` include a `button` with `action.kind: "continue"`.
 - At most one input layer per active path; do not combine OAuth or email/password login with other inputs on the same path.
 - Every `conditional` case has at least one rule and reads only fields answered above it.
 - Valid `fieldKey` (snake_case) on inputs; choice `goTo`, `go_to_step`, loader `onComplete`, and permission outcomes must reference existing `scr_*`, `dec_*`, or `surf_*` ids (or permission sentinels `continue` / `end`).
-- External surfaces: real `config.provider` (`revenuecat` for Integration Nodes or `headless` for External Surface Nodes), connected `fallback`, RevenueCat enabled when that provider is used.
+- External surfaces: real `config.provider` (`revenuecat` / `superwall` for Integration Nodes or `headless` for External Surface Nodes), connected `fallback`, matching App settings toggle enabled when a partner provider is used.
 - Run the skill's **audit-publish** command on `rheo-import.manifest.json` and fix all blocking issues in the publish-gates report.
 
 ## Common Invalid Outputs

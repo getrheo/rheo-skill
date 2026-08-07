@@ -45,9 +45,9 @@ These mirror `apps/web/src/features/builder/validateFlow.ts` and API `preflightP
 
 ### Integrations (default: enabled)
 
-- External surfaces need `config.provider` (not `unspecified`). Integration Nodes use partner providers such as `revenuecat`; External Surface Nodes use `headless`.
+- External surfaces need `config.provider` (not `unspecified`). Integration Nodes use partner providers such as `revenuecat` or `superwall`; External Surface Nodes use `headless`.
 - Every external surface needs `fallback`.
-- RevenueCat surfaces require RevenueCat integration enabled (import assumes enabled).
+- RevenueCat / Superwall surfaces require the matching integration enabled (import assumes enabled).
 - External Surface Nodes (`provider: "headless"`) do not require an App settings toggle; the host must supply `externalSurfaces`.
 
 ### Canvas editor gates (default: all enabled)

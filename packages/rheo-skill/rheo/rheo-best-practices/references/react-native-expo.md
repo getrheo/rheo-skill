@@ -15,7 +15,7 @@ pnpm add @getrheo/react-native-expo \
   react-native-safe-area-context expo-store-review expo-video
 ```
 
-**Integrations (host only, not SDK peers):** `react-native-appsflyer`, `react-native-purchases`, `react-native-purchases-ui` when the flow uses attribution or RevenueCat Integration Nodes. External Surface Nodes use `Flow` / `useFlow` `externalSurfaces` (no extra native peer).
+**Integrations (host only, not SDK peers):** `react-native-appsflyer`, `react-native-purchases`, `react-native-purchases-ui`, `expo-superwall` / `@superwall/react-native-superwall` when the flow uses attribution, RevenueCat, or Superwall Integration Nodes. External Surface Nodes use `Flow` / `useFlow` `externalSurfaces` (no extra native peer).
 
 ## Minimal Runtime
 
@@ -46,4 +46,4 @@ export const OnboardingHost = () => (
 - Pass channel public id, not flow id.
 - **Production:** default API is `https://api.getrheo.io`; omit `apiBaseUrl` unless self-hosting. Never use localhost with `ob_pk_live_*` keys.
 - Built-in OS permissions need `react-native-permissions` native setup (Expo plugin + Info.plist).
-- Expo Go cannot run native RevenueCat UI; use a dev client.
+- Expo Go cannot run native RevenueCat or Superwall UI; use a dev client.

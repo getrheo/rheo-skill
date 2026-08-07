@@ -299,7 +299,7 @@ const ScreenSpecSchema = z.object({
 const ExternalSurfaceSpecSchema = z.object({
   id: z.string().min(1).max(64),
   name: z.string().min(1).max(80).optional(),
-  provider: z.enum(['revenuecat', 'headless', 'unspecified']),
+  provider: z.enum(['revenuecat', 'superwall', 'headless', 'unspecified']),
   offeringId: z.string().min(1).max(128).optional(),
   placementId: z.string().min(1).max(128).optional(),
   presentation: z.enum(['paywall', 'paywall_if_needed']).optional(),

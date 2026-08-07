@@ -1,6 +1,6 @@
 ---
 name: rheo-best-practices
-description: Install and wire the Rheo SDK in a host app and follow Rheo implementation best practices. Use when a user asks to install Rheo, add @getrheo/react-native-expo or @getrheo/react-native-bare or RheoSwiftUI, wrap a flow host in RheoProvider, render Flow/FlowView, wire terminal callbacks, configure RevenueCat or AppsFlyer integrations, wire OAuth or email/password auth callbacks, request OS permissions, or add in-app review. Part of the `rheo` skill.
+description: Install and wire the Rheo SDK in a host app and follow Rheo implementation best practices. Use when a user asks to install Rheo, add @getrheo/react-native-expo or @getrheo/react-native-bare or RheoSwiftUI, wrap a flow host in RheoProvider, render Flow/FlowView, wire terminal callbacks, configure RevenueCat, Superwall, or AppsFlyer integrations, wire OAuth or email/password auth callbacks, request OS permissions, or add in-app review. Part of the `rheo` skill.
 ---
 
 # Rheo — Best Practices (SDK implementation)
@@ -30,7 +30,7 @@ Only install packages or edit host code when the user explicitly asks for implem
 - **Pass the channel public id**, not a flow id, to `Flow` / `FlowView`.
 - **Preserve the existing onboarding** as a fallback/rollback path (feature flag or route swap) unless the user explicitly asks to remove it.
 - **Read local conventions first** (package manager, navigation, env handling) and keep edits localized to the integration entry point and app config.
-- **RevenueCat and AppsFlyer are host integrations**, not SDK peers — the host configures and owns those SDKs and their secrets. Wire `fallback` for every Integration / External Surface Node.
+- **RevenueCat, Superwall, and AppsFlyer are host integrations**, not SDK peers — the host configures and owns those SDKs and their secrets. Wire `fallback` for every Integration / External Surface Node.
 - **External Surface Nodes** need a host `externalSurfaces` registry keyed by Host key (`config.hostKey` or `surf_*` id; callbacks `onComplete` / `onBack` / `onDismiss`). No App settings toggle.
 - **Do not add `request_app_review`** prompts unless the user explicitly asks; Apple discourages prompting from raw button taps.
 - Run the **narrowest useful verification** (typecheck or a build of the touched module), not a full app build, unless asked.

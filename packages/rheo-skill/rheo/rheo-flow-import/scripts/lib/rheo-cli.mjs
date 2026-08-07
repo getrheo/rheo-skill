@@ -4885,6 +4885,22 @@ var FieldKeySchema = external_exports.string().min(1).max(64).regex(FIELD_KEY_RE
 var FieldClassificationSchema = external_exports.enum(FIELD_CLASSIFICATIONS);
 var lazyLayer4 = () => layerSchemaStore.schema;
 var EmailPasswordAuthModeSchema = external_exports.enum(EMAIL_PASSWORD_AUTH_MODES);
+var PasswordRulesSchema = external_exports.object({
+  minLength: external_exports.number().int().min(4).max(128).optional(),
+  maxLength: external_exports.number().int().min(4).max(128).optional(),
+  requireUppercase: external_exports.boolean().optional(),
+  requireLowercase: external_exports.boolean().optional(),
+  requireDigit: external_exports.boolean().optional(),
+  requireSpecial: external_exports.boolean().optional()
+}).strict().superRefine((data, ctx) => {
+  if (data.minLength !== void 0 && data.maxLength !== void 0 && data.maxLength < data.minLength) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "passwordRules.maxLength must be >= minLength",
+      path: ["maxLength"]
+    });
+  }
+});
 var migrateEmailPasswordAuthIncoming = (raw) => {
   if (!raw || typeof raw !== "object") return raw;
   const o = raw;
@@ -5001,7 +5017,10 @@ var EmailPasswordAuthLayerSchemaValidated = external_exports.object({
   kind: external_exports.literal("email_password_auth"),
   mode: EmailPasswordAuthModeSchema,
   fieldKey: FieldKeySchema,
+  /** @deprecated Prefer `passwordRules.minLength`. Kept for backward compatibility. */
   minPasswordLength: external_exports.number().int().min(4).max(128).optional(),
+  /** Composition rules beyond minimum length (uppercase, digit, special, max). */
+  passwordRules: PasswordRulesSchema.optional(),
   children: external_exports.lazy(
     () => external_exports.array(external_exports.union([EmailPasswordFieldLayerSchema, EmailPasswordSubmitLayerSchema])).min(1)
   ),
@@ -5072,16 +5091,39 @@ var TextInputFieldStyleSchema = external_exports.object({
   letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
   opacity: external_exports.number().min(0).max(1).optional()
 }).partial();
+var TextInputAutoCapitalizeSchema = external_exports.enum([
+  "none",
+  "sentences",
+  "words",
+  "characters"
+]);
+var TextInputReturnKeyTypeSchema = external_exports.enum([
+  "done",
+  "next",
+  "go",
+  "send",
+  "search",
+  "default"
+]);
+var TextInputValidationModeSchema = external_exports.enum(["onBlur", "onSubmit", "live"]);
 var TextInputLayerSchema = external_exports.object({
   ...baseLayerShape,
   kind: external_exports.literal("text_input"),
   fieldKey: FieldKeySchema,
   placeholder: LocalizedTextSchema.optional(),
+  /** Optional helper copy shown under the field when valid / untouched. */
+  helperText: LocalizedTextSchema.optional(),
   inputType: TextInputTypeSchema.optional(),
   required: external_exports.boolean().optional(),
   minLength: external_exports.number().int().min(0).max(2e3).optional(),
   maxLength: external_exports.number().int().positive().max(2e3).optional(),
   classification: FieldClassificationSchema,
+  /** Override autocapitalize (defaults from `inputType` when omitted). */
+  autoCapitalize: TextInputAutoCapitalizeSchema.optional(),
+  /** Soft keyboard return key label. */
+  returnKeyType: TextInputReturnKeyTypeSchema.optional(),
+  /** When to show inline validation errors (default `onBlur`). */
+  validationMode: TextInputValidationModeSchema.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer5())).optional(),
   /** Typography for the native input's typed text. */
   fieldStyle: TextInputFieldStyleSchema.optional(),
@@ -5150,6 +5192,221 @@ var WheelPickerLayerSchema = external_exports.object({
   itemStyle: WheelPickerItemStyleSchema.optional(),
   selectedItemStyle: WheelPickerItemStyleSchema.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer5())).optional(),
+  style: CommonStyleSchema.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema
+});
+var DATE_TIME_INPUT_MODES = ["date", "time", "datetime"];
+var NUMBER_STEPPER_BUTTON_ROLES = ["decrement", "increment"];
+var ADDRESS_INPUT_FIELDS = [
+  "line1",
+  "line2",
+  "city",
+  "region",
+  "postalCode",
+  "country"
+];
+var lazyLayer6 = () => layerSchemaStore.schema;
+var CountryCodeSchema = external_exports.string().length(2).regex(/^[A-Za-z]{2}$/u).transform((s) => s.toUpperCase());
+var DateTimeInputModeSchema = external_exports.enum(DATE_TIME_INPUT_MODES);
+var DateTimeInputLayerSchema = external_exports.object({
+  ...baseLayerShape,
+  kind: external_exports.literal("date_time_input"),
+  fieldKey: FieldKeySchema,
+  mode: DateTimeInputModeSchema.optional(),
+  required: external_exports.boolean().optional(),
+  min: external_exports.string().min(1).max(64).optional(),
+  max: external_exports.string().min(1).max(64).optional(),
+  defaultValue: external_exports.string().min(1).max(64).optional(),
+  placeholder: LocalizedTextSchema.optional(),
+  classification: FieldClassificationSchema,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer6())).optional(),
+  fieldStyle: TextInputFieldStyleSchema.optional(),
+  style: CommonStyleSchema.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema
+});
+var NumberStepperButtonRoleSchema = external_exports.enum(NUMBER_STEPPER_BUTTON_ROLES);
+var NumberStepperButtonLayerSchema = external_exports.object({
+  ...baseLayerShape,
+  kind: external_exports.literal("number_stepper_button"),
+  role: NumberStepperButtonRoleSchema,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer6())).optional(),
+  style: CommonStyleSchema.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema
+});
+var NumberStepperValueLayerSchema = external_exports.object({
+  ...baseLayerShape,
+  kind: external_exports.literal("number_stepper_value"),
+  unitLabel: LocalizedTextSchema.optional(),
+  style: TextStyleSchema.optional(),
+  styleBreakpoints: TextStyleBreakpointsSchema
+});
+var migrateNumberStepperIncoming = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "number_stepper") return raw;
+  if (Array.isArray(o.children) && o.children.length > 0) return raw;
+  const idBase = typeof o.id === "string" ? o.id : "lyr_number_stepper";
+  const slugRaw = idBase.replace(/^lyr_/i, "").replace(/[^a-z0-9_]/gi, "_");
+  const slug = slugRaw.length > 0 ? slugRaw.slice(0, 40) : "stepper";
+  const valueStyle = o.valueStyle && typeof o.valueStyle === "object" ? o.valueStyle : void 0;
+  const buttonColor = o.buttonColor;
+  const mkButton = (role, glyph) => {
+    const suf = role === "decrement" ? "dec" : "inc";
+    return {
+      id: `lyr_${slug}_btn_${suf}`.slice(0, 64),
+      kind: "number_stepper_button",
+      role,
+      style: {
+        width: 36,
+        height: 36,
+        radius: 8
+      },
+      children: [
+        {
+          id: `lyr_${slug}_btn_${suf}_txt`.slice(0, 64),
+          kind: "text",
+          text: { default: glyph },
+          style: {
+            fontSize: 20,
+            align: "center",
+            ...buttonColor !== void 0 ? { color: buttonColor } : {}
+          }
+        }
+      ]
+    };
+  };
+  const valueChild = {
+    id: `lyr_${slug}_value`.slice(0, 64),
+    kind: "number_stepper_value",
+    style: {
+      fontSize: typeof valueStyle?.fontSize === "number" ? valueStyle.fontSize : 14,
+      width: "full",
+      ...typeof valueStyle?.fontFamily === "string" ? { fontFamily: valueStyle.fontFamily } : {},
+      ...typeof valueStyle?.fontWeight === "number" ? { fontWeight: valueStyle.fontWeight } : {},
+      ...valueStyle?.color !== void 0 ? { color: valueStyle.color } : {},
+      ...typeof valueStyle?.lineHeight === "number" ? { lineHeight: valueStyle.lineHeight } : {},
+      ...typeof valueStyle?.letterSpacing === "number" ? { letterSpacing: valueStyle.letterSpacing } : {},
+      ...typeof valueStyle?.opacity === "number" ? { opacity: valueStyle.opacity } : {},
+      align: typeof valueStyle?.align === "string" ? valueStyle.align : "center"
+    }
+  };
+  if (o.unitLabel !== void 0) valueChild.unitLabel = o.unitLabel;
+  const {
+    valueStyle: _vs,
+    buttonColor: _bc,
+    unitLabel: _ul,
+    ...rest
+  } = o;
+  return {
+    ...rest,
+    direction: typeof o.direction === "string" ? o.direction : "horizontal",
+    gap: typeof o.gap === "number" ? o.gap : 12,
+    align: typeof o.align === "string" ? o.align : "center",
+    ...typeof o.distribution === "string" ? { distribution: o.distribution } : {},
+    children: [mkButton("decrement", "-"), valueChild, mkButton("increment", "+")]
+  };
+};
+var refineNumberStepperChildren = (data, ctx) => {
+  const buttons = data.children.filter((c) => c.kind === "number_stepper_button");
+  const values = data.children.filter((c) => c.kind === "number_stepper_value");
+  const other = data.children.filter(
+    (c) => c.kind !== "number_stepper_button" && c.kind !== "number_stepper_value"
+  );
+  if (other.length > 0) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "number_stepper children must be number_stepper_button or number_stepper_value",
+      path: ["children"]
+    });
+  }
+  const roles = /* @__PURE__ */ new Set();
+  for (const b of buttons) {
+    if (b.kind !== "number_stepper_button") continue;
+    if (roles.has(b.role)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate number_stepper_button role "${b.role}"`,
+        path: ["children"]
+      });
+    }
+    roles.add(b.role);
+  }
+  for (const role of NUMBER_STEPPER_BUTTON_ROLES) {
+    if (!roles.has(role)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `number_stepper requires a number_stepper_button with role "${role}"`,
+        path: ["children"]
+      });
+    }
+  }
+  if (values.length !== 1) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: `number_stepper must have exactly one number_stepper_value (found ${values.length})`,
+      path: ["children"]
+    });
+  }
+};
+var NumberStepperLayerSchemaValidated = external_exports.object({
+  ...baseLayerShape,
+  kind: external_exports.literal("number_stepper"),
+  fieldKey: FieldKeySchema,
+  min: external_exports.number(),
+  max: external_exports.number(),
+  step: external_exports.number().positive().optional(),
+  defaultValue: external_exports.number().optional(),
+  classification: FieldClassificationSchema,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).max(64).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  children: external_exports.lazy(
+    () => external_exports.array(external_exports.union([NumberStepperButtonLayerSchema, NumberStepperValueLayerSchema])).min(1)
+  ),
+  style: CommonStyleSchema.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema
+}).superRefine(refineNumberStepperChildren);
+var NumberStepperLayerSchema = external_exports.preprocess(
+  migrateNumberStepperIncoming,
+  NumberStepperLayerSchemaValidated
+);
+var PhoneInputLayerSchema = external_exports.object({
+  ...baseLayerShape,
+  kind: external_exports.literal("phone_input"),
+  fieldKey: FieldKeySchema,
+  defaultCountryCode: CountryCodeSchema.optional(),
+  allowedCountryCodes: external_exports.array(CountryCodeSchema).min(1).max(250).optional(),
+  required: external_exports.boolean().optional(),
+  placeholder: LocalizedTextSchema.optional(),
+  classification: FieldClassificationSchema,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer6())).optional(),
+  fieldStyle: TextInputFieldStyleSchema.optional(),
+  style: CommonStyleSchema.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema
+});
+var AddressInputFieldSchema = external_exports.enum(ADDRESS_INPUT_FIELDS);
+var AddressInputPlaceholdersSchema = external_exports.object({
+  line1: LocalizedTextSchema.optional(),
+  line2: LocalizedTextSchema.optional(),
+  city: LocalizedTextSchema.optional(),
+  region: LocalizedTextSchema.optional(),
+  postalCode: LocalizedTextSchema.optional(),
+  country: LocalizedTextSchema.optional()
+}).partial();
+var AddressInputLayerSchema = external_exports.object({
+  ...baseLayerShape,
+  kind: external_exports.literal("address_input"),
+  fieldKey: FieldKeySchema,
+  requiredFields: external_exports.array(AddressInputFieldSchema).min(1).max(6).optional(),
+  showLine2: external_exports.boolean().optional(),
+  showRegion: external_exports.boolean().optional(),
+  defaultCountryCode: CountryCodeSchema.optional(),
+  placeholders: AddressInputPlaceholdersSchema.optional(),
+  classification: FieldClassificationSchema,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer6())).optional(),
+  fieldStyle: TextInputFieldStyleSchema.optional(),
+  gap: external_exports.number().int().min(0).max(64).optional(),
   style: CommonStyleSchema.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema
 });
@@ -5287,6 +5544,12 @@ layerSchemaStore.schema = external_exports.lazy(
     TextInputLayerSchema,
     ScaleInputLayerSchema,
     WheelPickerLayerSchema,
+    DateTimeInputLayerSchema,
+    NumberStepperLayerSchema,
+    NumberStepperButtonLayerSchema,
+    NumberStepperValueLayerSchema,
+    PhoneInputLayerSchema,
+    AddressInputLayerSchema,
     OAuthLoginLayerSchema,
     OAuthProviderPresetLayerSchema,
     OAuthProviderCustomLayerSchema,
@@ -5298,7 +5561,17 @@ layerSchemaStore.schema = external_exports.lazy(
   ])
 );
 var LayerSchema = layerSchemaStore.schema;
-var isInputLayer = (l) => l.kind === "single_choice" || l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker";
+var MANUAL_SUBMIT_INPUT_KINDS = [
+  "multiple_choice",
+  "text_input",
+  "scale_input",
+  "wheel_picker",
+  "date_time_input",
+  "number_stepper",
+  "phone_input",
+  "address_input"
+];
+var isInputLayer = (l) => l.kind === "single_choice" || l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker" || l.kind === "date_time_input" || l.kind === "number_stepper" || l.kind === "phone_input" || l.kind === "address_input";
 
 // ../../node_modules/@getrheo/contracts/dist/localized.js
 var LocaleCode2 = external_exports.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/, 'locale must be like "en" or "en-US"');
@@ -5733,11 +6006,11 @@ var OAuthPresetButtonChromeBreakpointsSchema2 = external_exports.object({
 }).partial().optional();
 var EMAIL_PASSWORD_AUTH_MODES2 = ["sign_in", "sign_up"];
 var EMAIL_PASSWORD_SLOTS2 = ["email", "password", "confirm"];
-var lazyLayer6 = () => layerSchemaStore2.schema;
+var lazyLayer7 = () => layerSchemaStore2.schema;
 var ButtonLayerSchema2 = external_exports.object({
   ...baseLayerShape2,
   kind: external_exports.literal("button"),
-  children: external_exports.lazy(() => external_exports.array(lazyLayer6())),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer7())),
   action: ButtonActionSchema2,
   variant: ButtonLayerVariantSchema2,
   direction: external_exports.enum(["vertical", "horizontal"]).optional(),
@@ -5751,7 +6024,7 @@ var ButtonLayerSchema2 = external_exports.object({
 var BackButtonLayerSchema2 = external_exports.object({
   ...baseLayerShape2,
   kind: external_exports.literal("back_button"),
-  children: external_exports.lazy(() => external_exports.array(lazyLayer6())),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer7())),
   variant: ButtonLayerVariantSchema2,
   direction: external_exports.enum(["vertical", "horizontal"]).optional(),
   gap: external_exports.number().int().min(0).optional(),
@@ -6138,6 +6411,22 @@ var FieldKeySchema2 = external_exports.string().min(1).max(64).regex(FIELD_KEY_R
 var FieldClassificationSchema2 = external_exports.enum(FIELD_CLASSIFICATIONS2);
 var lazyLayer42 = () => layerSchemaStore2.schema;
 var EmailPasswordAuthModeSchema2 = external_exports.enum(EMAIL_PASSWORD_AUTH_MODES2);
+var PasswordRulesSchema2 = external_exports.object({
+  minLength: external_exports.number().int().min(4).max(128).optional(),
+  maxLength: external_exports.number().int().min(4).max(128).optional(),
+  requireUppercase: external_exports.boolean().optional(),
+  requireLowercase: external_exports.boolean().optional(),
+  requireDigit: external_exports.boolean().optional(),
+  requireSpecial: external_exports.boolean().optional()
+}).strict().superRefine((data, ctx) => {
+  if (data.minLength !== void 0 && data.maxLength !== void 0 && data.maxLength < data.minLength) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "passwordRules.maxLength must be >= minLength",
+      path: ["maxLength"]
+    });
+  }
+});
 var migrateEmailPasswordAuthIncoming2 = (raw) => {
   if (!raw || typeof raw !== "object") return raw;
   const o = raw;
@@ -6254,7 +6543,10 @@ var EmailPasswordAuthLayerSchemaValidated2 = external_exports.object({
   kind: external_exports.literal("email_password_auth"),
   mode: EmailPasswordAuthModeSchema2,
   fieldKey: FieldKeySchema2,
+  /** @deprecated Prefer `passwordRules.minLength`. Kept for backward compatibility. */
   minPasswordLength: external_exports.number().int().min(4).max(128).optional(),
+  /** Composition rules beyond minimum length (uppercase, digit, special, max). */
+  passwordRules: PasswordRulesSchema2.optional(),
   children: external_exports.lazy(
     () => external_exports.array(external_exports.union([EmailPasswordFieldLayerSchema2, EmailPasswordSubmitLayerSchema2])).min(1)
   ),
@@ -6325,16 +6617,39 @@ var TextInputFieldStyleSchema2 = external_exports.object({
   letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
   opacity: external_exports.number().min(0).max(1).optional()
 }).partial();
+var TextInputAutoCapitalizeSchema2 = external_exports.enum([
+  "none",
+  "sentences",
+  "words",
+  "characters"
+]);
+var TextInputReturnKeyTypeSchema2 = external_exports.enum([
+  "done",
+  "next",
+  "go",
+  "send",
+  "search",
+  "default"
+]);
+var TextInputValidationModeSchema2 = external_exports.enum(["onBlur", "onSubmit", "live"]);
 var TextInputLayerSchema2 = external_exports.object({
   ...baseLayerShape2,
   kind: external_exports.literal("text_input"),
   fieldKey: FieldKeySchema2,
   placeholder: LocalizedTextSchema3.optional(),
+  /** Optional helper copy shown under the field when valid / untouched. */
+  helperText: LocalizedTextSchema3.optional(),
   inputType: TextInputTypeSchema2.optional(),
   required: external_exports.boolean().optional(),
   minLength: external_exports.number().int().min(0).max(2e3).optional(),
   maxLength: external_exports.number().int().positive().max(2e3).optional(),
   classification: FieldClassificationSchema2,
+  /** Override autocapitalize (defaults from `inputType` when omitted). */
+  autoCapitalize: TextInputAutoCapitalizeSchema2.optional(),
+  /** Soft keyboard return key label. */
+  returnKeyType: TextInputReturnKeyTypeSchema2.optional(),
+  /** When to show inline validation errors (default `onBlur`). */
+  validationMode: TextInputValidationModeSchema2.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer52())).optional(),
   /** Typography for the native input's typed text. */
   fieldStyle: TextInputFieldStyleSchema2.optional(),
@@ -6403,6 +6718,221 @@ var WheelPickerLayerSchema2 = external_exports.object({
   itemStyle: WheelPickerItemStyleSchema2.optional(),
   selectedItemStyle: WheelPickerItemStyleSchema2.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer52())).optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+});
+var DATE_TIME_INPUT_MODES2 = ["date", "time", "datetime"];
+var NUMBER_STEPPER_BUTTON_ROLES2 = ["decrement", "increment"];
+var ADDRESS_INPUT_FIELDS2 = [
+  "line1",
+  "line2",
+  "city",
+  "region",
+  "postalCode",
+  "country"
+];
+var lazyLayer62 = () => layerSchemaStore2.schema;
+var CountryCodeSchema2 = external_exports.string().length(2).regex(/^[A-Za-z]{2}$/u).transform((s) => s.toUpperCase());
+var DateTimeInputModeSchema2 = external_exports.enum(DATE_TIME_INPUT_MODES2);
+var DateTimeInputLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("date_time_input"),
+  fieldKey: FieldKeySchema2,
+  mode: DateTimeInputModeSchema2.optional(),
+  required: external_exports.boolean().optional(),
+  min: external_exports.string().min(1).max(64).optional(),
+  max: external_exports.string().min(1).max(64).optional(),
+  defaultValue: external_exports.string().min(1).max(64).optional(),
+  placeholder: LocalizedTextSchema3.optional(),
+  classification: FieldClassificationSchema2,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer62())).optional(),
+  fieldStyle: TextInputFieldStyleSchema2.optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+});
+var NumberStepperButtonRoleSchema2 = external_exports.enum(NUMBER_STEPPER_BUTTON_ROLES2);
+var NumberStepperButtonLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("number_stepper_button"),
+  role: NumberStepperButtonRoleSchema2,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer62())).optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+});
+var NumberStepperValueLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("number_stepper_value"),
+  unitLabel: LocalizedTextSchema3.optional(),
+  style: TextStyleSchema2.optional(),
+  styleBreakpoints: TextStyleBreakpointsSchema2
+});
+var migrateNumberStepperIncoming2 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "number_stepper") return raw;
+  if (Array.isArray(o.children) && o.children.length > 0) return raw;
+  const idBase = typeof o.id === "string" ? o.id : "lyr_number_stepper";
+  const slugRaw = idBase.replace(/^lyr_/i, "").replace(/[^a-z0-9_]/gi, "_");
+  const slug = slugRaw.length > 0 ? slugRaw.slice(0, 40) : "stepper";
+  const valueStyle = o.valueStyle && typeof o.valueStyle === "object" ? o.valueStyle : void 0;
+  const buttonColor = o.buttonColor;
+  const mkButton = (role, glyph) => {
+    const suf = role === "decrement" ? "dec" : "inc";
+    return {
+      id: `lyr_${slug}_btn_${suf}`.slice(0, 64),
+      kind: "number_stepper_button",
+      role,
+      style: {
+        width: 36,
+        height: 36,
+        radius: 8
+      },
+      children: [
+        {
+          id: `lyr_${slug}_btn_${suf}_txt`.slice(0, 64),
+          kind: "text",
+          text: { default: glyph },
+          style: {
+            fontSize: 20,
+            align: "center",
+            ...buttonColor !== void 0 ? { color: buttonColor } : {}
+          }
+        }
+      ]
+    };
+  };
+  const valueChild = {
+    id: `lyr_${slug}_value`.slice(0, 64),
+    kind: "number_stepper_value",
+    style: {
+      fontSize: typeof valueStyle?.fontSize === "number" ? valueStyle.fontSize : 14,
+      width: "full",
+      ...typeof valueStyle?.fontFamily === "string" ? { fontFamily: valueStyle.fontFamily } : {},
+      ...typeof valueStyle?.fontWeight === "number" ? { fontWeight: valueStyle.fontWeight } : {},
+      ...valueStyle?.color !== void 0 ? { color: valueStyle.color } : {},
+      ...typeof valueStyle?.lineHeight === "number" ? { lineHeight: valueStyle.lineHeight } : {},
+      ...typeof valueStyle?.letterSpacing === "number" ? { letterSpacing: valueStyle.letterSpacing } : {},
+      ...typeof valueStyle?.opacity === "number" ? { opacity: valueStyle.opacity } : {},
+      align: typeof valueStyle?.align === "string" ? valueStyle.align : "center"
+    }
+  };
+  if (o.unitLabel !== void 0) valueChild.unitLabel = o.unitLabel;
+  const {
+    valueStyle: _vs,
+    buttonColor: _bc,
+    unitLabel: _ul,
+    ...rest
+  } = o;
+  return {
+    ...rest,
+    direction: typeof o.direction === "string" ? o.direction : "horizontal",
+    gap: typeof o.gap === "number" ? o.gap : 12,
+    align: typeof o.align === "string" ? o.align : "center",
+    ...typeof o.distribution === "string" ? { distribution: o.distribution } : {},
+    children: [mkButton("decrement", "-"), valueChild, mkButton("increment", "+")]
+  };
+};
+var refineNumberStepperChildren2 = (data, ctx) => {
+  const buttons = data.children.filter((c) => c.kind === "number_stepper_button");
+  const values = data.children.filter((c) => c.kind === "number_stepper_value");
+  const other = data.children.filter(
+    (c) => c.kind !== "number_stepper_button" && c.kind !== "number_stepper_value"
+  );
+  if (other.length > 0) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "number_stepper children must be number_stepper_button or number_stepper_value",
+      path: ["children"]
+    });
+  }
+  const roles = /* @__PURE__ */ new Set();
+  for (const b of buttons) {
+    if (b.kind !== "number_stepper_button") continue;
+    if (roles.has(b.role)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate number_stepper_button role "${b.role}"`,
+        path: ["children"]
+      });
+    }
+    roles.add(b.role);
+  }
+  for (const role of NUMBER_STEPPER_BUTTON_ROLES2) {
+    if (!roles.has(role)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `number_stepper requires a number_stepper_button with role "${role}"`,
+        path: ["children"]
+      });
+    }
+  }
+  if (values.length !== 1) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: `number_stepper must have exactly one number_stepper_value (found ${values.length})`,
+      path: ["children"]
+    });
+  }
+};
+var NumberStepperLayerSchemaValidated2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("number_stepper"),
+  fieldKey: FieldKeySchema2,
+  min: external_exports.number(),
+  max: external_exports.number(),
+  step: external_exports.number().positive().optional(),
+  defaultValue: external_exports.number().optional(),
+  classification: FieldClassificationSchema2,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).max(64).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  children: external_exports.lazy(
+    () => external_exports.array(external_exports.union([NumberStepperButtonLayerSchema2, NumberStepperValueLayerSchema2])).min(1)
+  ),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+}).superRefine(refineNumberStepperChildren2);
+var NumberStepperLayerSchema2 = external_exports.preprocess(
+  migrateNumberStepperIncoming2,
+  NumberStepperLayerSchemaValidated2
+);
+var PhoneInputLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("phone_input"),
+  fieldKey: FieldKeySchema2,
+  defaultCountryCode: CountryCodeSchema2.optional(),
+  allowedCountryCodes: external_exports.array(CountryCodeSchema2).min(1).max(250).optional(),
+  required: external_exports.boolean().optional(),
+  placeholder: LocalizedTextSchema3.optional(),
+  classification: FieldClassificationSchema2,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer62())).optional(),
+  fieldStyle: TextInputFieldStyleSchema2.optional(),
+  style: CommonStyleSchema2.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema2
+});
+var AddressInputFieldSchema2 = external_exports.enum(ADDRESS_INPUT_FIELDS2);
+var AddressInputPlaceholdersSchema2 = external_exports.object({
+  line1: LocalizedTextSchema3.optional(),
+  line2: LocalizedTextSchema3.optional(),
+  city: LocalizedTextSchema3.optional(),
+  region: LocalizedTextSchema3.optional(),
+  postalCode: LocalizedTextSchema3.optional(),
+  country: LocalizedTextSchema3.optional()
+}).partial();
+var AddressInputLayerSchema2 = external_exports.object({
+  ...baseLayerShape2,
+  kind: external_exports.literal("address_input"),
+  fieldKey: FieldKeySchema2,
+  requiredFields: external_exports.array(AddressInputFieldSchema2).min(1).max(6).optional(),
+  showLine2: external_exports.boolean().optional(),
+  showRegion: external_exports.boolean().optional(),
+  defaultCountryCode: CountryCodeSchema2.optional(),
+  placeholders: AddressInputPlaceholdersSchema2.optional(),
+  classification: FieldClassificationSchema2,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer62())).optional(),
+  fieldStyle: TextInputFieldStyleSchema2.optional(),
+  gap: external_exports.number().int().min(0).max(64).optional(),
   style: CommonStyleSchema2.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema2
 });
@@ -6558,6 +7088,12 @@ layerSchemaStore2.schema = external_exports.lazy(
     TextInputLayerSchema2,
     ScaleInputLayerSchema2,
     WheelPickerLayerSchema2,
+    DateTimeInputLayerSchema2,
+    NumberStepperLayerSchema2,
+    NumberStepperButtonLayerSchema2,
+    NumberStepperValueLayerSchema2,
+    PhoneInputLayerSchema2,
+    AddressInputLayerSchema2,
     OAuthLoginLayerSchema2,
     OAuthProviderPresetLayerSchema2,
     OAuthProviderCustomLayerSchema2,
@@ -7049,11 +7585,11 @@ var OAuthPresetButtonChromeBreakpointsSchema3 = external_exports.object({
 }).partial().optional();
 var EMAIL_PASSWORD_AUTH_MODES3 = ["sign_in", "sign_up"];
 var EMAIL_PASSWORD_SLOTS3 = ["email", "password", "confirm"];
-var lazyLayer7 = () => layerSchemaStore3.schema;
+var lazyLayer8 = () => layerSchemaStore3.schema;
 var ButtonLayerSchema3 = external_exports.object({
   ...baseLayerShape3,
   kind: external_exports.literal("button"),
-  children: external_exports.lazy(() => external_exports.array(lazyLayer7())),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer8())),
   action: ButtonActionSchema3,
   variant: ButtonLayerVariantSchema3,
   direction: external_exports.enum(["vertical", "horizontal"]).optional(),
@@ -7067,7 +7603,7 @@ var ButtonLayerSchema3 = external_exports.object({
 var BackButtonLayerSchema3 = external_exports.object({
   ...baseLayerShape3,
   kind: external_exports.literal("back_button"),
-  children: external_exports.lazy(() => external_exports.array(lazyLayer7())),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer8())),
   variant: ButtonLayerVariantSchema3,
   direction: external_exports.enum(["vertical", "horizontal"]).optional(),
   gap: external_exports.number().int().min(0).optional(),
@@ -7451,6 +7987,22 @@ var OAuthLoginProvidersArraySchema2 = external_exports.array(OAuthLoginProviderS
 });
 var lazyLayer43 = () => layerSchemaStore3.schema;
 var EmailPasswordAuthModeSchema3 = external_exports.enum(EMAIL_PASSWORD_AUTH_MODES3);
+var PasswordRulesSchema3 = external_exports.object({
+  minLength: external_exports.number().int().min(4).max(128).optional(),
+  maxLength: external_exports.number().int().min(4).max(128).optional(),
+  requireUppercase: external_exports.boolean().optional(),
+  requireLowercase: external_exports.boolean().optional(),
+  requireDigit: external_exports.boolean().optional(),
+  requireSpecial: external_exports.boolean().optional()
+}).strict().superRefine((data, ctx) => {
+  if (data.minLength !== void 0 && data.maxLength !== void 0 && data.maxLength < data.minLength) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "passwordRules.maxLength must be >= minLength",
+      path: ["maxLength"]
+    });
+  }
+});
 var migrateEmailPasswordAuthIncoming3 = (raw) => {
   if (!raw || typeof raw !== "object") return raw;
   const o = raw;
@@ -7567,7 +8119,10 @@ var EmailPasswordAuthLayerSchemaValidated3 = external_exports.object({
   kind: external_exports.literal("email_password_auth"),
   mode: EmailPasswordAuthModeSchema3,
   fieldKey: FieldKeySchema3,
+  /** @deprecated Prefer `passwordRules.minLength`. Kept for backward compatibility. */
   minPasswordLength: external_exports.number().int().min(4).max(128).optional(),
+  /** Composition rules beyond minimum length (uppercase, digit, special, max). */
+  passwordRules: PasswordRulesSchema3.optional(),
   children: external_exports.lazy(
     () => external_exports.array(external_exports.union([EmailPasswordFieldLayerSchema3, EmailPasswordSubmitLayerSchema3])).min(1)
   ),
@@ -7686,16 +8241,39 @@ var TextInputFieldStyleSchema3 = external_exports.object({
   letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
   opacity: external_exports.number().min(0).max(1).optional()
 }).partial();
+var TextInputAutoCapitalizeSchema3 = external_exports.enum([
+  "none",
+  "sentences",
+  "words",
+  "characters"
+]);
+var TextInputReturnKeyTypeSchema3 = external_exports.enum([
+  "done",
+  "next",
+  "go",
+  "send",
+  "search",
+  "default"
+]);
+var TextInputValidationModeSchema3 = external_exports.enum(["onBlur", "onSubmit", "live"]);
 var TextInputLayerSchema3 = external_exports.object({
   ...baseLayerShape3,
   kind: external_exports.literal("text_input"),
   fieldKey: FieldKeySchema3,
   placeholder: LocalizedTextSchema4.optional(),
+  /** Optional helper copy shown under the field when valid / untouched. */
+  helperText: LocalizedTextSchema4.optional(),
   inputType: TextInputTypeSchema3.optional(),
   required: external_exports.boolean().optional(),
   minLength: external_exports.number().int().min(0).max(2e3).optional(),
   maxLength: external_exports.number().int().positive().max(2e3).optional(),
   classification: FieldClassificationSchema3,
+  /** Override autocapitalize (defaults from `inputType` when omitted). */
+  autoCapitalize: TextInputAutoCapitalizeSchema3.optional(),
+  /** Soft keyboard return key label. */
+  returnKeyType: TextInputReturnKeyTypeSchema3.optional(),
+  /** When to show inline validation errors (default `onBlur`). */
+  validationMode: TextInputValidationModeSchema3.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer53())).optional(),
   /** Typography for the native input's typed text. */
   fieldStyle: TextInputFieldStyleSchema3.optional(),
@@ -7764,6 +8342,221 @@ var WheelPickerLayerSchema3 = external_exports.object({
   itemStyle: WheelPickerItemStyleSchema3.optional(),
   selectedItemStyle: WheelPickerItemStyleSchema3.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer53())).optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+});
+var DATE_TIME_INPUT_MODES3 = ["date", "time", "datetime"];
+var NUMBER_STEPPER_BUTTON_ROLES3 = ["decrement", "increment"];
+var ADDRESS_INPUT_FIELDS3 = [
+  "line1",
+  "line2",
+  "city",
+  "region",
+  "postalCode",
+  "country"
+];
+var lazyLayer63 = () => layerSchemaStore3.schema;
+var CountryCodeSchema3 = external_exports.string().length(2).regex(/^[A-Za-z]{2}$/u).transform((s) => s.toUpperCase());
+var DateTimeInputModeSchema3 = external_exports.enum(DATE_TIME_INPUT_MODES3);
+var DateTimeInputLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("date_time_input"),
+  fieldKey: FieldKeySchema3,
+  mode: DateTimeInputModeSchema3.optional(),
+  required: external_exports.boolean().optional(),
+  min: external_exports.string().min(1).max(64).optional(),
+  max: external_exports.string().min(1).max(64).optional(),
+  defaultValue: external_exports.string().min(1).max(64).optional(),
+  placeholder: LocalizedTextSchema4.optional(),
+  classification: FieldClassificationSchema3,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer63())).optional(),
+  fieldStyle: TextInputFieldStyleSchema3.optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+});
+var NumberStepperButtonRoleSchema3 = external_exports.enum(NUMBER_STEPPER_BUTTON_ROLES3);
+var NumberStepperButtonLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("number_stepper_button"),
+  role: NumberStepperButtonRoleSchema3,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer63())).optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+});
+var NumberStepperValueLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("number_stepper_value"),
+  unitLabel: LocalizedTextSchema4.optional(),
+  style: TextStyleSchema3.optional(),
+  styleBreakpoints: TextStyleBreakpointsSchema3
+});
+var migrateNumberStepperIncoming3 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "number_stepper") return raw;
+  if (Array.isArray(o.children) && o.children.length > 0) return raw;
+  const idBase = typeof o.id === "string" ? o.id : "lyr_number_stepper";
+  const slugRaw = idBase.replace(/^lyr_/i, "").replace(/[^a-z0-9_]/gi, "_");
+  const slug = slugRaw.length > 0 ? slugRaw.slice(0, 40) : "stepper";
+  const valueStyle = o.valueStyle && typeof o.valueStyle === "object" ? o.valueStyle : void 0;
+  const buttonColor = o.buttonColor;
+  const mkButton = (role, glyph) => {
+    const suf = role === "decrement" ? "dec" : "inc";
+    return {
+      id: `lyr_${slug}_btn_${suf}`.slice(0, 64),
+      kind: "number_stepper_button",
+      role,
+      style: {
+        width: 36,
+        height: 36,
+        radius: 8
+      },
+      children: [
+        {
+          id: `lyr_${slug}_btn_${suf}_txt`.slice(0, 64),
+          kind: "text",
+          text: { default: glyph },
+          style: {
+            fontSize: 20,
+            align: "center",
+            ...buttonColor !== void 0 ? { color: buttonColor } : {}
+          }
+        }
+      ]
+    };
+  };
+  const valueChild = {
+    id: `lyr_${slug}_value`.slice(0, 64),
+    kind: "number_stepper_value",
+    style: {
+      fontSize: typeof valueStyle?.fontSize === "number" ? valueStyle.fontSize : 14,
+      width: "full",
+      ...typeof valueStyle?.fontFamily === "string" ? { fontFamily: valueStyle.fontFamily } : {},
+      ...typeof valueStyle?.fontWeight === "number" ? { fontWeight: valueStyle.fontWeight } : {},
+      ...valueStyle?.color !== void 0 ? { color: valueStyle.color } : {},
+      ...typeof valueStyle?.lineHeight === "number" ? { lineHeight: valueStyle.lineHeight } : {},
+      ...typeof valueStyle?.letterSpacing === "number" ? { letterSpacing: valueStyle.letterSpacing } : {},
+      ...typeof valueStyle?.opacity === "number" ? { opacity: valueStyle.opacity } : {},
+      align: typeof valueStyle?.align === "string" ? valueStyle.align : "center"
+    }
+  };
+  if (o.unitLabel !== void 0) valueChild.unitLabel = o.unitLabel;
+  const {
+    valueStyle: _vs,
+    buttonColor: _bc,
+    unitLabel: _ul,
+    ...rest
+  } = o;
+  return {
+    ...rest,
+    direction: typeof o.direction === "string" ? o.direction : "horizontal",
+    gap: typeof o.gap === "number" ? o.gap : 12,
+    align: typeof o.align === "string" ? o.align : "center",
+    ...typeof o.distribution === "string" ? { distribution: o.distribution } : {},
+    children: [mkButton("decrement", "-"), valueChild, mkButton("increment", "+")]
+  };
+};
+var refineNumberStepperChildren3 = (data, ctx) => {
+  const buttons = data.children.filter((c) => c.kind === "number_stepper_button");
+  const values = data.children.filter((c) => c.kind === "number_stepper_value");
+  const other = data.children.filter(
+    (c) => c.kind !== "number_stepper_button" && c.kind !== "number_stepper_value"
+  );
+  if (other.length > 0) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "number_stepper children must be number_stepper_button or number_stepper_value",
+      path: ["children"]
+    });
+  }
+  const roles = /* @__PURE__ */ new Set();
+  for (const b of buttons) {
+    if (b.kind !== "number_stepper_button") continue;
+    if (roles.has(b.role)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate number_stepper_button role "${b.role}"`,
+        path: ["children"]
+      });
+    }
+    roles.add(b.role);
+  }
+  for (const role of NUMBER_STEPPER_BUTTON_ROLES3) {
+    if (!roles.has(role)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `number_stepper requires a number_stepper_button with role "${role}"`,
+        path: ["children"]
+      });
+    }
+  }
+  if (values.length !== 1) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: `number_stepper must have exactly one number_stepper_value (found ${values.length})`,
+      path: ["children"]
+    });
+  }
+};
+var NumberStepperLayerSchemaValidated3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("number_stepper"),
+  fieldKey: FieldKeySchema3,
+  min: external_exports.number(),
+  max: external_exports.number(),
+  step: external_exports.number().positive().optional(),
+  defaultValue: external_exports.number().optional(),
+  classification: FieldClassificationSchema3,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).max(64).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  children: external_exports.lazy(
+    () => external_exports.array(external_exports.union([NumberStepperButtonLayerSchema3, NumberStepperValueLayerSchema3])).min(1)
+  ),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+}).superRefine(refineNumberStepperChildren3);
+var NumberStepperLayerSchema3 = external_exports.preprocess(
+  migrateNumberStepperIncoming3,
+  NumberStepperLayerSchemaValidated3
+);
+var PhoneInputLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("phone_input"),
+  fieldKey: FieldKeySchema3,
+  defaultCountryCode: CountryCodeSchema3.optional(),
+  allowedCountryCodes: external_exports.array(CountryCodeSchema3).min(1).max(250).optional(),
+  required: external_exports.boolean().optional(),
+  placeholder: LocalizedTextSchema4.optional(),
+  classification: FieldClassificationSchema3,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer63())).optional(),
+  fieldStyle: TextInputFieldStyleSchema3.optional(),
+  style: CommonStyleSchema3.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema3
+});
+var AddressInputFieldSchema3 = external_exports.enum(ADDRESS_INPUT_FIELDS3);
+var AddressInputPlaceholdersSchema3 = external_exports.object({
+  line1: LocalizedTextSchema4.optional(),
+  line2: LocalizedTextSchema4.optional(),
+  city: LocalizedTextSchema4.optional(),
+  region: LocalizedTextSchema4.optional(),
+  postalCode: LocalizedTextSchema4.optional(),
+  country: LocalizedTextSchema4.optional()
+}).partial();
+var AddressInputLayerSchema3 = external_exports.object({
+  ...baseLayerShape3,
+  kind: external_exports.literal("address_input"),
+  fieldKey: FieldKeySchema3,
+  requiredFields: external_exports.array(AddressInputFieldSchema3).min(1).max(6).optional(),
+  showLine2: external_exports.boolean().optional(),
+  showRegion: external_exports.boolean().optional(),
+  defaultCountryCode: CountryCodeSchema3.optional(),
+  placeholders: AddressInputPlaceholdersSchema3.optional(),
+  classification: FieldClassificationSchema3,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer63())).optional(),
+  fieldStyle: TextInputFieldStyleSchema3.optional(),
+  gap: external_exports.number().int().min(0).max(64).optional(),
   style: CommonStyleSchema3.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema3
 });
@@ -7972,6 +8765,12 @@ layerSchemaStore3.schema = external_exports.lazy(
     TextInputLayerSchema3,
     ScaleInputLayerSchema3,
     WheelPickerLayerSchema3,
+    DateTimeInputLayerSchema3,
+    NumberStepperLayerSchema3,
+    NumberStepperButtonLayerSchema3,
+    NumberStepperValueLayerSchema3,
+    PhoneInputLayerSchema3,
+    AddressInputLayerSchema3,
     OAuthLoginLayerSchema3,
     OAuthProviderPresetLayerSchema3,
     OAuthProviderCustomLayerSchema3,
@@ -7996,14 +8795,21 @@ var layerChildren = (layer) => {
     case "oauth_login":
     case "email_password_auth":
     case "email_password_submit":
+    case "number_stepper":
       return layer.children;
     case "carousel":
       return layer.slides;
     case "text_input":
     case "scale_input":
     case "wheel_picker":
+    case "date_time_input":
+    case "phone_input":
+    case "address_input":
     case "email_password_field":
+    case "number_stepper_button":
       return layer.children ?? [];
+    case "number_stepper_value":
+      return [];
     case "oauth_provider":
       return layer.variant === "custom" ? layer.children : [];
     default:
@@ -8041,7 +8847,15 @@ var layerHasAbsolutePositionAuthored = (layer) => {
     case "text_input":
     case "scale_input":
     case "wheel_picker":
+    case "date_time_input":
+    case "number_stepper":
+    case "phone_input":
+    case "address_input":
       return commonStyleHasAbsolutePosition(layer.style, void 0);
+    case "number_stepper_button":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
+    case "number_stepper_value":
+      return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
     case "oauth_provider":
       if (layer.variant === "preset") {
         return commonStyleHasAbsolutePosition(layer.style, layer.styleBreakpoints);
@@ -8065,7 +8879,7 @@ var layerHasAbsolutePositionAuthored = (layer) => {
       return false;
   }
 };
-var isInputLayer2 = (l) => l.kind === "single_choice" || l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker";
+var isInputLayer2 = (l) => l.kind === "single_choice" || l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker" || l.kind === "date_time_input" || l.kind === "number_stepper" || l.kind === "phone_input" || l.kind === "address_input";
 var ANIMATABLE_PROPERTIES = [
   "opacity",
   "translateX",
@@ -8317,7 +9131,11 @@ var walkScreenLayersWithLayoutContext = (screen, fn) => {
       for (const c of l.children) {
         visit(c, childCtx({ insideChoiceOption: true }));
       }
-    } else if (l.kind === "text_input" || l.kind === "scale_input") {
+    } else if (l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker" || l.kind === "date_time_input" || l.kind === "phone_input" || l.kind === "address_input") {
+      for (const c of l.children ?? []) visit(c, childCtx());
+    } else if (l.kind === "number_stepper") {
+      for (const c of l.children) visit(c, childCtx());
+    } else if (l.kind === "number_stepper_button") {
       for (const c of l.children ?? []) visit(c, childCtx());
     } else if (l.kind === "oauth_login") {
       for (const c of l.children) visit(c, childCtx());
@@ -8352,7 +9170,11 @@ var walkScreenLayers = (screen, fn) => {
     else if (l.kind === "hyperlink") l.children.forEach(visit);
     else if (l.kind === "single_choice" || l.kind === "multiple_choice") {
       l.children.forEach(visit);
-    } else if (l.kind === "text_input" || l.kind === "scale_input") {
+    } else if (l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker" || l.kind === "date_time_input" || l.kind === "phone_input" || l.kind === "address_input") {
+      l.children?.forEach(visit);
+    } else if (l.kind === "number_stepper") {
+      l.children.forEach(visit);
+    } else if (l.kind === "number_stepper_button") {
       l.children?.forEach(visit);
     } else if (l.kind === "oauth_login") {
       l.children.forEach(visit);
@@ -8435,7 +9257,7 @@ var NORMALIZED_SURFACE_OUTCOMES = [
   "back"
 ];
 var NormalizedSurfaceOutcomeSchema = external_exports.enum(NORMALIZED_SURFACE_OUTCOMES);
-var SurfaceProviderSchema = external_exports.enum(["unspecified", "revenuecat", "headless"]);
+var SurfaceProviderSchema = external_exports.enum(["unspecified", "revenuecat", "superwall", "headless"]);
 var UnspecifiedExternalSurfaceConfigSchema = external_exports.object({
   provider: external_exports.literal("unspecified")
 });
@@ -8445,6 +9267,10 @@ var RevenueCatSurfaceConfigSchema = external_exports.object({
   offeringId: external_exports.string().min(1).max(128).optional(),
   placementId: external_exports.string().min(1).max(128).optional(),
   presentation: RevenueCatSurfacePresentationSchema.optional()
+});
+var SuperwallSurfaceConfigSchema = external_exports.object({
+  provider: external_exports.literal("superwall"),
+  placementId: external_exports.string().min(1).max(128).optional()
 });
 var ExternalSurfaceHostKeySchema = external_exports.string().min(1).max(64).regex(
   /^[a-zA-Z][a-zA-Z0-9_]*$/,
@@ -8458,6 +9284,7 @@ var HeadlessExternalSurfaceConfigSchema = external_exports.object({
 var ExternalSurfaceConfigSchema = external_exports.discriminatedUnion("provider", [
   UnspecifiedExternalSurfaceConfigSchema,
   RevenueCatSurfaceConfigSchema,
+  SuperwallSurfaceConfigSchema,
   HeadlessExternalSurfaceConfigSchema
 ]);
 var ExternalSurfaceOutcomesMapSchema = external_exports.object({
@@ -8494,7 +9321,18 @@ var RESERVED_RC_SDK_KEYS = [
   /** RevenueCat offering id surfaced by the most recent paywall presentation. */
   "onb_rc_last_offering_id"
 ];
-var RESERVED_SDK_KEYS_SET = new Set(RESERVED_RC_SDK_KEYS);
+var RESERVED_SUPERWALL_SDK_KEYS = [
+  /** Last Superwall event observed by the SDK (e.g. `purchase_completed`, `dismissed`). */
+  "onb_sw_last_event",
+  /** Product identifier from the most recent successful Superwall purchase. */
+  "onb_sw_last_product_id",
+  /** Placement id from the most recent Superwall registration. */
+  "onb_sw_last_placement_id"
+];
+var RESERVED_SDK_KEYS_SET = /* @__PURE__ */ new Set([
+  ...RESERVED_RC_SDK_KEYS,
+  ...RESERVED_SUPERWALL_SDK_KEYS
+]);
 var isReservedSdkKey = (key) => RESERVED_SDK_KEYS_SET.has(key);
 var MANIFEST_SCHEMA_VERSION = 7;
 var ThemeSchema = external_exports.object({
@@ -8876,6 +9714,13 @@ var refineManifestScreens = (manifest, ctx, jumpTargets, screenIds, allFieldKeys
           path: ["screens", screenIdx, "regions"]
         });
       }
+      if ((l.kind === "number_stepper_button" || l.kind === "number_stepper_value") && layoutCtx.parentKind !== "number_stepper") {
+        ctx.addIssue({
+          code: external_exports.ZodIssueCode.custom,
+          message: `Layer "${l.id}" (${l.kind}) must be nested under a number stepper`,
+          path: ["screens", screenIdx, "regions"]
+        });
+      }
     });
     const nextDefault = screen.next.default;
     if (nextDefault && !jumpTargets.has(nextDefault)) {
@@ -9117,15 +9962,21 @@ var RevenueCatIntegrationSchema = external_exports.object({
   defaultOfferingId: external_exports.string(),
   defaultPlacementId: external_exports.string()
 });
+var SuperwallIntegrationSchema = external_exports.object({
+  enabled: external_exports.boolean(),
+  defaultPlacementId: external_exports.string()
+});
 var AppsFlyerIntegrationSchema = external_exports.object({
   enabled: external_exports.boolean()
 });
 var ResolvedAppIntegrationsSchema = external_exports.object({
   revenuecat: RevenueCatIntegrationSchema,
+  superwall: SuperwallIntegrationSchema,
   appsflyer: AppsFlyerIntegrationSchema
 });
 var AppIntegrationsSchema = external_exports.object({
   revenuecat: RevenueCatIntegrationSchema.partial().optional(),
+  superwall: SuperwallIntegrationSchema.partial().optional(),
   appsflyer: AppsFlyerIntegrationSchema.partial().optional()
 }).passthrough();
 var DASHBOARD_ATTRIBUTION_INTEGRATION_PROVIDER_IDS = ["appsflyer"];
@@ -9307,14 +10158,14 @@ var SdkEventBatchSchema = external_exports.object({
 var IapPurchasePeriodTypeSchema = external_exports.enum(["normal", "intro", "trial"]);
 var IapPurchaseEventPropertiesSchema = external_exports.object({
   /** External surface provider that produced the purchase. */
-  provider: external_exports.literal("revenuecat"),
+  provider: external_exports.enum(["revenuecat", "superwall"]),
   /** Manifest node id of the surface (e.g. `surf_paywall_welcome`). */
   surface_node_id: external_exports.string().min(1).max(128),
   /** Store product identifier (e.g. `pro_annual`). */
   product_id: external_exports.string().min(1).max(256),
-  /** Optional RevenueCat offering id (manifest config or RC metadata). */
+  /** Optional offering id (RevenueCat) or placement id mirrored for analytics. */
   offering_id: external_exports.string().min(1).max(128).optional(),
-  /** Optional RevenueCat package identifier within the offering (e.g. `$rc_annual`). */
+  /** Optional package identifier within an offering (e.g. `$rc_annual`). */
   package_id: external_exports.string().min(1).max(128).optional(),
   /** Localized gross store price at purchase time (non-negative). */
   price: external_exports.number().nonnegative().optional(),
@@ -9846,11 +10697,11 @@ var OAuthPresetButtonChromeBreakpointsSchema4 = external_exports.object({
 }).partial().optional();
 var EMAIL_PASSWORD_AUTH_MODES4 = ["sign_in", "sign_up"];
 var EMAIL_PASSWORD_SLOTS4 = ["email", "password", "confirm"];
-var lazyLayer8 = () => layerSchemaStore4.schema;
+var lazyLayer9 = () => layerSchemaStore4.schema;
 var ButtonLayerSchema4 = external_exports.object({
   ...baseLayerShape4,
   kind: external_exports.literal("button"),
-  children: external_exports.lazy(() => external_exports.array(lazyLayer8())),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer9())),
   action: ButtonActionSchema4,
   variant: ButtonLayerVariantSchema4,
   direction: external_exports.enum(["vertical", "horizontal"]).optional(),
@@ -9864,7 +10715,7 @@ var ButtonLayerSchema4 = external_exports.object({
 var BackButtonLayerSchema4 = external_exports.object({
   ...baseLayerShape4,
   kind: external_exports.literal("back_button"),
-  children: external_exports.lazy(() => external_exports.array(lazyLayer8())),
+  children: external_exports.lazy(() => external_exports.array(lazyLayer9())),
   variant: ButtonLayerVariantSchema4,
   direction: external_exports.enum(["vertical", "horizontal"]).optional(),
   gap: external_exports.number().int().min(0).optional(),
@@ -10251,6 +11102,22 @@ var FieldKeySchema5 = external_exports.string().min(1).max(64).regex(FIELD_KEY_R
 var FieldClassificationSchema5 = external_exports.enum(FIELD_CLASSIFICATIONS5);
 var lazyLayer44 = () => layerSchemaStore4.schema;
 var EmailPasswordAuthModeSchema4 = external_exports.enum(EMAIL_PASSWORD_AUTH_MODES4);
+var PasswordRulesSchema4 = external_exports.object({
+  minLength: external_exports.number().int().min(4).max(128).optional(),
+  maxLength: external_exports.number().int().min(4).max(128).optional(),
+  requireUppercase: external_exports.boolean().optional(),
+  requireLowercase: external_exports.boolean().optional(),
+  requireDigit: external_exports.boolean().optional(),
+  requireSpecial: external_exports.boolean().optional()
+}).strict().superRefine((data, ctx) => {
+  if (data.minLength !== void 0 && data.maxLength !== void 0 && data.maxLength < data.minLength) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "passwordRules.maxLength must be >= minLength",
+      path: ["maxLength"]
+    });
+  }
+});
 var migrateEmailPasswordAuthIncoming4 = (raw) => {
   if (!raw || typeof raw !== "object") return raw;
   const o = raw;
@@ -10367,7 +11234,10 @@ var EmailPasswordAuthLayerSchemaValidated4 = external_exports.object({
   kind: external_exports.literal("email_password_auth"),
   mode: EmailPasswordAuthModeSchema4,
   fieldKey: FieldKeySchema5,
+  /** @deprecated Prefer `passwordRules.minLength`. Kept for backward compatibility. */
   minPasswordLength: external_exports.number().int().min(4).max(128).optional(),
+  /** Composition rules beyond minimum length (uppercase, digit, special, max). */
+  passwordRules: PasswordRulesSchema4.optional(),
   children: external_exports.lazy(
     () => external_exports.array(external_exports.union([EmailPasswordFieldLayerSchema4, EmailPasswordSubmitLayerSchema4])).min(1)
   ),
@@ -10438,16 +11308,39 @@ var TextInputFieldStyleSchema4 = external_exports.object({
   letterSpacing: external_exports.number().min(-0.5).max(1).optional(),
   opacity: external_exports.number().min(0).max(1).optional()
 }).partial();
+var TextInputAutoCapitalizeSchema4 = external_exports.enum([
+  "none",
+  "sentences",
+  "words",
+  "characters"
+]);
+var TextInputReturnKeyTypeSchema4 = external_exports.enum([
+  "done",
+  "next",
+  "go",
+  "send",
+  "search",
+  "default"
+]);
+var TextInputValidationModeSchema4 = external_exports.enum(["onBlur", "onSubmit", "live"]);
 var TextInputLayerSchema4 = external_exports.object({
   ...baseLayerShape4,
   kind: external_exports.literal("text_input"),
   fieldKey: FieldKeySchema5,
   placeholder: LocalizedTextSchema5.optional(),
+  /** Optional helper copy shown under the field when valid / untouched. */
+  helperText: LocalizedTextSchema5.optional(),
   inputType: TextInputTypeSchema4.optional(),
   required: external_exports.boolean().optional(),
   minLength: external_exports.number().int().min(0).max(2e3).optional(),
   maxLength: external_exports.number().int().positive().max(2e3).optional(),
   classification: FieldClassificationSchema5,
+  /** Override autocapitalize (defaults from `inputType` when omitted). */
+  autoCapitalize: TextInputAutoCapitalizeSchema4.optional(),
+  /** Soft keyboard return key label. */
+  returnKeyType: TextInputReturnKeyTypeSchema4.optional(),
+  /** When to show inline validation errors (default `onBlur`). */
+  validationMode: TextInputValidationModeSchema4.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer54())).optional(),
   /** Typography for the native input's typed text. */
   fieldStyle: TextInputFieldStyleSchema4.optional(),
@@ -10516,6 +11409,221 @@ var WheelPickerLayerSchema4 = external_exports.object({
   itemStyle: WheelPickerItemStyleSchema4.optional(),
   selectedItemStyle: WheelPickerItemStyleSchema4.optional(),
   children: external_exports.lazy(() => external_exports.array(lazyLayer54())).optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+});
+var DATE_TIME_INPUT_MODES4 = ["date", "time", "datetime"];
+var NUMBER_STEPPER_BUTTON_ROLES4 = ["decrement", "increment"];
+var ADDRESS_INPUT_FIELDS4 = [
+  "line1",
+  "line2",
+  "city",
+  "region",
+  "postalCode",
+  "country"
+];
+var lazyLayer64 = () => layerSchemaStore4.schema;
+var CountryCodeSchema4 = external_exports.string().length(2).regex(/^[A-Za-z]{2}$/u).transform((s) => s.toUpperCase());
+var DateTimeInputModeSchema4 = external_exports.enum(DATE_TIME_INPUT_MODES4);
+var DateTimeInputLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("date_time_input"),
+  fieldKey: FieldKeySchema5,
+  mode: DateTimeInputModeSchema4.optional(),
+  required: external_exports.boolean().optional(),
+  min: external_exports.string().min(1).max(64).optional(),
+  max: external_exports.string().min(1).max(64).optional(),
+  defaultValue: external_exports.string().min(1).max(64).optional(),
+  placeholder: LocalizedTextSchema5.optional(),
+  classification: FieldClassificationSchema5,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer64())).optional(),
+  fieldStyle: TextInputFieldStyleSchema4.optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+});
+var NumberStepperButtonRoleSchema4 = external_exports.enum(NUMBER_STEPPER_BUTTON_ROLES4);
+var NumberStepperButtonLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("number_stepper_button"),
+  role: NumberStepperButtonRoleSchema4,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer64())).optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+});
+var NumberStepperValueLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("number_stepper_value"),
+  unitLabel: LocalizedTextSchema5.optional(),
+  style: TextStyleSchema4.optional(),
+  styleBreakpoints: TextStyleBreakpointsSchema4
+});
+var migrateNumberStepperIncoming4 = (raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = raw;
+  if (o.kind !== "number_stepper") return raw;
+  if (Array.isArray(o.children) && o.children.length > 0) return raw;
+  const idBase = typeof o.id === "string" ? o.id : "lyr_number_stepper";
+  const slugRaw = idBase.replace(/^lyr_/i, "").replace(/[^a-z0-9_]/gi, "_");
+  const slug = slugRaw.length > 0 ? slugRaw.slice(0, 40) : "stepper";
+  const valueStyle = o.valueStyle && typeof o.valueStyle === "object" ? o.valueStyle : void 0;
+  const buttonColor = o.buttonColor;
+  const mkButton = (role, glyph) => {
+    const suf = role === "decrement" ? "dec" : "inc";
+    return {
+      id: `lyr_${slug}_btn_${suf}`.slice(0, 64),
+      kind: "number_stepper_button",
+      role,
+      style: {
+        width: 36,
+        height: 36,
+        radius: 8
+      },
+      children: [
+        {
+          id: `lyr_${slug}_btn_${suf}_txt`.slice(0, 64),
+          kind: "text",
+          text: { default: glyph },
+          style: {
+            fontSize: 20,
+            align: "center",
+            ...buttonColor !== void 0 ? { color: buttonColor } : {}
+          }
+        }
+      ]
+    };
+  };
+  const valueChild = {
+    id: `lyr_${slug}_value`.slice(0, 64),
+    kind: "number_stepper_value",
+    style: {
+      fontSize: typeof valueStyle?.fontSize === "number" ? valueStyle.fontSize : 14,
+      width: "full",
+      ...typeof valueStyle?.fontFamily === "string" ? { fontFamily: valueStyle.fontFamily } : {},
+      ...typeof valueStyle?.fontWeight === "number" ? { fontWeight: valueStyle.fontWeight } : {},
+      ...valueStyle?.color !== void 0 ? { color: valueStyle.color } : {},
+      ...typeof valueStyle?.lineHeight === "number" ? { lineHeight: valueStyle.lineHeight } : {},
+      ...typeof valueStyle?.letterSpacing === "number" ? { letterSpacing: valueStyle.letterSpacing } : {},
+      ...typeof valueStyle?.opacity === "number" ? { opacity: valueStyle.opacity } : {},
+      align: typeof valueStyle?.align === "string" ? valueStyle.align : "center"
+    }
+  };
+  if (o.unitLabel !== void 0) valueChild.unitLabel = o.unitLabel;
+  const {
+    valueStyle: _vs,
+    buttonColor: _bc,
+    unitLabel: _ul,
+    ...rest
+  } = o;
+  return {
+    ...rest,
+    direction: typeof o.direction === "string" ? o.direction : "horizontal",
+    gap: typeof o.gap === "number" ? o.gap : 12,
+    align: typeof o.align === "string" ? o.align : "center",
+    ...typeof o.distribution === "string" ? { distribution: o.distribution } : {},
+    children: [mkButton("decrement", "-"), valueChild, mkButton("increment", "+")]
+  };
+};
+var refineNumberStepperChildren4 = (data, ctx) => {
+  const buttons = data.children.filter((c) => c.kind === "number_stepper_button");
+  const values = data.children.filter((c) => c.kind === "number_stepper_value");
+  const other = data.children.filter(
+    (c) => c.kind !== "number_stepper_button" && c.kind !== "number_stepper_value"
+  );
+  if (other.length > 0) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: "number_stepper children must be number_stepper_button or number_stepper_value",
+      path: ["children"]
+    });
+  }
+  const roles = /* @__PURE__ */ new Set();
+  for (const b of buttons) {
+    if (b.kind !== "number_stepper_button") continue;
+    if (roles.has(b.role)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `duplicate number_stepper_button role "${b.role}"`,
+        path: ["children"]
+      });
+    }
+    roles.add(b.role);
+  }
+  for (const role of NUMBER_STEPPER_BUTTON_ROLES4) {
+    if (!roles.has(role)) {
+      ctx.addIssue({
+        code: external_exports.ZodIssueCode.custom,
+        message: `number_stepper requires a number_stepper_button with role "${role}"`,
+        path: ["children"]
+      });
+    }
+  }
+  if (values.length !== 1) {
+    ctx.addIssue({
+      code: external_exports.ZodIssueCode.custom,
+      message: `number_stepper must have exactly one number_stepper_value (found ${values.length})`,
+      path: ["children"]
+    });
+  }
+};
+var NumberStepperLayerSchemaValidated4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("number_stepper"),
+  fieldKey: FieldKeySchema5,
+  min: external_exports.number(),
+  max: external_exports.number(),
+  step: external_exports.number().positive().optional(),
+  defaultValue: external_exports.number().optional(),
+  classification: FieldClassificationSchema5,
+  direction: external_exports.enum(["vertical", "horizontal"]).optional(),
+  gap: external_exports.number().int().min(0).max(64).optional(),
+  align: external_exports.enum(["start", "center", "end", "stretch"]).optional(),
+  distribution: external_exports.enum(["start", "center", "end", "between", "around"]).optional(),
+  children: external_exports.lazy(
+    () => external_exports.array(external_exports.union([NumberStepperButtonLayerSchema4, NumberStepperValueLayerSchema4])).min(1)
+  ),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+}).superRefine(refineNumberStepperChildren4);
+var NumberStepperLayerSchema4 = external_exports.preprocess(
+  migrateNumberStepperIncoming4,
+  NumberStepperLayerSchemaValidated4
+);
+var PhoneInputLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("phone_input"),
+  fieldKey: FieldKeySchema5,
+  defaultCountryCode: CountryCodeSchema4.optional(),
+  allowedCountryCodes: external_exports.array(CountryCodeSchema4).min(1).max(250).optional(),
+  required: external_exports.boolean().optional(),
+  placeholder: LocalizedTextSchema5.optional(),
+  classification: FieldClassificationSchema5,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer64())).optional(),
+  fieldStyle: TextInputFieldStyleSchema4.optional(),
+  style: CommonStyleSchema4.optional(),
+  styleBreakpoints: CommonStyleBreakpointsSchema4
+});
+var AddressInputFieldSchema4 = external_exports.enum(ADDRESS_INPUT_FIELDS4);
+var AddressInputPlaceholdersSchema4 = external_exports.object({
+  line1: LocalizedTextSchema5.optional(),
+  line2: LocalizedTextSchema5.optional(),
+  city: LocalizedTextSchema5.optional(),
+  region: LocalizedTextSchema5.optional(),
+  postalCode: LocalizedTextSchema5.optional(),
+  country: LocalizedTextSchema5.optional()
+}).partial();
+var AddressInputLayerSchema4 = external_exports.object({
+  ...baseLayerShape4,
+  kind: external_exports.literal("address_input"),
+  fieldKey: FieldKeySchema5,
+  requiredFields: external_exports.array(AddressInputFieldSchema4).min(1).max(6).optional(),
+  showLine2: external_exports.boolean().optional(),
+  showRegion: external_exports.boolean().optional(),
+  defaultCountryCode: CountryCodeSchema4.optional(),
+  placeholders: AddressInputPlaceholdersSchema4.optional(),
+  classification: FieldClassificationSchema5,
+  children: external_exports.lazy(() => external_exports.array(lazyLayer64())).optional(),
+  fieldStyle: TextInputFieldStyleSchema4.optional(),
+  gap: external_exports.number().int().min(0).max(64).optional(),
   style: CommonStyleSchema4.optional(),
   styleBreakpoints: CommonStyleBreakpointsSchema4
 });
@@ -10653,6 +11761,12 @@ layerSchemaStore4.schema = external_exports.lazy(
     TextInputLayerSchema4,
     ScaleInputLayerSchema4,
     WheelPickerLayerSchema4,
+    DateTimeInputLayerSchema4,
+    NumberStepperLayerSchema4,
+    NumberStepperButtonLayerSchema4,
+    NumberStepperValueLayerSchema4,
+    PhoneInputLayerSchema4,
+    AddressInputLayerSchema4,
     OAuthLoginLayerSchema4,
     OAuthProviderPresetLayerSchema4,
     OAuthProviderCustomLayerSchema4,
@@ -10891,7 +12005,7 @@ var walkLayers = (root, fn) => {
     else if (l.kind === "hyperlink") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "single_choice" || l.kind === "multiple_choice") {
       l.children.forEach((c) => visit(c, depth + 1));
-    } else if (l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker") {
+    } else if (l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker" || l.kind === "date_time_input" || l.kind === "phone_input" || l.kind === "address_input") {
       l.children?.forEach((c) => visit(c, depth + 1));
     } else if (l.kind === "oauth_login") {
       l.children.forEach((c) => visit(c, depth + 1));
@@ -10903,6 +12017,10 @@ var walkLayers = (root, fn) => {
       l.children?.forEach((c) => visit(c, depth + 1));
     } else if (l.kind === "email_password_submit") {
       l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "number_stepper") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "number_stepper_button") {
+      l.children?.forEach((c) => visit(c, depth + 1));
     }
   };
   visit(root, 0);
@@ -11134,6 +12252,7 @@ var validatePublishable = (manifest) => {
   }
   return { ok: issues.length === 0, issues, warnings };
 };
+var isManualSubmitKind = (kind) => MANUAL_SUBMIT_INPUT_KINDS.includes(kind);
 var FIELD_KEY_RE6 = /^[a-z][a-z0-9_]*$/;
 var styleBucketHasColor = (s) => s !== void 0 && s.color !== void 0;
 var textLayerHasAuthoringColor = (l) => {
@@ -11239,7 +12358,7 @@ var collectFlowBuilderIssues = (manifest) => {
       }
       if (isInputLayer(l)) {
         inputCount += 1;
-        if (l.kind === "multiple_choice" || l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker") {
+        if (isManualSubmitKind(l.kind)) {
           needsManualSubmit = true;
         }
         const key = l.fieldKey;
@@ -11436,7 +12555,7 @@ var collectFlowBuilderIssues = (manifest) => {
     }
     if (needsManualSubmit && !hasContinueButton) {
       issues.push(
-        `Screen "${screen.name || screen.id}" has a multiple_choice, text_input, scale_input, or wheel_picker but no Button with action "continue". Add a Continue button so users can submit.`
+        `Screen "${screen.name || screen.id}" has a manual-submit input (text, scale, wheel, date/time, stepper, phone, address, or multiple choice) but no Button with action "continue". Add a Continue button so users can submit.`
       );
     }
   }
@@ -11681,6 +12800,20 @@ var scanLayer = (issues, screen, layer, branding) => {
         branding
       );
       return;
+    case "date_time_input":
+    case "phone_input":
+    case "address_input":
+      walkCommonBreakpoints(issues, stepId, id, layer.style, void 0, branding);
+      return;
+    case "number_stepper":
+      walkCommonBreakpoints(issues, stepId, id, layer.style, layer.styleBreakpoints, branding);
+      return;
+    case "number_stepper_button":
+      walkCommonBreakpoints(issues, stepId, id, layer.style, layer.styleBreakpoints, branding);
+      return;
+    case "number_stepper_value":
+      walkTextBreakpoints(issues, stepId, id, layer.style, layer.styleBreakpoints, branding);
+      return;
     case "oauth_login":
       walkCommonBreakpoints(issues, stepId, id, layer.style, layer.styleBreakpoints, branding);
       return;
@@ -11766,6 +12899,62 @@ var RESTING_MOTION_KEYFRAMES_CSS = `
   100% { transform: rotate(var(--ob-rm-rotate-peak, 5deg)); }
 }
 `.trim();
+var COUNTRY_DIAL_ENTRIES = [
+  { code: "US", dial: "1", label: "United States" },
+  { code: "CA", dial: "1", label: "Canada" },
+  { code: "GB", dial: "44", label: "United Kingdom" },
+  { code: "AU", dial: "61", label: "Australia" },
+  { code: "NZ", dial: "64", label: "New Zealand" },
+  { code: "IE", dial: "353", label: "Ireland" },
+  { code: "DE", dial: "49", label: "Germany" },
+  { code: "FR", dial: "33", label: "France" },
+  { code: "ES", dial: "34", label: "Spain" },
+  { code: "IT", dial: "39", label: "Italy" },
+  { code: "PT", dial: "351", label: "Portugal" },
+  { code: "NL", dial: "31", label: "Netherlands" },
+  { code: "BE", dial: "32", label: "Belgium" },
+  { code: "CH", dial: "41", label: "Switzerland" },
+  { code: "AT", dial: "43", label: "Austria" },
+  { code: "SE", dial: "46", label: "Sweden" },
+  { code: "NO", dial: "47", label: "Norway" },
+  { code: "DK", dial: "45", label: "Denmark" },
+  { code: "FI", dial: "358", label: "Finland" },
+  { code: "PL", dial: "48", label: "Poland" },
+  { code: "CZ", dial: "420", label: "Czechia" },
+  { code: "RO", dial: "40", label: "Romania" },
+  { code: "HU", dial: "36", label: "Hungary" },
+  { code: "GR", dial: "30", label: "Greece" },
+  { code: "TR", dial: "90", label: "Turkey" },
+  { code: "UA", dial: "380", label: "Ukraine" },
+  { code: "RU", dial: "7", label: "Russia" },
+  { code: "IN", dial: "91", label: "India" },
+  { code: "PK", dial: "92", label: "Pakistan" },
+  { code: "BD", dial: "880", label: "Bangladesh" },
+  { code: "JP", dial: "81", label: "Japan" },
+  { code: "KR", dial: "82", label: "South Korea" },
+  { code: "CN", dial: "86", label: "China" },
+  { code: "TW", dial: "886", label: "Taiwan" },
+  { code: "HK", dial: "852", label: "Hong Kong" },
+  { code: "SG", dial: "65", label: "Singapore" },
+  { code: "MY", dial: "60", label: "Malaysia" },
+  { code: "TH", dial: "66", label: "Thailand" },
+  { code: "VN", dial: "84", label: "Vietnam" },
+  { code: "PH", dial: "63", label: "Philippines" },
+  { code: "ID", dial: "62", label: "Indonesia" },
+  { code: "BR", dial: "55", label: "Brazil" },
+  { code: "MX", dial: "52", label: "Mexico" },
+  { code: "AR", dial: "54", label: "Argentina" },
+  { code: "CL", dial: "56", label: "Chile" },
+  { code: "CO", dial: "57", label: "Colombia" },
+  { code: "PE", dial: "51", label: "Peru" },
+  { code: "ZA", dial: "27", label: "South Africa" },
+  { code: "NG", dial: "234", label: "Nigeria" },
+  { code: "EG", dial: "20", label: "Egypt" },
+  { code: "IL", dial: "972", label: "Israel" },
+  { code: "AE", dial: "971", label: "United Arab Emirates" },
+  { code: "SA", dial: "966", label: "Saudi Arabia" }
+];
+var byCode = new Map(COUNTRY_DIAL_ENTRIES.map((e) => [e.code, e]));
 var extractLiquidTemplateBodies = (s) => {
   const out = [];
   let i = 0;
@@ -12044,6 +13233,8 @@ var GAP_BY_KIND = {
   oauth_login: 8,
   email_password_auth: 8,
   email_password_submit: 8,
+  number_stepper: 12,
+  address_input: 8,
   button: 8,
   back_button: 8,
   oauth_provider: 8,
@@ -12095,13 +13286,21 @@ var defaultLayoutStyleForKind = (kind) => {
     case "oauth_provider":
     case "email_password_submit":
       return LAYOUT_FULL_HUG;
+    case "number_stepper_button":
+      return LAYOUT_HUG_HUG;
     case "text_input":
     case "scale_input":
     case "wheel_picker":
+    case "date_time_input":
+    case "number_stepper":
+    case "phone_input":
+    case "address_input":
     case "email_password_auth":
     case "email_password_field":
     case "oauth_login":
       return LAYOUT_FULL_FILL;
+    case "number_stepper_value":
+      return LAYOUT_FULL_HUG;
     case "progress":
       return LAYOUT_PROGRESS;
     case "loader":
@@ -12313,7 +13512,7 @@ var walkLayers2 = (root, fn) => {
     else if (l.kind === "hyperlink") l.children.forEach((c) => visit(c, depth + 1));
     else if (l.kind === "single_choice" || l.kind === "multiple_choice") {
       l.children.forEach((c) => visit(c, depth + 1));
-    } else if (l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker") {
+    } else if (l.kind === "text_input" || l.kind === "scale_input" || l.kind === "wheel_picker" || l.kind === "date_time_input" || l.kind === "phone_input" || l.kind === "address_input") {
       l.children?.forEach((c) => visit(c, depth + 1));
     } else if (l.kind === "oauth_login") {
       l.children.forEach((c) => visit(c, depth + 1));
@@ -12325,6 +13524,10 @@ var walkLayers2 = (root, fn) => {
       l.children?.forEach((c) => visit(c, depth + 1));
     } else if (l.kind === "email_password_submit") {
       l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "number_stepper") {
+      l.children.forEach((c) => visit(c, depth + 1));
+    } else if (l.kind === "number_stepper_button") {
+      l.children?.forEach((c) => visit(c, depth + 1));
     }
   };
   visit(root, 0);
@@ -12389,6 +13592,10 @@ var IMPORT_PUBLISH_INTEGRATIONS = {
     enabled: true,
     defaultOfferingId: "default",
     defaultPlacementId: ""
+  },
+  superwall: {
+    enabled: true,
+    defaultPlacementId: "campaign_trigger"
   },
   appsflyer: { enabled: false }
 };
@@ -12466,8 +13673,11 @@ var fixForBuilderMessage = (message) => {
   if (message.includes("RevenueCat")) {
     return "Enable RevenueCat in App settings \u2192 Integrations, or remove RevenueCat external surfaces from the import manifest.";
   }
+  if (message.includes("Superwall")) {
+    return "Enable Superwall in App settings \u2192 Integrations, or remove Superwall external surfaces from the import manifest.";
+  }
   if (message.includes("integration provider")) {
-    return "Set externalSurfaceNodes[].config.provider to a real provider (e.g. revenuecat), not unspecified.";
+    return "Set externalSurfaceNodes[].config.provider to a real provider (e.g. revenuecat or superwall), not unspecified.";
   }
   if (message.includes("Fallback edge")) {
     return "Connect every external surface fallback to the next screen/decision/surface when no specific outcome is mapped.";
@@ -12490,6 +13700,11 @@ var collectIntegrationIssues = (manifest, integrations) => {
     if (node.config.provider === "revenuecat" && !integrations.revenuecat.enabled) {
       issues.push(
         `External surface "${node.name ?? node.id}" uses RevenueCat, but the integration is disabled. Enable it in App Settings \u2192 Integrations.`
+      );
+    }
+    if (node.config.provider === "superwall" && !integrations.superwall.enabled) {
+      issues.push(
+        `External surface "${node.name ?? node.id}" uses Superwall, but the integration is disabled. Enable it in App Settings \u2192 Integrations.`
       );
     }
   }
@@ -14730,7 +15945,7 @@ var renderPublishGateMarkdown = (manifestPath, result) => {
     "- Schema: valid FlowManifest (Zod)",
     "- Builder: text/icon `style.color`, Continue on manual-submit inputs, one input per screen, valid graph targets, media triggers",
     "- Publishable: entry connected, completion path, decision branches wired",
-    "- Integrations: external surfaces have provider + fallback; RevenueCat enabled when used",
+    "- Integrations: external surfaces have provider + fallback; RevenueCat / Superwall enabled when used",
     "- Canvas gates: no disabled layer types (default import assumes all enabled)",
     "- Branding gradients: `$brandGradient:` only on backgrounds; known preset ids when branding is provided",
     "",
@@ -15039,7 +16254,7 @@ var ScreenSpecSchema = external_exports.object({
 var ExternalSurfaceSpecSchema = external_exports.object({
   id: external_exports.string().min(1).max(64),
   name: external_exports.string().min(1).max(80).optional(),
-  provider: external_exports.enum(["revenuecat", "headless", "unspecified"]),
+  provider: external_exports.enum(["revenuecat", "superwall", "headless", "unspecified"]),
   offeringId: external_exports.string().min(1).max(128).optional(),
   placementId: external_exports.string().min(1).max(128).optional(),
   presentation: external_exports.enum(["paywall", "paywall_if_needed"]).optional(),
@@ -15556,6 +16771,9 @@ var buildExternalSurface = (surface) => {
     ...surface.offeringId ? { offeringId: surface.offeringId } : {},
     ...surface.placementId ? { placementId: surface.placementId } : {},
     ...surface.presentation ? { presentation: surface.presentation } : {}
+  } : surface.provider === "superwall" ? {
+    provider: "superwall",
+    ...surface.placementId ? { placementId: surface.placementId } : {}
   } : surface.provider === "headless" ? {
     provider: "headless",
     ...surface.hostKey ? { hostKey: surface.hostKey } : {}

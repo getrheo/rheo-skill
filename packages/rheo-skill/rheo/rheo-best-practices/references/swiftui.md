@@ -16,6 +16,7 @@ Optional products:
 
 ```swift
 .product(name: "RheoSwiftUIRevenueCat", package: "RheoSwiftUI")
+.product(name: "RheoSwiftUISuperwall", package: "RheoSwiftUI")
 .product(name: "RheoSwiftUIAppsFlyer", package: "RheoSwiftUI")
 ```
 
@@ -47,6 +48,7 @@ struct OnboardingHost: View {
 ## Notes
 
 - Use `RheoSwiftUIRevenueCat` for RevenueCat Integration Node presenter helpers.
+- Use `RheoSwiftUISuperwall` for Superwall Integration Node presenter helpers.
 - External Surface Nodes: pass `externalSurfaces: [surfId: { ctx in AnyView(...) }]` on `FlowView` (`ctx.onComplete` / `onBack` / `onDismiss`).
 - Use `RheoSwiftUIAppsFlyer` for AppsFlyer attribution providers.
 - Host apps must include Info.plist usage strings for authored permission prompts.

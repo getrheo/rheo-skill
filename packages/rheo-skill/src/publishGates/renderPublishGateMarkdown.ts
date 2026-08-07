@@ -56,7 +56,7 @@ export const renderPublishGateMarkdown = (
     '- Schema: valid FlowManifest (Zod)',
     '- Builder: text/icon `style.color`, Continue on manual-submit inputs, one input per screen, valid graph targets, media triggers',
     '- Publishable: entry connected, completion path, decision branches wired',
-    '- Integrations: external surfaces have provider + fallback; RevenueCat enabled when used',
+    '- Integrations: external surfaces have provider + fallback; RevenueCat / Superwall enabled when used',
     '- Canvas gates: no disabled layer types (default import assumes all enabled)',
     '- Branding gradients: `$brandGradient:` only on backgrounds; known preset ids when branding is provided',
     '',

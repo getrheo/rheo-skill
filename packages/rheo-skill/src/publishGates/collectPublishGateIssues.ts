@@ -41,6 +41,10 @@ export const IMPORT_PUBLISH_INTEGRATIONS: ResolvedAppIntegrations = {
     defaultOfferingId: 'default',
     defaultPlacementId: '',
   },
+  superwall: {
+    enabled: true,
+    defaultPlacementId: 'campaign_trigger',
+  },
   appsflyer: { enabled: false },
 };
 
@@ -139,8 +143,11 @@ export const fixForBuilderMessage = (message: string): string => {
   if (message.includes('RevenueCat')) {
     return 'Enable RevenueCat in App settings → Integrations, or remove RevenueCat external surfaces from the import manifest.';
   }
+  if (message.includes('Superwall')) {
+    return 'Enable Superwall in App settings → Integrations, or remove Superwall external surfaces from the import manifest.';
+  }
   if (message.includes('integration provider')) {
-    return 'Set externalSurfaceNodes[].config.provider to a real provider (e.g. revenuecat), not unspecified.';
+    return 'Set externalSurfaceNodes[].config.provider to a real provider (e.g. revenuecat or superwall), not unspecified.';
   }
   if (message.includes('Fallback edge')) {
     return 'Connect every external surface fallback to the next screen/decision/surface when no specific outcome is mapped.';
@@ -167,6 +174,11 @@ const collectIntegrationIssues = (
     if (node.config.provider === 'revenuecat' && !integrations.revenuecat.enabled) {
       issues.push(
         `External surface "${node.name ?? node.id}" uses RevenueCat, but the integration is disabled. Enable it in App Settings → Integrations.`,
+      );
+    }
+    if (node.config.provider === 'superwall' && !integrations.superwall.enabled) {
+      issues.push(
+        `External surface "${node.name ?? node.id}" uses Superwall, but the integration is disabled. Enable it in App Settings → Integrations.`,
       );
     }
   }
