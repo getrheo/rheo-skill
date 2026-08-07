@@ -67,7 +67,7 @@ Use only: `stack`, `text`, `image`, `lottie`, `video`, `icon`, `button`, `back_b
 - Black-and-white fallback is acceptable only when the audit finds no style/token evidence and the user confirms no theme source.
 - Use at most one input layer kind per **active path** (`single_choice`, `multiple_choice`, `text_input`, `scale_input`, `wheel_picker`) — one per screen unless sibling `conditional` branches split the path.
 - Non-reserved `sdk.*` decision keys must be listed in `sdkAttributeKeys`.
-- RevenueCat **Integration Nodes** and headless **External Surface Nodes** both live in `externalSurfaceNodes` and always need `fallback`.
+- RevenueCat / Superwall **Integration Nodes** and headless **External Surface Nodes** both live in `externalSurfaceNodes` and always need `fallback`.
 - Emit complete graph edges for imported flows.
 - Use placeholder UUID media ids and `rheo-import.assets.json`; never put file paths directly in `mediaAssetId`.
 - Do not silently drop media layers. If a traced asset cannot be copied, report the missing file and do not call the import complete.

@@ -200,7 +200,7 @@ instead of a plain footer CTA ([carousel-import.md](carousel-import.md)).
 
 `decisions` accepts full `@getrheo/contracts` `DecisionNode` objects (the scaffold
 passes them through). External surfaces use `externalSurfaces` (builder:
-**Integration Node** for `revenuecat`, **External Surface Node** for `headless`):
+**Integration Node** for `revenuecat` / `superwall`, **External Surface Node** for `headless`):
 
 ```jsonc
 {
@@ -210,6 +210,16 @@ passes them through). External surfaces use `externalSurfaces` (builder:
   "presentation": "paywall",
   "outcomes": { "purchase_completed": "scr_done", "restore_completed": "scr_done", "dismissed": "scr_offer2" },
   "fallback": "scr_offer2"   // required — Integration Node
+}
+```
+
+```jsonc
+{
+  "id": "surf_sw_paywall",
+  "provider": "superwall",
+  "placementId": "campaign_trigger",
+  "outcomes": { "purchase_completed": "scr_done", "restore_completed": "scr_done", "dismissed": "scr_offer2" },
+  "fallback": "scr_offer2"   // required — Integration Node; placementId optional (uses app defaultPlacementId)
 }
 ```
 

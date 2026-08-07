@@ -81,6 +81,8 @@ page. Paging is swipe by default; an explicit Next button becomes a `button` wit
 
 - RevenueCat (`Purchases.configure`, `RevenueCatUI` `PaywallView`, `.presentPaywall`)
   → a RevenueCat **Integration Node** (`provider: "revenuecat"`, required
+  `fallback`). Superwall (`Superwall.configure`, `register(placement:)`)
+  → a Superwall **Integration Node** (`provider: "superwall"`, required
   `fallback`). Host-owned custom screens → an **External Surface Node**
   (`provider: "headless"`). See [integrations](../../rheo-best-practices/references/integrations.md).
 - AppsFlyer (`AppsFlyerLib`) → represent stable attribution branches via decision

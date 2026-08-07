@@ -293,7 +293,7 @@ export type ScreenSpec = {
 export type ExternalSurfaceSpec = {
   id: string;
   name?: string;
-  provider: 'revenuecat' | 'headless' | 'unspecified';
+  provider: 'revenuecat' | 'superwall' | 'headless' | 'unspecified';
   offeringId?: string;
   placementId?: string;
   presentation?: 'paywall' | 'paywall_if_needed';

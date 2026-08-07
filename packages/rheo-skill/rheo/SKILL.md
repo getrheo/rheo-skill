@@ -1,9 +1,9 @@
 ---
 name: rheo
-description: Work with Rheo, the headless onboarding/paywall flow engine for mobile apps. Use when a user wants to install or wire the Rheo SDK (React Native, Expo, or SwiftUI), follow Rheo SDK best practices, configure integrations (RevenueCat, AppsFlyer), wire auth/permissions/terminal callbacks, OR import/migrate an existing mobile flow into a compliant Rheo FlowManifest and validate it. Routes to the `rheo-best-practices` and `rheo-flow-import` sub-skills.
+description: Work with Rheo, the headless onboarding/paywall flow engine for mobile apps. Use when a user wants to install or wire the Rheo SDK (React Native, Expo, or SwiftUI), follow Rheo SDK best practices, configure integrations (RevenueCat, Superwall, AppsFlyer), wire auth/permissions/terminal callbacks, OR import/migrate an existing mobile flow into a compliant Rheo FlowManifest and validate it. Routes to the `rheo-best-practices` and `rheo-flow-import` sub-skills.
 compatibility: Requires Node.js 20+. rheo-flow-import scripts are fully self-contained (no install step). Internet access fetches the latest Manifest Agent Profile; a bundled fallback works offline.
 metadata:
-  rheo-version: "2.5.0"
+  rheo-version: "2.6.0"
   manifest-schema-version: "7"
 ---
 
@@ -15,7 +15,7 @@ Rheo is a headless flow engine: a hosted dashboard authors onboarding, paywall, 
 
 | The user wants to… | Use sub-skill | Read |
 |--------------------|---------------|------|
-| Install the Rheo SDK, wire `Flow`/`FlowView`, follow SDK best practices, configure RevenueCat / AppsFlyer / auth / permissions / terminal callbacks, or implement Rheo in an existing app | **rheo-best-practices** | [rheo-best-practices/SKILL.md](rheo-best-practices/SKILL.md) |
+| Install the Rheo SDK, wire `Flow`/`FlowView`, follow SDK best practices, configure RevenueCat / Superwall / AppsFlyer / auth / permissions / terminal callbacks, or implement Rheo in an existing app | **rheo-best-practices** | [rheo-best-practices/SKILL.md](rheo-best-practices/SKILL.md) |
 | Analyze an existing mobile onboarding/paywall/setup flow and export it as a compliant Rheo `FlowManifest` (or validate/repair a manifest) | **rheo-flow-import** | [rheo-flow-import/SKILL.md](rheo-flow-import/SKILL.md) |
 
 If a request spans both (e.g. "import my onboarding **and** wire the SDK"), run **rheo-flow-import** to produce the manifest first, then **rheo-best-practices** to implement the SDK — they are independent and can be done in sequence.

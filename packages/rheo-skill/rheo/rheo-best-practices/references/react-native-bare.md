@@ -15,7 +15,7 @@ pnpm add @getrheo/react-native-bare \
   react-native-safe-area-context react-native-in-app-review react-native-video
 ```
 
-**Integrations (host only):** `react-native-appsflyer`, `react-native-purchases`, `react-native-purchases-ui` when needed. External Surface Nodes use `Flow` `externalSurfaces` (no extra native peer).
+**Integrations (host only):** `react-native-appsflyer`, `react-native-purchases`, `react-native-purchases-ui`, `@superwall/react-native-superwall` when needed. External Surface Nodes use `Flow` `externalSurfaces` (no extra native peer).
 
 ## Minimal Runtime
 

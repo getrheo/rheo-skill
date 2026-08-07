@@ -27,6 +27,12 @@ Every layer `kind` accepted by the manifest:
 - `text_input`
 - `scale_input`
 - `wheel_picker`
+- `date_time_input`
+- `number_stepper`
+- `number_stepper_button`
+- `number_stepper_value`
+- `phone_input`
+- `address_input`
 - `oauth_provider`
 - `oauth_login`
 - `email_password_auth`
@@ -113,8 +119,10 @@ Valid `permissionKey` values for `request_os_permission`:
 
 ## External surface outcomes
 
-Builder add-menu kinds share `externalSurfaceNodes`: **Integration Node** (partner providers such as RevenueCat) and **External Surface Node** (`provider: "headless"`). Every node needs a `fallback` jump target.
+Builder add-menu kinds share `externalSurfaceNodes`: **Integration Node** (partner providers such as RevenueCat / Superwall) and **External Surface Node** (`provider: "headless"`). Every node needs a `fallback` jump target.
 
 **Integration Node / RevenueCat** (`provider: "revenuecat"`): `purchase_completed`, `purchase_cancelled`, `dismissed`, `failed`, `restore_completed`.
+
+**Integration Node / Superwall** (`provider: "superwall"`): `purchase_completed`, `purchase_cancelled`, `dismissed`, `failed`, `restore_completed`.
 
 **External Surface Node / Headless** (`provider: "headless"`): `completed`, `back`, `dismissed`, `failed`. Host apps register UI via `externalSurfaces[hostKey]` (`config.hostKey` or node id) with `onComplete` / `onBack` / `onDismiss`.

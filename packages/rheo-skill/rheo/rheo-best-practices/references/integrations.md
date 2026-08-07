@@ -4,7 +4,7 @@ In the flow builder, partner paywalls and host UI are **two add-menu nodes** tha
 
 | Builder node | Manifest `config.provider` | App settings toggle |
 | --- | --- | --- |
-| **Integration Node** | `revenuecat` (and future partners) | Required |
+| **Integration Node** | `revenuecat`, `superwall` (and future partners) | Required |
 | **External Surface Node** | `headless` | None (host registry) |
 
 ## RevenueCat (Integration Node)
@@ -24,9 +24,22 @@ Manifest mapping:
 
 The host remains responsible for configuring RevenueCat. Rheo does not own purchase SDK secrets or receipt validation.
 
+## Superwall (Integration Node)
+
+Detect source calls such as `Superwall.configure`, `SuperwallProvider`, `expo-superwall`, `@superwall/react-native-superwall`, or `register(placement:)` / `registerPlacement`.
+
+Manifest mapping:
+
+- Create an **Integration Node** with `config.provider: "superwall"`.
+- Preserve the placement id from the Superwall dashboard / source.
+- Wire the same IAP outcomes as RevenueCat (`purchase_completed`, `restore_completed`, `purchase_cancelled`, `dismissed`, `failed`).
+- Always wire `fallback`.
+
+The host remains responsible for configuring Superwall. Rheo registers the placement and maps dismiss / skip / error callbacks to normalized outcomes. Skip / holdout / already-entitled paths map to `dismissed`.
+
 ## External Surface Node (headless host UI)
 
-Use when a source screen is owned by the host (custom native UI, third-party screen Rheo does not ship) rather than a Rheo layer tree or RevenueCat paywall.
+Use when a source screen is owned by the host (custom native UI, third-party screen Rheo does not ship) rather than a Rheo layer tree or a partner paywall.
 
 Manifest mapping:
 
@@ -53,7 +66,7 @@ Host wiring (required for success):
 
 SwiftUI / Flutter: pass the same map on `FlowView` as `externalSurfaces` (builders receive `onComplete` / `onBack` / `onDismiss`). Docs: product Developer Guide → Headless external surfaces.
 
-Do **not** use an External Surface Node to wrap RevenueCat when you need `iap_purchase` commerce events — use an Integration Node with `provider: "revenuecat"`.
+Do **not** use an External Surface Node to wrap RevenueCat or Superwall when you need `iap_purchase` commerce events — use an Integration Node with `provider: "revenuecat"` or `provider: "superwall"`.
 
 ## AppsFlyer
 

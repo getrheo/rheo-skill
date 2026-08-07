@@ -38,11 +38,11 @@ Fix workflow:
 
 ## Missing Fallback Edge
 
-Every Integration / External Surface Node needs `fallback`. Outcomes that are not explicitly mapped (RevenueCat purchase outcomes or headless `completed` / `back` / `dismissed`) fall through to this target.
+Every Integration / External Surface Node needs `fallback`. Outcomes that are not explicitly mapped (RevenueCat / Superwall purchase outcomes or headless `completed` / `back` / `dismissed`) fall through to this target.
 
 ## Integration Disabled
 
-The manifest may validate locally but fail dashboard import if the target app has RevenueCat disabled or the workspace lacks integration entitlements.
+The manifest may validate locally but fail dashboard import if the target app has RevenueCat / Superwall disabled or the workspace lacks integration entitlements.
 
 ## Wrong Environment
 

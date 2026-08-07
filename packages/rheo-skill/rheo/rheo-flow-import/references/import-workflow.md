@@ -109,7 +109,7 @@ If the user has not named an entry point, stop after question 1 and wait for an 
 18. Generate `rheo-import.manifest.json`:
    - Emit a complete graph with explicit `next.default` edges.
    - Use decision nodes for clear branches.
-   - Use RevenueCat external surfaces for detected RevenueCat paywalls.
+   - Use RevenueCat / Superwall **Integration Nodes** for detected partner paywalls (`provider: "revenuecat"` or `"superwall"`).
    - Prefer fidelity when the user chose visual fidelity: carousels, gradients, shadows, and centered stacks.
    - **Layer ids:** `scr_*` / `lyr_*` only on screens and layers; UUID placeholders **only** for `media.mediaAssetId` and font sidecars ([layer-schema-pitfalls.md](layer-schema-pitfalls.md#layer-ids-vs-media-placeholder-uuids)).
    - **Container layers:** every `button`, `back_button`, `hyperlink`, `stack`, choice input, and auth layer must include its `children` (or `slides`) array ([manifest-rules.md](manifest-rules.md#container-layers-required-children)).

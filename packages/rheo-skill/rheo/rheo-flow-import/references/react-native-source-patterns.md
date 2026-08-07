@@ -84,10 +84,12 @@ Paging is swipe by default; map the pager's own next button to a `button` with
 
 - `react-native-purchases` / `react-native-purchases-ui` / `Purchases.configure`
   / a `<Paywall>` → a RevenueCat **Integration Node** (`provider: "revenuecat"`,
+  required `fallback`). `expo-superwall` / `@superwall/react-native-superwall` /
+  `registerPlacement` → a Superwall **Integration Node** (`provider: "superwall"`,
   required `fallback`). Host-owned custom screens → an **External Surface Node**
   (`provider: "headless"`). See [integrations](../../rheo-best-practices/references/integrations.md).
 - `react-native-appsflyer` → represent stable attribution branches via decision
-  nodes; add keys to `sdkAttributeKeys`. Never include AppsFlyer/RevenueCat secrets.
+  nodes; add keys to `sdkAttributeKeys`. Never include AppsFlyer/RevenueCat/Superwall secrets.
 - OAuth / email-password screens → `oauth_login` / `email_password_auth` (host
   owns the actual auth logic).
 - `react-native-permissions` prompts → a `request_os_permission` button action.

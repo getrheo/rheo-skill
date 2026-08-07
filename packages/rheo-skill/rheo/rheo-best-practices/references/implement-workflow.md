@@ -15,7 +15,7 @@ Use this when the user explicitly asks to install or wire Rheo in a host app.
 6. Replace or gate the existing onboarding entry with the Rheo runtime component.
 7. Preserve old onboarding as a fallback/rollback path unless explicitly told to remove it.
 8. Wire terminal callbacks to continue host navigation.
-9. Install **`@getrheo/react-native-expo`** or **`@getrheo/react-native-bare`** with all required peers (see platform reference). Wire optional auth, RevenueCat, AppsFlyer (host packages only), and resolve fallback when used.
+9. Install **`@getrheo/react-native-expo`** or **`@getrheo/react-native-bare`** with all required peers (see platform reference). Wire optional auth, RevenueCat, Superwall, AppsFlyer (host packages only), and resolve fallback when used.
 10. When `request_app_review` is present, tell the user TestFlight/production may not show prompts every tap and builder preview always advances as `not_shown`.
 11. Run the narrowest useful verification.
 
