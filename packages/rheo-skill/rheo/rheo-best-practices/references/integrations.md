@@ -1,10 +1,12 @@
 # Integrations
 
+Partner paywalls, Stripe, and host UI are Convert graph nodes. Revenue from those partners also feeds Analytics once the host registers the billing id. Read [product-model.md](product-model.md) for which pipe each call uses.
+
 In the flow builder, partner paywalls and host UI are **two add-menu nodes** that share the `externalSurfaceNodes` schema:
 
 | Builder node | Manifest `config.provider` | App settings toggle |
 | --- | --- | --- |
-| **Integration Node** | `revenuecat`, `superwall` (and future partners) | Required |
+| **Integration Node** | `stripe`, `revenuecat`, `superwall` | Required |
 | **External Surface Node** | `headless` | None (host registry) |
 
 ## RevenueCat (Integration Node)
@@ -24,6 +26,8 @@ Manifest mapping:
 
 The host remains responsible for configuring RevenueCat. Rheo does not own purchase SDK secrets or receipt validation.
 
+After `Purchases.configure` or `Purchases.logIn`, call `setBillingIdentity('revenuecat', customerInfo.originalAppUserId)` with the id RevenueCat already has. Dollars come from the RevenueCat webhook, not from the device. In **App settings → Integrations**, pick RevenueCat as the revenue source for that store. One source per store.
+
 ## Superwall (Integration Node)
 
 Detect source calls such as `Superwall.configure`, `SuperwallProvider`, `expo-superwall`, `@superwall/react-native-superwall`, or `register(placement:)` / `registerPlacement`.
@@ -36,6 +40,19 @@ Manifest mapping:
 - Always wire `fallback`.
 
 The host remains responsible for configuring Superwall. Rheo registers the placement and maps dismiss / skip / error callbacks to normalized outcomes. Skip / holdout / already-entitled paths map to `dismissed`.
+
+After `Superwall.identify`, call `setBillingIdentity('superwall', userId)` with that same id. Dollars come from the Superwall webhook. One source per store, shared with RevenueCat: a second source for the same store is rejected.
+
+## Stripe (web Integration Node)
+
+Stripe Payment Links run on `@getrheo/react` only. There is no Stripe adapter on `RheoProvider` and no `setBillingIdentity('stripe', …)`.
+
+- Enable **Stripe** under **App settings → Integrations**.
+- Integration Node `config.provider: "stripe"` with a Payment Link on `buy.stripe.com` or another `https://*.stripe.com` host.
+- Paste Rheo's webhook URL and signing secret into Stripe. The verified `checkout.session.completed` webhook is the purchase record. The browser does not send a price.
+- Always wire `fallback`.
+
+RevenueCat, Superwall, and headless surfaces fail closed on web and follow **Fallback**. See [react-web.md](react-web.md).
 
 ## External Surface Node (headless host UI)
 
@@ -66,7 +83,7 @@ Host wiring (required for success):
 
 SwiftUI / Flutter: pass the same map on `FlowView` as `externalSurfaces` (builders receive `onComplete` / `onBack` / `onDismiss`). Docs: product Developer Guide → Headless external surfaces.
 
-Do **not** use an External Surface Node to wrap RevenueCat or Superwall when you need `iap_purchase` commerce events — use an Integration Node with `provider: "revenuecat"` or `provider: "superwall"`.
+Do **not** use an External Surface Node to wrap RevenueCat, Superwall, or Stripe when the flow should record a paywall outcome. Use an Integration Node with `provider: "revenuecat"`, `provider: "superwall"`, or `provider: "stripe"`. Conversion is `surface_outcome` with `purchase_completed`. Dollars come from that provider's webhook, not from the device.
 
 ## AppsFlyer
 
@@ -91,7 +108,11 @@ Native permission prompts can map to `request_os_permission` button actions. Ver
 - Manifest: `action.kind: "request_app_review"` on a button (no extra fields).
 - Requires **`screen.next.default`** on that screen.
 - Submits inputs like **Continue**; advances only via default next (no branching).
-- **React Native (Expo):** required peer `expo-store-review`.
+- **React Native (Expo):** required peer `expo-store-review`. Push uses required peer `expo-notifications` (`registerPush` after a notifications grant).
+- **React Native (bare):** call `registerPushTokenAdapter`, or pass the device token to `registerPush`.
+- **Web:** `registerPush()` subscribes with the app VAPID key. Set `RheoConfig.push.serviceWorkerUrl` or rely on `navigator.serviceWorker.ready`.
+- **SwiftUI:** after notifications are granted the SDK calls `registerForRemoteNotifications`. Forward `didRegister` with `RheoPush.forward(deviceToken:)`.
+- **Flutter:** call `runtime.registerPush(token:)`, or set `runtime.setPushTokenProvider` so a notifications grant uploads a Firebase token.
 - **React Native (bare):** required peer `react-native-in-app-review`.
 - **SwiftUI:** built-in StoreKit; ~1.5s delay when a prompt may have shown (no dismiss callback on iOS).
 - Analytics: `app_review_prompt_shown`, `app_review_prompt_dismissed`; capture key `app_review:{layerId}`.

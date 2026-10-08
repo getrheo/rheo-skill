@@ -74,6 +74,7 @@ Valid `action.kind` values on `button` layers:
 - `play_media`
 - `request_app_review`
 - `advance_carousel`
+- `dismiss_banner`
 
 - `FlowGraphNodeJumpTarget` (`scr_*` | `dec_*` | `surf_*`): `go_to_step.screenId`, choice `branching.conditions[].goTo`, loader/lottie/video `onComplete` when mode is `screen`, and `request_os_permission` outcomes (except `continue`/`end`).
 - `go_back_one_screen` and `back_button` accept optional `fallbackScreenId` (`scr_*` only).

@@ -38,5 +38,7 @@ export const OnboardingHost = () => (
 ## Notes
 
 - Do **not** install `@getrheo/react-native-expo` in the same app.
+- `RheoProvider` starts Analytics even when `Flow` is omitted. Pass a channel public id only for Convert, never a flow id.
+- `logEvent` / `screen` / `setUserId` / `setBillingIdentity` are Analytics. `identify` and `track` are Engage. Same exports as Expo. See [analytics.md](analytics.md) and [engage.md](engage.md).
 - **Production:** default API is `https://api.getrheo.io`; omit `apiBaseUrl` unless self-hosting.
 - Link native modules (permissions, video, reanimated babel plugin) per upstream docs.
