@@ -1,16 +1,19 @@
 # @getrheo/rheo-skill
 
-Current release: **`2.6.0`** on npm (`PLATFORM_SDK_VERSION` in `scripts/publish-package-registry.mjs`). Public source: [getrheo/rheo-skill](https://github.com/getrheo/rheo-skill) (mirrored from this private monorepo via `pnpm extract:oss-repos`).
+Current release: **`3.0.0`** on npm (`PLATFORM_SDK_VERSION` in `scripts/publish-package-registry.mjs`). Public source: [getrheo/rheo-skill](https://github.com/getrheo/rheo-skill) (mirrored from this private monorepo via `pnpm extract:oss-repos`).
 
 Source and build tooling for the **`rheo`** agent skill — a single, self-contained
-skill with two sub-skills:
+skill with two sub-skills. Rheo is one SDK and one Customer across **Analytics**,
+**Convert**, and **Engage**.
 
-- **`rheo/rheo-best-practices`** — how to install and wire the Rheo SDK (React Native,
-  Expo, SwiftUI), integrations, auth, and implementation best practices. Pure
-  guidance, no scripts.
-- **`rheo/rheo-flow-import`** — how to analyze an existing mobile flow and export it as
-  a compliant Rheo `FlowManifest`, plus self-contained `node` scripts (audit,
-  scaffold, validate, audit-publish, normalize, summary, profile).
+- **`rheo/rheo-best-practices`** — how to install and wire that SDK on **Expo**,
+  **bare React Native**, and **React web** (SwiftUI / Flutter SDK install is
+  coming soon): product analytics, Convert flows, Engage `identify` / `track`,
+  integrations, and auth. Pure guidance, no scripts.
+- **`rheo/rheo-flow-import`** — the Convert authoring path: analyze an existing
+  mobile flow and export it as a compliant Rheo `FlowManifest`, plus self-contained
+  `node` scripts (audit, scaffold, validate, audit-publish, normalize, summary,
+  profile).
 
 ## The deliverable is `rheo/`
 
@@ -25,8 +28,9 @@ rheo/
 ├── SKILL.md                      # router → rheo-best-practices / rheo-flow-import
 ├── rheo-best-practices/
 │   ├── SKILL.md
-│   ├── references/               # install-* , integrations, implement-workflow, troubleshooting
-│   └── examples/               # install snippets
+│   ├── references/               # product-model, analytics, engage, react-web,
+│   │                             #   install-* , integrations, implement-workflow, troubleshooting
+│   └── examples/               # install snippets (RN, SwiftUI, web)
 └── rheo-flow-import/
     ├── SKILL.md
     ├── references/               # import-workflow, flow-spec, capabilities (generated), manifest-rules,
@@ -74,5 +78,6 @@ back to `rheo/rheo-flow-import/references/manifest-agent-profile-fallback.md` of
 ## Compatibility
 
 - Manifest schema version: `7`
-- Supported SDK surfaces: React Native / Expo and SwiftUI
+- SDK surfaces this skill installs today: React Native (Expo and bare), React web (`@getrheo/react`). SwiftUI / Flutter SDK install is coming soon; SwiftUI **flow import** remains in rheo-flow-import
+- Engage `identify` and `track` ship on web (`@getrheo/react`) and React Native
 - Requires Node.js 20+

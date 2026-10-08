@@ -1,5 +1,18 @@
 # Troubleshooting
 
+## Analytics shows no product events
+
+- Confirm `RheoProvider` is mounted. Sessions start there, not when `Flow` mounts.
+- On web, omitted consent is `pending`. Call `setAnalyticsConsent('granted')` or pass `analytics.consent: 'granted'` when a grant already exists. `analytics.enabled: false` stays off after a grant.
+- `logEvent` before the provider mounts is a no-op. `track` does not write product analytics.
+
+## An Engage automation never enrolls
+
+- `logEvent` and flow events do not start automations. React Native must call `track`.
+- SwiftUI and web do not export Engage `track`.
+- `identify` with `unknown` or missing email does not make the person sendable. Consent has to be `granted`.
+- Provider credentials, suppressions, and topic grants are dashboard state. The SDK cannot repair them.
+
 ## Manifest Fails Validation
 
 Run:

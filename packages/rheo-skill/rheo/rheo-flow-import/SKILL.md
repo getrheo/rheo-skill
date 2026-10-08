@@ -1,12 +1,14 @@
 ---
 name: rheo-flow-import
-description: Analyze an existing mobile app flow (onboarding, paywall, post-purchase, setup) in a React Native, Expo, or SwiftUI codebase and export it as a compliant Rheo FlowManifest, then validate it against the dashboard publish gates. Use when a user asks to import, migrate, or convert an existing flow into Rheo, generate or scaffold a Rheo manifest, or validate/repair a Rheo manifest. Part of the `rheo` skill. Ships self-contained node scripts — no install step.
+description: Analyze an existing mobile Convert flow (onboarding, paywall, post-purchase, setup) in a React Native, Expo, or SwiftUI codebase and export it as a compliant Rheo FlowManifest, then validate it against the dashboard publish gates. Use when a user asks to import, migrate, or convert an existing flow into Rheo, generate or scaffold a Rheo manifest, or validate/repair a Rheo manifest. Part of the `rheo` skill. Does not install the SDK or configure Analytics or Engage. Ships self-contained node scripts — no install step.
 compatibility: Requires Node.js 20+. All scripts are self-contained (zod, @getrheo/contracts, and @getrheo/flow-runtime are bundled into scripts/lib/rheo-cli.mjs). Internet access fetches the latest Manifest Agent Profile; a bundled fallback works offline.
 ---
 
 # Rheo — Flow Import
 
-Convert an existing app flow into a Rheo `FlowManifest` that imports and publishes in the dashboard with zero blockers. Prefer **source code as truth**; use screenshots/recordings only as supporting evidence unless the user says they are newer.
+This is the **Convert** path. It turns an existing onboarding, paywall, post-purchase, or setup flow into a Rheo `FlowManifest` that imports and publishes in the dashboard with zero blockers. It does not install the SDK, record product analytics, or configure Engage. When the user also wants the app wired, finish the manifest, then follow [rheo-best-practices](../rheo-best-practices/SKILL.md).
+
+Prefer **source code as truth**; use screenshots/recordings only as supporting evidence unless the user says they are newer.
 
 The recommended authoring path is **spec → scaffold → enrich → validate**: describe the flow as a compact [flow spec](references/flow-spec.md), run `scaffold-manifest.mjs` to get a schema-valid skeleton with correct ids/structure, then enrich styling and validate. Hand-authoring full manifest JSON is allowed but error-prone — the scaffold removes the mechanical mistakes (ids, `children` arrays, choice bindings, branching).
 

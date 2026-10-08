@@ -46,6 +46,7 @@ export const IMPORT_PUBLISH_INTEGRATIONS: ResolvedAppIntegrations = {
     defaultPlacementId: 'campaign_trigger',
   },
   appsflyer: { enabled: false },
+  stripe: { enabled: true },
 };
 
 export type CollectPublishGateOptions = {
@@ -179,6 +180,11 @@ const collectIntegrationIssues = (
     if (node.config.provider === 'superwall' && !integrations.superwall.enabled) {
       issues.push(
         `External surface "${node.name ?? node.id}" uses Superwall, but the integration is disabled. Enable it in App Settings → Integrations.`,
+      );
+    }
+    if (node.config.provider === 'stripe' && !integrations.stripe.enabled) {
+      issues.push(
+        `External surface "${node.name ?? node.id}" uses Stripe, but the integration is disabled. Enable it in App Settings → Integrations.`,
       );
     }
   }
